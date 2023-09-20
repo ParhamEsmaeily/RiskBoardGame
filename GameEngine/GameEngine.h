@@ -1,8 +1,8 @@
-#ifndef GAMEENGINE_H
-#define GAMEENGINE_H
+#pragma once
 
 #include <iostream>
 #include <string>
+#include <memory>
 
 using namespace std;
 
@@ -12,9 +12,9 @@ class Command
 {
 public:
     string action;
-    State *nextState;
+    shared_ptr<State> nextState;
     Command(){};
-    Command(string action, State *nextState);
+    Command(string action, shared_ptr<State> nextState);
 };
 
 class State
@@ -27,7 +27,7 @@ public:
 
 class GameEngine
 {
-    State *currState;
+    shared_ptr<State> currState;
     void initGame();
 
 public:
@@ -36,5 +36,3 @@ public:
     string executeCommand(string input);
     string getPhase();
 };
-
-#endif // GAMEENGINE_H

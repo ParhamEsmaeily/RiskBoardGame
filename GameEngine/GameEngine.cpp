@@ -1,10 +1,11 @@
 #include <iostream>
 #include <string>
+#include <memory>
 #include "GameEngine.h"
 
 using namespace std;
 
-Command::Command(string action, State *nextState)
+Command::Command(string action, shared_ptr<State> nextState)
 {
     this->action = action;
     this->nextState = nextState;
@@ -32,10 +33,10 @@ void GameEngine::initGame()
      */
 
     // States
-    State *start = new State("start");
-    State *mapLoaded = new State("map loaded");
-    State *mapValidated = new State("map validated");
-    State *playersAdded = new State("players added");
+    shared_ptr<State> start = make_shared<State>("start");
+    shared_ptr<State> mapLoaded = make_shared<State>("map loaded");
+    shared_ptr<State> mapValidated = make_shared<State>("map validated");
+    shared_ptr<State> playersAdded = make_shared<State>("players added");
 
     // Commands
     Command loadMapCommand = Command("loadmap", mapLoaded);
@@ -54,11 +55,11 @@ void GameEngine::initGame()
      */
 
     // States
-    State *assignReinforcements = new State("assign reinforcements");
-    State *issueOrders = new State("issue orders");
-    State *executeOrders = new State("execute orders");
-    State *win = new State("win");
-    State *endGame = new State("end");
+    shared_ptr<State> assignReinforcements = make_shared<State>("assign reinforcements");
+    shared_ptr<State> issueOrders = make_shared<State>("issue orders");
+    shared_ptr<State> executeOrders = make_shared<State>("execute orders");
+    shared_ptr<State> win = make_shared<State>("win");
+    shared_ptr<State> endGame = make_shared<State>("end");
 
     // Commands
     Command assignCountriesCommand = Command("assigncountries", assignReinforcements);
