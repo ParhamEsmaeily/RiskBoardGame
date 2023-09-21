@@ -22,12 +22,25 @@ enum class MapSection
     TERRITORIES
 };
 
+enum class MapValidity
+{
+    UNKNOWN,
+    INVALID,
+    VALID
+};
+
 enum class ScrollDirection
 {
     NONE,
     HORIZONTAL,
     VERTICAL
 };
+
+// remove leading & trailing whitespace (https://stackoverflow.com/a/1798170)
+static std::string trim(const std::string &str, const std::string &whitespace = " \t\r\n");
+
+static ScrollDirection getScrollDirectionFromString(const std::string &scrollDirectionString);
+static bool getBooleanFromString(const std::string &booleanString);
 
 class Territory
 {
@@ -37,8 +50,8 @@ private:
     std::shared_ptr<Continent> continent;
     std::vector<std::shared_ptr<Territory>> adjacentTerritories;
 
-    uint16_t x = -1, y = -1;
-    std::string name = "";
+    uint16_t x, y;
+    std::string name;
 
 public:
     Territory();
@@ -59,8 +72,8 @@ class Continent
 private:
     std::vector<std::shared_ptr<Territory>> territories;
 
-    uint16_t bonus = -1;
-    std::string name = "";
+    uint16_t bonus;
+    std::string name;
 
 public:
     Continent();
@@ -81,14 +94,12 @@ private:
     std::unordered_map<std::string, std::shared_ptr<Territory>> territories;
     std::unordered_map<std::string, std::shared_ptr<Continent>> continents;
 
-    bool valid = false;
-
-    // TODO: [ASK] when the prof asks for every data member in a class to be of a pointer type, does he also mean these "value types"?
-    std::string image = "";
-    std::string author = "";
-    bool wrap = false;
-    ScrollDirection scroll = ScrollDirection::NONE;
-    bool warn = false;
+    std::string image;
+    std::string author;
+    bool wrap;
+    ScrollDirection scroll;
+    MapValidity validity;
+    bool warn;
 
 public:
     Map();
@@ -103,6 +114,7 @@ public:
     std::string getAuthor() const;
     bool getWrap() const;
     ScrollDirection getScroll() const;
+    MapValidity getValidity() const;
     bool getWarn() const;
 };
 
@@ -119,11 +131,6 @@ public:
 
 private:
     static uint8_t getMapSection(const std::string &line);
-
-    static std::string trim(const std::string &str, const std::string &whitespace = " \t\r\n");
-
-    static ScrollDirection getScrollDirectionFromString(const std::string &scrollDirectionString);
-    static bool getBooleanFromString(const std::string &booleanString);
 
     static bool processMapLine(const std::string &line, const std::shared_ptr<Map> &map);
     static bool processContinentsLine(const std::string &line, const std::shared_ptr<Map> &map);

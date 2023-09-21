@@ -3,6 +3,34 @@
 
 #include "Map.h"
 
+// remove leading & trailing whitespace (https://stackoverflow.com/a/1798170)
+std::string trim(const std::string &str, const std::string &whitespace)
+{
+    const auto strBegin = str.find_first_not_of(whitespace);
+    if (strBegin == std::string::npos)
+        return ""; // no content
+
+    const auto strEnd = str.find_last_not_of(whitespace);
+    const auto strRange = strEnd - strBegin + 1;
+
+    return str.substr(strBegin, strRange);
+}
+
+ScrollDirection getScrollDirectionFromString(const std::string &scrollDirectionString)
+{
+    if (scrollDirectionString == "horizontal")
+        return ScrollDirection::HORIZONTAL;
+    else if (scrollDirectionString == "vertical")
+        return ScrollDirection::VERTICAL;
+    else
+        return ScrollDirection::NONE;
+}
+
+bool getBooleanFromString(const std::string &booleanString)
+{
+    return booleanString == "yes" || booleanString == "true" || booleanString == "1";
+}
+
 std::shared_ptr<Map> MapLoader::loadMap(const std::string &path)
 {
     std::string line;
@@ -79,34 +107,6 @@ uint8_t MapLoader::getMapSection(const std::string &line)
         return 2;
     else
         return -1; // Invalid section
-}
-
-// remove leading & trailing whitespace (https://stackoverflow.com/a/1798170)
-std::string MapLoader::trim(const std::string &str, const std::string &whitespace)
-{
-    const auto strBegin = str.find_first_not_of(whitespace);
-    if (strBegin == std::string::npos)
-        return ""; // no content
-
-    const auto strEnd = str.find_last_not_of(whitespace);
-    const auto strRange = strEnd - strBegin + 1;
-
-    return str.substr(strBegin, strRange);
-}
-
-ScrollDirection MapLoader::getScrollDirectionFromString(const std::string &scrollDirectionString)
-{
-    if (scrollDirectionString == "horizontal")
-        return ScrollDirection::HORIZONTAL;
-    else if (scrollDirectionString == "vertical")
-        return ScrollDirection::VERTICAL;
-    else
-        return ScrollDirection::NONE;
-}
-
-bool MapLoader::getBooleanFromString(const std::string &booleanString)
-{
-    return booleanString == "yes" || booleanString == "true" || booleanString == "1";
 }
 
 bool MapLoader::processMapLine(const std::string &line, const std::shared_ptr<Map> &map)
@@ -208,6 +208,13 @@ bool MapLoader::associateTerritories(const std::shared_ptr<Map> &map, const std:
 
 Map::Map()
 {
+    image = "";
+    author = "";
+    wrap = false;
+    scroll = ScrollDirection::NONE;
+    validity = MapValidity::UNKNOWN;
+    warn = false;
+
     continents = std::unordered_map<std::string, std::shared_ptr<Continent>>();
     territories = std::unordered_map<std::string, std::shared_ptr<Territory>>();
 }
@@ -219,7 +226,7 @@ Map::Map(const Map &map)
     scroll = map.scroll;
     wrap = map.wrap;
     warn = map.warn;
-    valid = map.valid;
+    validity = map.validity;
 
     // need to implement proper copy constructors for these
     continents = map.continents;
@@ -233,7 +240,7 @@ Map &Map::operator=(const Map &map)
     this->scroll = map.scroll;
     this->wrap = map.wrap;
     this->warn = map.warn;
-    this->valid = map.valid;
+    this->validity = map.validity;
     this->continents = map.continents;
     this->territories = map.territories;
 
@@ -243,26 +250,30 @@ Map &Map::operator=(const Map &map)
 // Map object stream insertion operator
 std::ostream &operator<<(std::ostream &os, const Map &map)
 {
-    os << "Map: { Author: " << map.author << ", Image: " << map.image << ", Scroll: " << (int)map.scroll << ", Wrap: " << map.wrap << ", Warn: " << map.warn << ", Valid: " << map.valid << ", # of Continents: " << map.continents.size() << " }";
+    os << "Map: { Author: " << map.author << ", Image: " << map.image << ", Scroll: " << (int)map.scroll << ", Wrap: " << map.wrap << ", Warn: " << map.warn << ", Valid: " << (int)map.validity << ", # of Continents: " << map.continents.size() << " }";
 
     return os;
 }
 
 void Map::validate()
 {
-    valid = true;
+    validity = MapValidity::VALID;
 }
 
 std::string Map::getImage() const { return image; }
 std::string Map::getAuthor() const { return author; }
 bool Map::getWrap() const { return wrap; }
 ScrollDirection Map::getScroll() const { return scroll; }
+MapValidity Map::getValidity() const { return validity; }
 bool Map::getWarn() const { return warn; }
 
 /* CONTINENT */
 
 Continent::Continent()
 {
+    name = "";
+    bonus = -1;
+
     territories = std::vector<std::shared_ptr<Territory>>();
 }
 
@@ -299,6 +310,11 @@ uint16_t Continent::getBonus() const { return bonus; }
 
 Territory::Territory()
 {
+    name = "";
+    x = -1;
+    y = -1;
+
+    continent = std::make_shared<Continent>();
     adjacentTerritories = std::vector<std::shared_ptr<Territory>>();
 }
 
