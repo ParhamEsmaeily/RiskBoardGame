@@ -20,8 +20,6 @@ std::shared_ptr<Map> MapLoader::loadMap(const std::string &path)
 
     while (std::getline(mapFile, line))
     {
-        // std::cout << line << std::endl;
-
         if (line.empty() || line == "\r" || line == "\n" || line == "\r\n")
             continue; // skip empty lines
 
@@ -214,9 +212,32 @@ Map::Map()
     territories = std::unordered_map<std::string, std::shared_ptr<Territory>>();
 }
 
+Map::Map(const Map &map)
+{
+    author = map.author;
+    image = map.image;
+    scroll = map.scroll;
+    wrap = map.wrap;
+    warn = map.warn;
+    valid = map.valid;
+
+    // need to implement proper copy constructors for these
+    continents = map.continents;
+    territories = map.territories;
+}
+
 Map &Map::operator=(const Map &map)
 {
-    // TODO: insert return statement here
+    this->author = map.author;
+    this->image = map.image;
+    this->scroll = map.scroll;
+    this->wrap = map.wrap;
+    this->warn = map.warn;
+    this->valid = map.valid;
+    this->continents = map.continents;
+    this->territories = map.territories;
+
+    return *this;
 }
 
 // Map object stream insertion operator
@@ -247,11 +268,20 @@ Continent::Continent()
 
 Continent::Continent(const Continent &continent)
 {
+    name = continent.name;
+    bonus = continent.bonus;
+
+    // need to implement proper copy constructors for these
+    territories = continent.territories;
 }
 
 Continent &Continent::operator=(const Continent &continent)
 {
-    // TODO: insert return statement here
+    this->name = continent.name;
+    this->bonus = continent.bonus;
+    this->territories = continent.territories;
+
+    return *this;
 }
 
 // Continent object stream insertion operator
@@ -274,10 +304,24 @@ Territory::Territory()
 
 Territory::Territory(const Territory &territory)
 {
+    name = territory.name;
+    x = territory.x;
+    y = territory.y;
+
+    // need to implement proper copy constructors for these
+    continent = territory.continent;
+    adjacentTerritories = territory.adjacentTerritories;
 }
 
 Territory &Territory::operator=(const Territory &territory)
 {
+    this->name = territory.name;
+    this->x = territory.x;
+    this->y = territory.y;
+    this->continent = territory.continent;
+    this->adjacentTerritories = territory.adjacentTerritories;
+
+    return *this;
 }
 
 // Territory object stream insertion operator
