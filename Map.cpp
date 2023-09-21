@@ -38,7 +38,6 @@ std::shared_ptr<Map> MapLoader::loadMap(const std::string &path)
     int8_t mapSection = -1;
 
     std::shared_ptr<Map> map = std::make_shared<Map>();
-    std::unordered_map<std::string, std::vector<std::string>> adjacencyMap;
 
     if (!mapFile.is_open())
     {
@@ -75,17 +74,10 @@ std::shared_ptr<Map> MapLoader::loadMap(const std::string &path)
             break;
 
         case 2:
-            if (!processTerritoriesLine(line, map, &adjacencyMap))
+            if (!processTerritoriesLine(line, map))
                 return map;
             break;
         }
-    }
-
-    associateTerritories(map, adjacencyMap);
-
-    for (const auto &t : map->territories)
-    {
-        std::cout << *t.second << std::endl;
     }
 
     return map;
@@ -149,12 +141,10 @@ bool MapLoader::processContinentsLine(const std::string &line, const std::shared
 
     map->continents.emplace(continent->name, continent);
 
-    std::cout << *continent << std::endl;
-
     return true;
 }
 
-bool MapLoader::processTerritoriesLine(const std::string &line, const std::shared_ptr<Map> &map, std::unordered_map<std::string, std::vector<std::string>> *adjacencyMap)
+bool MapLoader::processTerritoriesLine(const std::string &line, const std::shared_ptr<Map> &map)
 {
     std::shared_ptr<Territory> territory = std::make_shared<Territory>();
     std::vector<std::string> allMatches;
@@ -177,29 +167,13 @@ bool MapLoader::processTerritoriesLine(const std::string &line, const std::share
     const auto continentName = trim(allMatches[3]);
 
     // add adjacent territories, to the adjacency map (key: territory name, value: vector of adjacent territory names), to be associated with the territory later
-    adjacencyMap->emplace(territory->name, std::vector<std::string>(allMatches.begin() + 4, allMatches.end()));
+    map->adjacency.emplace(territory->name, std::vector<std::string>(allMatches.begin() + 4, allMatches.end()));
 
     // associate the territory with its continent
     territory->continent = map->continents[continentName];
 
-    // update related data structures (continent vector, map's unordered map of territories)
-    map->continents[continentName]->territories.push_back(territory);
+    // update related data structures (map's unordered map of territories)
     map->territories.emplace(territory->name, territory);
-
-    return true;
-}
-
-bool MapLoader::associateTerritories(const std::shared_ptr<Map> &map, const std::unordered_map<std::string, std::vector<std::string>> &adjacencyMap)
-{
-    // iterate through the adjacency map, and associate each territory with its adjacent territories
-    for (const auto adjacencyPair : adjacencyMap)
-    {
-        // each pair is made up of the territory name and its adjacent territories names
-        for (const auto adjacentTerritoryName : adjacencyPair.second)
-        {
-            map->territories[adjacencyPair.first]->adjacentTerritories.emplace_back(map->territories[adjacentTerritoryName]);
-        }
-    }
 
     return true;
 }
@@ -219,7 +193,7 @@ Map::Map()
     territories = std::unordered_map<std::string, std::shared_ptr<Territory>>();
 }
 
-Map::Map(const Map &map)
+Map::Map(const Map &map) : continents(map.continents), territories(map.territories)
 {
     author = map.author;
     image = map.image;
@@ -227,10 +201,6 @@ Map::Map(const Map &map)
     wrap = map.wrap;
     warn = map.warn;
     validity = map.validity;
-
-    // need to implement proper copy constructors for these
-    continents = map.continents;
-    territories = map.territories;
 }
 
 Map &Map::operator=(const Map &map)
@@ -255,6 +225,67 @@ std::ostream &operator<<(std::ostream &os, const Map &map)
     return os;
 }
 
+SharedContinentsVector Map::getAllContinents(const Map &map)
+{
+    SharedContinentsVector continents{};
+
+    for (auto &&pair : map.continents)
+    {
+        continents.emplace_back(pair.second);
+    }
+
+    return continents;
+}
+
+SharedTerritoriesVector Map::getAllTerritories(const Map &map)
+{
+    SharedTerritoriesVector territories{};
+
+    for (auto &&pair : map.territories)
+    {
+        territories.emplace_back(pair.second);
+    }
+
+    return territories;
+}
+
+// This function is included for convenience, works identically to its overloaded version.
+SharedTerritoriesVector Map::getAllTerritoriesInContinent(const Map &map, const Continent &continent)
+{
+    return Map::getAllTerritoriesInContinent(map, continent.getName());
+}
+
+SharedTerritoriesVector Map::getAllTerritoriesInContinent(const Map &map, const std::string &continent)
+{
+    SharedTerritoriesVector territoriesInContinent{};
+
+    for (auto &&pair : map.territories)
+    {
+        if (pair.second->getContinent()->getName() == continent)
+            territoriesInContinent.emplace_back(pair.second);
+    }
+
+    return territoriesInContinent;
+}
+
+// This function is included for convenience, works identically to its overloaded version.
+SharedTerritoriesVector Map::getAdjacentTerritories(const Map &map, const Territory &territory)
+{
+    return Map::getAdjacentTerritories(map, territory.getName());
+}
+
+SharedTerritoriesVector Map::getAdjacentTerritories(const Map &map, const std::string &territory)
+{
+    SharedTerritoriesVector adjacentTerritories{};
+
+    for (auto &&territoryName : map.adjacency.at(territory))
+    {
+        adjacentTerritories.push_back(map.territories.at(territoryName));
+    }
+
+    return adjacentTerritories;
+}
+
 void Map::validate()
 {
     validity = MapValidity::VALID;
@@ -273,24 +304,18 @@ Continent::Continent()
 {
     name = "";
     bonus = -1;
-
-    territories = std::vector<std::shared_ptr<Territory>>();
 }
 
 Continent::Continent(const Continent &continent)
 {
     name = continent.name;
     bonus = continent.bonus;
-
-    // need to implement proper copy constructors for these
-    territories = continent.territories;
 }
 
 Continent &Continent::operator=(const Continent &continent)
 {
     this->name = continent.name;
     this->bonus = continent.bonus;
-    this->territories = continent.territories;
 
     return *this;
 }
@@ -315,18 +340,13 @@ Territory::Territory()
     y = -1;
 
     continent = std::make_shared<Continent>();
-    adjacentTerritories = std::vector<std::shared_ptr<Territory>>();
 }
 
-Territory::Territory(const Territory &territory)
+Territory::Territory(const Territory &territory) : continent(territory.continent)
 {
     name = territory.name;
     x = territory.x;
     y = territory.y;
-
-    // need to implement proper copy constructors for these
-    continent = territory.continent;
-    adjacentTerritories = territory.adjacentTerritories;
 }
 
 Territory &Territory::operator=(const Territory &territory)
@@ -335,7 +355,6 @@ Territory &Territory::operator=(const Territory &territory)
     this->x = territory.x;
     this->y = territory.y;
     this->continent = territory.continent;
-    this->adjacentTerritories = territory.adjacentTerritories;
 
     return *this;
 }
@@ -343,7 +362,7 @@ Territory &Territory::operator=(const Territory &territory)
 // Territory object stream insertion operator
 std::ostream &operator<<(std::ostream &os, const Territory &territory)
 {
-    os << "Territory: { Name: " << territory.name << ", X: " << territory.x << ", Y: " << territory.y << ", Continent: " << territory.continent->getName() << ", # of Adjacent Territories: " << territory.adjacentTerritories.size() << " }";
+    os << "Territory: { Name: " << territory.name << ", X: " << territory.x << ", Y: " << territory.y << ", Continent: " << territory.continent->getName() << " }";
 
     return os;
 }
@@ -351,3 +370,4 @@ std::ostream &operator<<(std::ostream &os, const Territory &territory)
 std::string Territory::getName() const { return name; }
 uint16_t Territory::getX() const { return x; }
 uint16_t Territory::getY() const { return y; }
+const std::shared_ptr<Continent> &Territory::getContinent() const { return continent; }
