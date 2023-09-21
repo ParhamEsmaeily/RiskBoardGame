@@ -6,15 +6,13 @@ using namespace std;
 
 void testGameStates()
 {
-    GameEngine *gameEngine = new GameEngine();
+    auto *gameEngine = new GameEngine();
 
     while (gameEngine->getPhase() != "end")
     {
-        string commandList = gameEngine->getCurrCommandsList();
-
-        cout << "\nCurrent Phase: " << gameEngine->getPhase() << endl;
-        cout << "Enter a command from the list below (number or name):" << endl;
-        cout << commandList << endl;
+        cout << "\n" << *gameEngine << endl;
+        cout << "Enter a command from the list below (# or name):" << endl;
+        cout << gameEngine->getCurrCommandsList() << endl;
 
         string input;
         cin >> input;

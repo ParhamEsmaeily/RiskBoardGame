@@ -5,21 +5,94 @@
 
 using namespace std;
 
+/**
+ * Command Class Constructor
+ */
 Command::Command(string action, shared_ptr<State> nextState)
 {
     this->action = action;
     this->nextState = nextState;
+}
+
+/** Copy Constructor */
+Command::Command(const Command &other) {
+    this->action = other.action;
+    this->nextState = other.nextState;
 };
 
+/** Assignment Constructor */
+Command &Command::operator=(const Command &other) {
+    this->action = other.action;
+    this->nextState = other.nextState;
+    return *this;
+};
+
+/** Ostream << operator */
+ostream &operator<<(ostream &os, const Command &command) {
+    os << "Action: " << command.action << " Next State: " << command.nextState->phase;
+    return os;
+};
+
+
+/**
+ * State Class Constructor
+ */
 State::State(string phase)
 {
     this->phase = phase;
+}
+
+/** Copy Constructor */
+State::State(const State &other) {
+    this->phase = other.phase;
+    for (int i = 0; i < 3; i++) {
+        this->commands[i] = other.commands[i];
+    }
+}
+
+/** Assignment Constructor */
+State &State::operator=(const State &other) {
+    this->phase = other.phase;
+    for (int i = 0; i < 3; i++) {
+        this->commands[i] = other.commands[i];
+    }
+    return *this;
+}
+
+/** Ostream << operator */
+ostream &operator<<(ostream &os, const State &state) {
+    os << "Phase: " << state.phase << endl;
+    for (int i = 0; i < 3; i++) {
+        os << "Command " << i << ": " << state.commands[i] << endl;
+    }
+    return os;
 };
 
+
+/**
+ * GameEngine Class Constructor
+ */
 GameEngine::GameEngine()
 {
     initGame();
 }
+
+/** Copy Constructor */
+GameEngine::GameEngine(const GameEngine &other){
+    this->currState = other.currState;
+}
+
+/** Assignment Constructor */
+GameEngine &GameEngine::operator=(const GameEngine &other){
+    this->currState = other.currState;
+    return *this;
+}
+
+/** Ostream << operator */
+ostream &operator<<(ostream &os, const GameEngine &gameEngine) {
+    os << "Current State: " << gameEngine.currState->phase;
+    return os;
+};
 
 string GameEngine::getPhase()
 {
