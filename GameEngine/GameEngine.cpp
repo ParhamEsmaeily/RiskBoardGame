@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <vector>
 #include "GameEngine.h"
 
 using namespace std;
@@ -8,8 +9,7 @@ using namespace std;
 /**
  * Command Class Constructor
  */
-Command::Command(string action, shared_ptr<State> nextState)
-{
+Command::Command(string action, shared_ptr<State> nextState) {
     this->action = action;
     this->nextState = nextState;
 }
@@ -37,8 +37,7 @@ ostream &operator<<(ostream &os, const Command &command) {
 /**
  * State Class Constructor
  */
-State::State(string phase)
-{
+State::State(string phase) {
     this->phase = phase;
 }
 
@@ -72,18 +71,17 @@ ostream &operator<<(ostream &os, const State &state) {
 /**
  * GameEngine Class Constructor
  */
-GameEngine::GameEngine()
-{
+GameEngine::GameEngine() {
     initGame();
 }
 
 /** Copy Constructor */
-GameEngine::GameEngine(const GameEngine &other){
+GameEngine::GameEngine(const GameEngine &other) {
     this->currState = other.currState;
 }
 
 /** Assignment Constructor */
-GameEngine &GameEngine::operator=(const GameEngine &other){
+GameEngine &GameEngine::operator=(const GameEngine &other) {
     this->currState = other.currState;
     return *this;
 }
@@ -94,13 +92,15 @@ ostream &operator<<(ostream &os, const GameEngine &gameEngine) {
     return os;
 };
 
-string GameEngine::getPhase()
-{
+string GameEngine::getPhase() {
     return currState->phase;
 };
 
-void GameEngine::initGame()
-{
+/**
+ * Initializes the game by creating the states and commands
+ * and assigning them to each other.
+ */
+void GameEngine::initGame() {
     /*
      *  Create 'Startup' section of the game
      */
@@ -112,16 +112,16 @@ void GameEngine::initGame()
     shared_ptr<State> playersAdded = make_shared<State>("players added");
 
     // Commands
-    Command loadMapCommand = Command("loadmap", mapLoaded);
-    Command validateMapCommand = Command("validate", mapValidated);
-    Command addPlayersCommand = Command("addplayers", playersAdded);
+    shared_ptr<Command> loadMapCommand = make_shared<Command>("loadmap", mapLoaded);
+    shared_ptr<Command> validateMapCommand = make_shared<Command>("validate", mapValidated);
+    shared_ptr<Command> addPlayersCommand = make_shared<Command>("addplayers", playersAdded);
 
     // Assign commands to states
-    start->commands[0] = loadMapCommand;
-    mapLoaded->commands[0] = loadMapCommand;
-    mapLoaded->commands[1] = validateMapCommand;
-    mapValidated->commands[0] = addPlayersCommand;
-    playersAdded->commands[0] = addPlayersCommand;
+    start->commands.push_back(loadMapCommand);
+    mapLoaded->commands.push_back(loadMapCommand);
+    mapLoaded->commands.push_back(validateMapCommand);
+    mapValidated->commands.push_back(addPlayersCommand);
+    playersAdded->commands.push_back(addPlayersCommand);
 
     /*
      * Create 'play' section of the game
@@ -135,44 +135,44 @@ void GameEngine::initGame()
     shared_ptr<State> endGame = make_shared<State>("end");
 
     // Commands
-    Command assignCountriesCommand = Command("assigncountries", assignReinforcements);
-    Command issueOrdersCommand = Command("issueorder", issueOrders);
-    Command endIssueOrdersCommand = Command("endissueorders", executeOrders);
-    Command executeOrdersCommand = Command("execorder", executeOrders);
-    Command endExecuteOrdersCommand = Command("endexecorders", assignReinforcements);
-    Command winCommand = Command("win", win);
-    Command endCommand = Command("end", endGame);
-    Command playAgainCommand = Command("play", start);
+    shared_ptr<Command> assignCountriesCommand = make_shared<Command>("assigncountries", assignReinforcements);
+    shared_ptr<Command> issueOrdersCommand = make_shared<Command>("issueorder", issueOrders);
+    shared_ptr<Command> endIssueOrdersCommand = make_shared<Command>("endissueorders", executeOrders);
+    shared_ptr<Command> executeOrdersCommand = make_shared<Command>("execorder", executeOrders);
+    shared_ptr<Command> endExecuteOrdersCommand = make_shared<Command>("endexecorders", assignReinforcements);
+    shared_ptr<Command> winCommand = make_shared<Command>("win", win);
+    shared_ptr<Command> endCommand = make_shared<Command>("end", endGame);
+    shared_ptr<Command> playAgainCommand = make_shared<Command>("play", start);
 
     // Assign commands to states
-    playersAdded->commands[1] = assignCountriesCommand;
-    assignReinforcements->commands[0] = issueOrdersCommand;
-    issueOrders->commands[0] = issueOrdersCommand;
-    issueOrders->commands[1] = endIssueOrdersCommand;
-    executeOrders->commands[0] = executeOrdersCommand;
-    executeOrders->commands[1] = endExecuteOrdersCommand;
-    executeOrders->commands[2] = winCommand;
-    win->commands[0] = endCommand;
-    win->commands[1] = playAgainCommand;
+    playersAdded->commands.push_back(assignCountriesCommand);
+    assignReinforcements->commands.push_back(issueOrdersCommand);
+    issueOrders->commands.push_back(issueOrdersCommand);
+    issueOrders->commands.push_back(endIssueOrdersCommand);
+    executeOrders->commands.push_back(executeOrdersCommand);
+    executeOrders->commands.push_back(endExecuteOrdersCommand);
+    executeOrders->commands.push_back(winCommand);
+    win->commands.push_back(endCommand);
+    win->commands.push_back(playAgainCommand);
 
     // Set current state to start
     currState = start;
 }
 
-/*
+/**
  * Returns a string of the current available commands
+ * in the currState for the console to display
  */
-string GameEngine::getCurrCommandsList()
-{
+string GameEngine::getCurrCommandsList() {
     string commandList = "  ";
-    int arraySize = sizeof(currState->commands) / sizeof(currState->commands[0]);
+    int index = 1;
 
-    for (int i = 0; i < arraySize; i++)
-    {
-        if (!currState->commands[i].action.empty())
-        {
-            commandList += to_string(i + 1) + "." + currState->commands[i].action + " ";
+    // Iterate through the commands in the currState
+    for (const auto &command: currState->commands) {
+        if (!command->action.empty()) {
+            commandList += to_string(index) + "." + command->action + " ";
         }
+        index++;
     }
 
     return commandList;
@@ -181,24 +181,19 @@ string GameEngine::getCurrCommandsList()
 /*
  * Executes the command and returns the phase of the next state
  */
-string GameEngine::executeCommand(string input)
-{
+string GameEngine::executeCommand(string input) {
     bool commandExecuted = false;
-    int arraySize = sizeof(currState->commands) / sizeof(currState->commands[0]);
 
-    for (int i = 0; i < arraySize; i++)
-    {
-        if (input == currState->commands[i].action ||
-            (input == to_string(i + 1) && !currState->commands[i].action.empty()))
-        {
-            currState = currState->commands[i].nextState;
+    for (int i = 0; i < currState->commands.size(); i++) {
+        if (input == currState->commands[i]->action ||
+            (input == to_string(i + 1) && !currState->commands[i]->action.empty())) {
+            currState = currState->commands[i]->nextState;
             commandExecuted = true;
             break; // Exit loop
         }
     }
 
-    if (!commandExecuted)
-    {
+    if (!commandExecuted) {
         cout << "Invalid command. Try again." << endl;
     }
 

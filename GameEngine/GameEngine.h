@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <vector>
 
 using namespace std;
 
@@ -25,7 +26,7 @@ class State
 {
 public:
     string phase;
-    Command commands[3];
+    vector<shared_ptr<Command>> commands;
     explicit State(string phase);
 
     State(State const &other);
