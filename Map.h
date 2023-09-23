@@ -10,6 +10,7 @@
 #include <string>
 #include <regex>
 #include <unordered_map>
+#include <unordered_set>
 
 // forward declarations
 class Map;
@@ -17,7 +18,7 @@ class Continent;
 class Territory;
 
 // complex type's declarations
-typedef std::unordered_map<std::string, std::vector<std::string>> AdjacencyList;
+typedef std::unordered_map<std::string, std::vector<std::string>> AdjacencyMap;
 typedef std::vector<std::shared_ptr<Territory>> SharedTerritoriesVector;
 typedef std::vector<std::shared_ptr<Continent>> SharedContinentsVector;
 
@@ -35,6 +36,8 @@ enum class MapValidity
     VALID
 };
 
+std::ostream &operator<<(std::ostream &os, const MapValidity &validity);
+
 enum class ScrollDirection
 {
     NONE,
@@ -42,11 +45,14 @@ enum class ScrollDirection
     VERTICAL
 };
 
+std::ostream &operator<<(std::ostream &os, const ScrollDirection &direction);
+
 // remove leading & trailing whitespace (https://stackoverflow.com/a/1798170)
 static std::string trim(const std::string &str, const std::string &whitespace = " \t\r\n");
 
 static ScrollDirection getScrollDirectionFromString(const std::string &scrollDirectionString);
 static bool getBooleanFromString(const std::string &booleanString);
+static std::string getStringFromBoolean(const bool &boolean);
 
 class Continent
 {
@@ -55,6 +61,7 @@ class Continent
 private:
     uint16_t bonus;
     std::string name;
+    size_t territoryCount;
 
 public:
     Continent();
@@ -65,6 +72,7 @@ public:
 
     std::string getName() const;
     uint16_t getBonus() const;
+    size_t getTerritoryCount() const;
 };
 
 class Territory
@@ -95,7 +103,7 @@ class Map
     friend class MapLoader;
 
 private:
-    AdjacencyList adjacency;
+    AdjacencyMap adjacency;
     std::unordered_map<std::string, std::shared_ptr<Territory>> territories;
     std::unordered_map<std::string, std::shared_ptr<Continent>> continents;
 
@@ -120,7 +128,10 @@ public:
     static SharedTerritoriesVector getAdjacentTerritories(const Map &map, const Territory &territory);
     static SharedTerritoriesVector getAdjacentTerritories(const Map &map, const std::string &territory);
 
-    void validate();
+    static void countTraversedTerritories(const Map &map, const std::string &territory, std::unordered_set<std::string> &visited);
+    static void countTraversedTerritoriesInContinent(const Map &map, const std::string &continent, const std::string &territory, std::unordered_set<std::string> &visited);
+
+    static void validate(Map &map);
 
     std::string getImage() const;
     std::string getAuthor() const;

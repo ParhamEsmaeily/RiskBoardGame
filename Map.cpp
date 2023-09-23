@@ -3,6 +3,46 @@
 
 #include "Map.h"
 
+std::ostream &operator<<(std::ostream &os, const MapValidity &validity)
+{
+    switch (validity)
+    {
+    case MapValidity::INVALID:
+        os << "Invalid";
+        break;
+
+    case MapValidity::VALID:
+        os << "Valid";
+        break;
+
+    default:
+        os << "Unknown";
+        break;
+    }
+
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, const ScrollDirection &direction)
+{
+    switch (direction)
+    {
+    case ScrollDirection::HORIZONTAL:
+        os << "Horizontal";
+        break;
+
+    case ScrollDirection::VERTICAL:
+        os << "Vertical";
+        break;
+
+    default:
+        os << "None";
+        break;
+    }
+
+    return os;
+}
+
 // remove leading & trailing whitespace (https://stackoverflow.com/a/1798170)
 std::string trim(const std::string &str, const std::string &whitespace)
 {
@@ -29,6 +69,11 @@ ScrollDirection getScrollDirectionFromString(const std::string &scrollDirectionS
 bool getBooleanFromString(const std::string &booleanString)
 {
     return booleanString == "yes" || booleanString == "true" || booleanString == "1";
+}
+
+std::string getStringFromBoolean(const bool &boolean)
+{
+    return boolean ? "True" : "False";
 }
 
 std::shared_ptr<Map> MapLoader::loadMap(const std::string &path)
@@ -171,6 +216,7 @@ bool MapLoader::processTerritoriesLine(const std::string &line, const std::share
 
     // associate the territory with its continent
     territory->continent = map->continents[continentName];
+    territory->continent->territoryCount++;
 
     // update related data structures (map's unordered map of territories)
     map->territories.emplace(territory->name, territory);
@@ -220,7 +266,7 @@ Map &Map::operator=(const Map &map)
 // Map object stream insertion operator
 std::ostream &operator<<(std::ostream &os, const Map &map)
 {
-    os << "Map: { Author: " << map.author << ", Image: " << map.image << ", Scroll: " << (int)map.scroll << ", Wrap: " << map.wrap << ", Warn: " << map.warn << ", Valid: " << (int)map.validity << ", # of Continents: " << map.continents.size() << " }";
+    os << "Map: { Author: " << map.author << ", Image: " << map.image << ", Scroll: " << map.scroll << ", Wrap: " << getStringFromBoolean(map.wrap) << ", Warn: " << getStringFromBoolean(map.warn) << ", Validity: " << map.validity << ", # of Continents: " << map.continents.size() << ", # of Territories: " << map.territories.size() << " }";
 
     return os;
 }
@@ -286,9 +332,72 @@ SharedTerritoriesVector Map::getAdjacentTerritories(const Map &map, const std::s
     return adjacentTerritories;
 }
 
-void Map::validate()
+void Map::countTraversedTerritories(const Map &map, const std::string &territory, std::unordered_set<std::string> &visited)
 {
-    validity = MapValidity::VALID;
+    visited.insert(territory);
+
+    for (auto &&territoryName : map.adjacency.at(territory))
+    {
+        if (visited.find(territoryName) == visited.end())
+            Map::countTraversedTerritories(map, territoryName, visited);
+    }
+}
+
+void Map::countTraversedTerritoriesInContinent(const Map &map, const std::string &continent, const std::string &territory, std::unordered_set<std::string> &visited)
+{
+    visited.insert(territory);
+
+    for (auto &&territoryName : map.adjacency.at(territory))
+    {
+        // if we haven't visited this territory before and is part of the continent we're looking at, continue the traversal
+        if (visited.find(territoryName) == visited.end() && map.territories.at(territoryName)->getContinent()->getName() == continent)
+            Map::countTraversedTerritoriesInContinent(map, continent, territoryName, visited);
+    }
+}
+
+void Map::validate(Map &map)
+{
+    std::unordered_set<std::string> visitedTerritories;
+
+    map.validity = MapValidity::UNKNOWN;
+
+    // 1: Map should be a connected graph
+
+    Map::countTraversedTerritories(map, map.territories.begin()->first, visitedTerritories);
+    if (visitedTerritories.size() != map.territories.size())
+    {
+        map.validity = MapValidity::INVALID;
+        return;
+    }
+
+    for (auto &&pair : map.continents)
+    {
+        visitedTerritories.clear();
+
+        // 3: Each country belongs to one and only one continent
+
+        const auto territoriesInContinent = Map::getAllTerritoriesInContinent(map, pair.first);
+
+        // if the # of known territories in a continent is not the same as the # of loaded territories, the map is invalid
+        if (territoriesInContinent.size() != pair.second->getTerritoryCount())
+        {
+            map.validity = MapValidity::INVALID;
+            return;
+        }
+
+        // 2: Continents are connected subgraphs
+
+        Map::countTraversedTerritoriesInContinent(map, pair.first, territoriesInContinent.front()->getName(), visitedTerritories);
+
+        // if the # of territories we traversed is not the same as the # of known territories in a continent, the map is invalid
+        if (visitedTerritories.size() != territoriesInContinent.size())
+        {
+            map.validity = MapValidity::INVALID;
+            return;
+        }
+    }
+
+    map.validity = MapValidity::VALID;
 }
 
 std::string Map::getImage() const { return image; }
@@ -303,19 +412,22 @@ bool Map::getWarn() const { return warn; }
 Continent::Continent()
 {
     name = "";
-    bonus = -1;
+    bonus = 0;
+    territoryCount = 0;
 }
 
 Continent::Continent(const Continent &continent)
 {
     name = continent.name;
     bonus = continent.bonus;
+    territoryCount = continent.territoryCount;
 }
 
 Continent &Continent::operator=(const Continent &continent)
 {
     this->name = continent.name;
     this->bonus = continent.bonus;
+    this->territoryCount = continent.territoryCount;
 
     return *this;
 }
@@ -330,14 +442,15 @@ std::ostream &operator<<(std::ostream &os, const Continent &continent)
 
 std::string Continent::getName() const { return name; }
 uint16_t Continent::getBonus() const { return bonus; }
+size_t Continent::getTerritoryCount() const { return territoryCount; }
 
 /* TERRITORY */
 
 Territory::Territory()
 {
     name = "";
-    x = -1;
-    y = -1;
+    x = 0;
+    y = 0;
 
     continent = std::make_shared<Continent>();
 }
