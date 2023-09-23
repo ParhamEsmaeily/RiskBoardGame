@@ -2,18 +2,17 @@
 
 #include "Map.h"
 
-void testLoadMaps()
+void testLoadMap(const std::string &mapLocation)
 {
-    const auto testMap = MapLoader::loadMap("maps/test.map");
-    const auto worldMap = MapLoader::loadMap("maps/world.map");
+    const auto map = MapLoader::loadMap(mapLocation);
 
-    Map::validate(*worldMap);
+    Map::validate(*map);
 
-    std::cout << *worldMap << std::endl;
+    std::cout << *map << std::endl;
 
     std::cout << "\nALL CONTINENTS TEST" << std::endl;
 
-    const auto continents = Map::getAllContinents(*worldMap);
+    const auto continents = Map::getAllContinents(*map);
     for (auto &&continent : continents)
     {
         std::cout << *continent << std::endl;
@@ -21,7 +20,7 @@ void testLoadMaps()
 
     std::cout << "\nALL TERRITORIES TEST" << std::endl;
 
-    const auto territories = Map::getAllTerritories(*worldMap);
+    const auto territories = Map::getAllTerritories(*map);
     for (auto &&territory : territories)
     {
         std::cout << *territory << std::endl;
@@ -33,7 +32,7 @@ void testLoadMaps()
 
     std::cout << "\nADJACENT TERRITORIES TEST" << std::endl;
 
-    const auto adjacentTerritories = Map::getAdjacentTerritories(*worldMap, *testTerritory);
+    const auto adjacentTerritories = Map::getAdjacentTerritories(*map, *testTerritory);
     for (auto &&territory : adjacentTerritories)
     {
         std::cout << *territory << std::endl;
@@ -41,10 +40,22 @@ void testLoadMaps()
 
     std::cout << "\nSAME CONTINENT TERRITORIES TEST" << std::endl;
 
-    const auto sameContinentTerritories = Map::getAllTerritoriesInContinent(*worldMap, *testTerritory->getContinent());
+    const auto sameContinentTerritories = Map::getAllTerritoriesInContinent(*map, *testTerritory->getContinent());
     for (auto &&territory : sameContinentTerritories)
     {
         std::cout << *territory << std::endl;
+    }
+}
+
+void testLoadMaps()
+{
+    const auto maps = {"maps/test.map", "maps/world.map"};
+
+    for (auto &&map : maps)
+    {
+        testLoadMap(std::string(map));
+
+        std::cout << std::endl;
     }
 }
 
