@@ -1,10 +1,13 @@
 #include <iostream>
 #include <string>
 #include <memory>
-#include <vector>
 #include "GameEngine.h"
 
-using namespace std;
+using std::cin;
+using std::make_shared;
+using std::shared_ptr;
+using std::ostream;
+using std::string;
 
 /**
  * Command Class Constructor
@@ -60,9 +63,9 @@ State &State::operator=(const State &other) {
 
 /** Ostream << operator */
 ostream &operator<<(ostream &os, const State &state) {
-    os << "Phase: " << state.phase << endl;
+    os << "Phase: " << state.phase << std::endl;
     for (int i = 0; i < 3; i++) {
-        os << "Command " << i << ": " << state.commands[i] << endl;
+        os << "Command " << i << ": " << state.commands[i] << std::endl;
     }
     return os;
 };
@@ -170,7 +173,7 @@ string GameEngine::getCurrCommandsList() {
     // Iterate through the commands in the currState
     for (const auto &command: currState->commands) {
         if (!command->action.empty()) {
-            commandList += to_string(index) + "." + command->action + " ";
+            commandList += std::to_string(index) + "." + command->action + " ";
         }
         index++;
     }
@@ -186,7 +189,7 @@ string GameEngine::executeCommand(string input) {
 
     for (int i = 0; i < currState->commands.size(); i++) {
         if (input == currState->commands[i]->action ||
-            (input == to_string(i + 1) && !currState->commands[i]->action.empty())) {
+            (input == std::to_string(i + 1) && !currState->commands[i]->action.empty())) {
             currState = currState->commands[i]->nextState;
             commandExecuted = true;
             break; // Exit loop
@@ -194,7 +197,7 @@ string GameEngine::executeCommand(string input) {
     }
 
     if (!commandExecuted) {
-        cout << "Invalid command. Try again." << endl;
+        std::cout << "Invalid command. Try again." << std::endl;
     }
 
     return currState->phase;

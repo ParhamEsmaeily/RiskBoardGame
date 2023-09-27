@@ -5,7 +5,10 @@
 #include <memory>
 #include <vector>
 
-using namespace std;
+using std::string;
+using std::shared_ptr;
+using std::vector;
+using std::ostream;
 
 class State; // Forward declaration
 
