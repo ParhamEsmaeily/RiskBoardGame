@@ -26,13 +26,7 @@ void test_cards(int no_cards = 15) {
 
 // Testing purposes.
 int main() {
-  Card c(bomb);
-  Card c1(airlift);
-
-  Hand h;
-  Deck d;
-
-  std::cout << h.play(bomb, d) << std::endl;
+  test_cards();
 
   return 0;
 }
