@@ -4,31 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <random>
-
-// Free functions.
-
-/*
-  Test the cards methods.
-  Creates a deck of cards, then creates a hand by drawing repeatedly from the
-  deck.
-*/
-void test_cards(int no_cards = 15) {
-  Deck deck;
-  for (int i = 0; i < no_cards; i++) {
-    deck.insert(card_type(i % 5)); // Kind of random insertion of cards.
-  }
-
-  Hand hand;
-  for (int i = 0; i < no_cards; i++) {
-    deck.draw(hand);
-  }
-
-  for (int i = 0; i < no_cards; i++) {
-    hand.play(card_type(i % 5), deck);
-  }
-
-  std::cout << deck.size();
-}
+#include <stdexcept>
 
 namespace cd {
 std::string type_map(const int index) {
@@ -52,10 +28,8 @@ void Card::play(Deck &deck) const noexcept {
 
 const std::string Card::value() const noexcept { return cd::type_map(type); }
 
-// --> How to define const attributes w/ assignment overload.
-void Card::operator=(const Card &card) noexcept {
-  // type = card.type;
-}
+// void Card::operator=(const Card &card) noexcept {
+// }
 
 // --Buffer
 
@@ -73,6 +47,13 @@ Buffer::Buffer(const Buffer &buf) {
 }
 
 card_ptr Buffer::remove(const int index) {
+  if (index > buffer.size() - 1 || index < 0) {
+    std::cerr << "Index out of range inside Card buffer/container. Please "
+                 "verify the Cards.cpp."
+              << std::endl;
+    throw std::runtime_error("Index out of range");
+  } // Index out of range.
+
   int end_index = buffer.size() - 1;
   // Removes the card from the buffer.
   auto card = std::move(buffer[index]);
@@ -89,6 +70,16 @@ void Buffer::insert(const Card &card) noexcept {
 
 void Buffer::insert(const card_type type) noexcept {
   buffer.push_back(std::make_unique<Card>(type));
+}
+
+std::vector<card_type> Buffer::show_cards() const noexcept {
+  // Creates array of same size as buffer.
+  auto arr = std::vector<card_type>(buffer.size());
+  // Each card of the buffer taken and converted to a card_type.
+  for (int i = 0; i < buffer.size(); i++) {
+    arr[i] = buffer[i]->type;
+  }
+  return arr;
 }
 
 int Buffer::size() const noexcept { return buffer.size(); }
@@ -123,7 +114,7 @@ void Deck::draw(Hand &hand) {
 
 // --Hand.
 
-void Hand::play(const card_type type, Deck &deck) {
+bool Hand::play(const card_type type, Deck &deck) {
   // Searching through the whole hand to search for a card of the proper
   for (int i = 0; i < buffer.size(); i++) {
     if (buffer[i]->type == type) {
@@ -131,26 +122,10 @@ void Hand::play(const card_type type, Deck &deck) {
       auto ptr = this->remove(i);
 
       deck.insert(*ptr); // Inserts the card inside the buffer.
-      return;
+      return true;
     }
   }
 
-  // If the card has not been found --> Throws exception.
-}
-
-// Free functions.
-
-// For testing purposes.
-int main() {
-  card_type t1 = reinforcement;
-  card_type t2 = bomb;
-  Card c1(t1);
-  Deck deck;
-  Hand h;
-
-  deck.insert(c1);
-
-  std::cout << deck.size();
-
-  return 0;
+  // If card has not been found.
+  return false;
 }

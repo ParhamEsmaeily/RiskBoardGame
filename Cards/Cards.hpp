@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm>
+#include <exception>
 #include <memory>
 #include <ostream>
 #include <string>
@@ -52,11 +53,6 @@ public:
     os << "Card is of type: " << cd::type_map(c.type);
     return os;
   }
-
-  /*
-    Deep copy of the Card is made.
-  */
-  void operator=(const Card &) noexcept;
 };
 
 /*
@@ -100,6 +96,9 @@ public:
   */
   int size() const noexcept;
 
+  /*
+    Removes every card inside the buffer. Clears it.
+  */
   void clear() noexcept;
 
   /*
@@ -115,9 +114,10 @@ class Hand : public Buffer {
 public:
   /*
     The card with desired type will be played, and removed from the player's
-    hands.
+    hands. The card is then placed back in the deck.
+    Returns false if the card is not in the hand of the player.
   */
-  void play(const card_type, Deck &);
+  bool play(const card_type, Deck &);
 };
 
 /*
@@ -130,6 +130,4 @@ public:
     Place it in the their hand of cards.
    */
   void draw(Hand &);
-
-  void operator=(const Card &) const noexcept;
 };
