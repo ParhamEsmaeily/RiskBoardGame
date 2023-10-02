@@ -1,11 +1,18 @@
 #pragma once
 #include <algorithm>
-#include <exception>
 #include <memory>
 #include <ostream>
 #include <string>
 #include <vector>
 
+/*
+  Five card_type available:
+  0- bomb,
+  1- reinforcement,
+  2- blockade,
+  3- airlift,
+  4- diplomacy.
+*/
 enum card_type { bomb, reinforcement, blockade, airlift, diplomacy };
 
 namespace cd {

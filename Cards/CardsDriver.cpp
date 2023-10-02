@@ -20,13 +20,4 @@ void test_cards(int no_cards = 15) {
   for (int i = 0; i < no_cards; i++) {
     hand.play(card_type(i % 5), deck);
   }
-
-  std::cout << deck.size();
-}
-
-// Testing purposes.
-int main() {
-  test_cards();
-
-  return 0;
 }
