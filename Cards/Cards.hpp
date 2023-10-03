@@ -24,10 +24,19 @@ std::string type_map(const int);
 } // namespace cd
 
 class Card;
+class Buffer;
 class Deck;
 class Hand;
-// Forward-Declaration.
+// Forward-Declaration.`
 
+// Stream insertion overload.
+std::ostream &operator<<(std::ostream &, const Buffer &);
+
+std::ostream &operator<<(std::ostream &, const Hand &);
+
+std::ostream &operator<<(std::ostream &, const Deck &);
+
+// Unique_ptr to card.
 using card_ptr = std::unique_ptr<Card>;
 // Vector holding unique_ptr to Cards.
 using card_vector = std::vector<card_ptr>;
@@ -55,11 +64,7 @@ public:
   */
   const std::string value() const noexcept;
 
-  friend std::ostream &operator<<(std::ostream &os, const Card &c) {
-    // Mapping is made from enum index to the proper string type.
-    os << "Card is of type: " << cd::type_map(c.type);
-    return os;
-  }
+  friend std::ostream &operator<<(std::ostream &os, const Card &c);
 };
 
 /*

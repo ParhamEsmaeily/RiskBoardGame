@@ -21,3 +21,14 @@ void test_cards(int no_cards = 15) {
     hand.play(card_type(i % 5), deck);
   }
 }
+
+int main() {
+  Card c(bomb);
+  Hand h;
+
+  h.insert(c);
+
+  std::cout << h;
+
+  return 0;
+}

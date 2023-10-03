@@ -14,6 +14,27 @@ std::string type_map(const int index) {
 }
 } // namespace cd
 
+std::ostream &operator<<(std::ostream &os, const Card &c) {
+  // Mapping is made from enum index to the proper string type.
+  os << "Card is of type: " << cd::type_map(c.type);
+  return os;
+}
+
+std::ostream &operator<<(std::ostream &os, const Buffer &b) {
+  os << "The buffer contains " << b.size() << " cards.";
+  return os;
+}
+
+std::ostream &operator<<(std::ostream &os, const Hand &h) {
+  os << "The hand contains " << h.size() << " cards.";
+  return os;
+}
+
+std::ostream &operator<<(std::ostream &os, const Deck &d) {
+  os << "The deck contains " << d.size() << " cards.";
+  return os;
+}
+
 // --Card.
 
 Card::Card(const card_type type) : type{card_type(type)} {}
