@@ -1,8 +1,6 @@
-#ifndef ORDERS
-#define ORDERS
+#pragma once
 
 #include <iostream>
-using std::ostream;
 #include <vector>
 #include <memory>
 #include<string>
@@ -10,85 +8,72 @@ using namespace std;
 
 namespace std
 {
-    class OrdersList
-    {
-        private:
-
-            unique_ptr<vector<Order>> list; //the actual list of orders
-            OrdersList(OrdersList &o); //copy constructor
-
-        public:
-
-            bool move(int index, int destination);
-            bool remove(int index);
-            bool add();
-            bool isEmpty();
-            unique_ptr<vector<Order>> get_list(){return unique_ptr<vector<Order>>temp(this->list);}//I do not know how to write the getter for this
-    };
 
     class Order
     {
-        private:
-
-            string description;
-            string name;       
-
         public:
 
-            virtual bool validate();
-            virtual void execute();
-            void set_desc(string s){this->description=s;}
-            void set_name(string s){this->name=s;}
-            string get_desc(){return this->description;}
-            string get_name(){return this->name;}
-    };
+            std::string description;
+            std::string name;
 
-    class Deploy : Order
+            Order() = default;
+            Order(Order const &other);
+            bool validate();
+            void execute();
+            friend ostream &operator<<(ostream &os, const Order &order);
+    };
+    class OrdersList
     {
         public:
 
-            bool validate() override;
-            void execute() override;
+            vector<std::shared_ptr<Order>> list;
+
+            OrdersList() = default;
+            OrdersList(vector<shared_ptr<Order>>);//*
+            OrdersList(const OrdersList &other);
+            bool move(int index, int destination);
+            bool remove(int index);
+            void add(shared_ptr<Order> o);
+            bool isEmpty()const{return (this->list.size()==0);};
+            int size()const{return this->list.size();};
+
+            std::shared_ptr<Order>& operator[](const int i);
+            friend ostream &operator<<(ostream &os, const OrdersList& olist);
     };
 
-    class Advance : Order
+    class Deploy : public Order
     {
         public:
-
-            bool validate() override;
-            void execute() override;
+            Deploy();
     };
 
-    class Bomb : Order
+    class Advance : public Order
     {
         public:
-
-            bool validate() override;
-            void execute() override;
+            Advance();
     };
 
-    class Blockade : Order
+    class Bomb : public Order
     {
         public:
-
-            bool validate() override;
-            void execute() override;
+            Bomb();
     };
 
-    class Airlift : Order
+    class Blockade : public Order
     {
         public:
-
-            bool validate() override;
-            void execute() override;
+            Blockade();
     };
 
-    class Negotiate : Order
+    class Airlift : public Order
     {
         public:
+            Airlift();
+    };
 
-            bool validate() override;
-            void execute() override;
+    class Negotiate : public Order
+    {
+        public:
+            Negotiate();
     };
 }
-#endif
