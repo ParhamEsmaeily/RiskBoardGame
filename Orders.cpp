@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
-#include<string>
+#include <string>
 #include "Orders.h"
 using namespace std;
 
@@ -28,7 +28,9 @@ std::shared_ptr<Order>& OrdersList::operator[](const int i)
     return this->list[i];
 }
 
-/**<< Operator override*/
+/**<< Operator override, I would like for this operator to be able to call the same operator,
+ * but for its contained class. This will do for now.
+*/
 ostream& operator<<(ostream &os, OrdersList& olist) {
     os << "Orders list: \n";
     for(int i=0; i<olist.size(); i++)
