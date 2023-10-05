@@ -15,7 +15,7 @@ class State; // Forward declaration
 class Command
 {
 public:
-    string action;
+    shared_ptr<string> action;
     shared_ptr<State> nextState;
     Command()= default;
     Command(string action, shared_ptr<State> nextState);
@@ -28,7 +28,7 @@ public:
 class State
 {
 public:
-    string phase;
+    shared_ptr<string> phase;
     vector<shared_ptr<Command>> commands;
     explicit State(string phase);
 

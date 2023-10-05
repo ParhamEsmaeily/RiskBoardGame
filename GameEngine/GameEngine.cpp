@@ -13,7 +13,7 @@ using std::string;
  * Command Class Constructor
  */
 Command::Command(string action, shared_ptr<State> nextState) {
-    this->action = action;
+    this->action = make_shared<string>(action);
     this->nextState = nextState;
 }
 
@@ -32,7 +32,7 @@ Command &Command::operator=(const Command &other) {
 
 /** Ostream << operator */
 ostream &operator<<(ostream &os, const Command &command) {
-    os << "Action: " << command.action << " Next State: " << command.nextState->phase;
+    os << "Action: " << *command.action << " Next State: " << *command.nextState->phase;
     return os;
 };
 
@@ -41,7 +41,7 @@ ostream &operator<<(ostream &os, const Command &command) {
  * State Class Constructor
  */
 State::State(string phase) {
-    this->phase = phase;
+    this->phase = make_shared<string>(phase);
 }
 
 /** Copy Constructor */
@@ -65,7 +65,7 @@ State &State::operator=(const State &other) {
 ostream &operator<<(ostream &os, const State &state) {
     os << "Phase: " << state.phase << std::endl;
     for (int i = 0; i < 3; i++) {
-        os << "Command " << i << ": " << state.commands[i] << std::endl;
+        os << "Command " << i << ": " << *state.commands[i] << std::endl;
     }
     return os;
 };
@@ -91,12 +91,12 @@ GameEngine &GameEngine::operator=(const GameEngine &other) {
 
 /** Ostream << operator */
 ostream &operator<<(ostream &os, const GameEngine &gameEngine) {
-    os << "Current State: " << gameEngine.currState->phase;
+    os << "Current State: " << *gameEngine.currState->phase;
     return os;
 };
 
 string GameEngine::getPhase() {
-    return currState->phase;
+    return *currState->phase;
 };
 
 /**
@@ -172,8 +172,8 @@ string GameEngine::getCurrCommandsList() {
 
     // Iterate through the commands in the currState
     for (const auto &command: currState->commands) {
-        if (!command->action.empty()) {
-            commandList += std::to_string(index) + "." + command->action + " ";
+        if (!command->action->empty()) {
+            commandList += std::to_string(index) + "." + *command->action + " ";
         }
         index++;
     }
@@ -188,8 +188,8 @@ string GameEngine::executeCommand(string input) {
     bool commandExecuted = false;
 
     for (int i = 0; i < currState->commands.size(); i++) {
-        if (input == currState->commands[i]->action ||
-            (input == std::to_string(i + 1) && !currState->commands[i]->action.empty())) {
+        if (input == *currState->commands[i]->action ||
+            (input == std::to_string(i + 1) && !currState->commands[i]->action->empty())) {
             currState = currState->commands[i]->nextState;
             commandExecuted = true;
             break; // Exit loop
@@ -200,5 +200,5 @@ string GameEngine::executeCommand(string input) {
         std::cout << "Invalid command. Try again." << std::endl;
     }
 
-    return currState->phase;
+    return *currState->phase;
 }
