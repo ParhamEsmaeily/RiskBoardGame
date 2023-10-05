@@ -1,4 +1,3 @@
-#include <iostream>
 #include <fstream>
 
 #include "Map.h"
@@ -155,19 +154,19 @@ bool MapLoader::processMapLine(const std::string &line, const std::shared_ptr<Ma
         return false; // invalid line, not enough matches (or too many matches)
 
     if (match[1].str() == "author")
-        map->author = match[2].str();
+        *map->author = match[2].str();
 
     if (match[1].str() == "image")
-        map->image = match[2].str();
+        *map->image = match[2].str();
 
     if (match[1].str() == "scroll")
-        map->scroll = getScrollDirectionFromString(match[2].str());
+        *map->scroll = getScrollDirectionFromString(match[2].str());
 
     if (match[1].str() == "wrap")
-        map->wrap = getBooleanFromString(match[2].str());
+        *map->wrap = getBooleanFromString(match[2].str());
 
     if (match[1].str() == "warn")
-        map->warn = getBooleanFromString(match[2].str());
+        *map->warn = getBooleanFromString(match[2].str());
 
     return true;
 }
@@ -181,10 +180,10 @@ bool MapLoader::processContinentsLine(const std::string &line, const std::shared
     if (match.size() != 3)
         return false; // invalid line, not enough matches (or too many matches)
 
-    continent->name = trim(match[1].str());
-    continent->bonus = std::stoi(match[2].str());
+    *continent->name = trim(match[1].str());
+    *continent->bonus = std::stoi(match[2].str());
 
-    map->continents.emplace(continent->name, continent);
+    map->continents.emplace(*continent->name, continent);
 
     return true;
 }
@@ -206,20 +205,20 @@ bool MapLoader::processTerritoriesLine(const std::string &line, const std::share
     if (allMatches.size() < 5)
         return false; // invalid line, not enough matches
 
-    territory->name = trim(allMatches[0]);
-    territory->x = std::stoi(allMatches[1]);
-    territory->y = std::stoi(allMatches[2]);
+    *territory->name = trim(allMatches[0]);
+    *territory->x = std::stoi(allMatches[1]);
+    *territory->y = std::stoi(allMatches[2]);
     const auto continentName = trim(allMatches[3]);
 
     // add adjacent territories, to the adjacency map (key: territory name, value: vector of adjacent territory names), to be associated with the territory later
-    map->adjacency.emplace(territory->name, std::vector<std::string>(allMatches.begin() + 4, allMatches.end()));
+    map->adjacency.emplace(*territory->name, std::vector<std::string>(allMatches.begin() + 4, allMatches.end()));
 
     // associate the territory with its continent
     territory->continent = map->continents[continentName];
-    territory->continent->territoryCount++;
+    (*territory->continent->territoryCount)++;
 
     // update related data structures (map's unordered map of territories)
-    map->territories.emplace(territory->name, territory);
+    map->territories.emplace(*territory->name, territory);
 
     return true;
 }
@@ -228,12 +227,12 @@ bool MapLoader::processTerritoriesLine(const std::string &line, const std::share
 
 Map::Map()
 {
-    image = "";
-    author = "";
-    wrap = false;
-    scroll = ScrollDirection::NONE;
-    validity = MapValidity::UNKNOWN;
-    warn = false;
+    image = new std::string("");
+    author = new std::string("");
+    wrap = new bool(false);
+    scroll = new ScrollDirection(ScrollDirection::NONE);
+    validity = new MapValidity(MapValidity::UNKNOWN);
+    warn = new bool(false);
 
     continents = std::unordered_map<std::string, std::shared_ptr<Continent>>();
     territories = std::unordered_map<std::string, std::shared_ptr<Territory>>();
@@ -245,8 +244,13 @@ Map::Map(const Map &map) : continents(map.continents), territories(map.territori
     image = map.image;
     scroll = map.scroll;
     wrap = map.wrap;
-    warn = map.warn;
     validity = map.validity;
+    warn = map.warn;
+}
+
+Map::~Map()
+{
+    delete image, author, wrap, scroll, validity, warn;
 }
 
 Map &Map::operator=(const Map &map)
@@ -266,7 +270,7 @@ Map &Map::operator=(const Map &map)
 // Map object stream insertion operator
 std::ostream &operator<<(std::ostream &os, const Map &map)
 {
-    os << "Map: { Author: " << map.author << ", Image: " << map.image << ", Scroll: " << map.scroll << ", Wrap: " << getStringFromBoolean(map.wrap) << ", Warn: " << getStringFromBoolean(map.warn) << ", Validity: " << map.validity << ", # of Continents: " << map.continents.size() << ", # of Territories: " << map.territories.size() << " }";
+    os << "Map: { Author: " << *map.author << ", Image: " << *map.image << ", Scroll: " << *map.scroll << ", Wrap: " << getStringFromBoolean(*map.wrap) << ", Warn: " << getStringFromBoolean(*map.warn) << ", Validity: " << *map.validity << ", # of Continents: " << map.continents.size() << ", # of Territories: " << map.territories.size() << " }";
 
     return os;
 }
@@ -359,14 +363,14 @@ void Map::validate(Map &map)
 {
     std::unordered_set<std::string> visitedTerritories;
 
-    map.validity = MapValidity::UNKNOWN;
+    *map.validity = MapValidity::UNKNOWN;
 
     // 1: Map should be a connected graph
 
     Map::countTraversedTerritories(map, map.territories.begin()->first, visitedTerritories);
     if (visitedTerritories.size() != map.territories.size())
     {
-        map.validity = MapValidity::INVALID;
+        *map.validity = MapValidity::INVALID;
         return;
     }
 
@@ -381,7 +385,7 @@ void Map::validate(Map &map)
         // if the # of known territories in a continent is not the same as the # of loaded territories, the map is invalid
         if (territoriesInContinent.size() != pair.second->getTerritoryCount())
         {
-            map.validity = MapValidity::INVALID;
+            *map.validity = MapValidity::INVALID;
             return;
         }
 
@@ -392,28 +396,28 @@ void Map::validate(Map &map)
         // if the # of territories we traversed is not the same as the # of known territories in a continent, the map is invalid
         if (visitedTerritories.size() != territoriesInContinent.size())
         {
-            map.validity = MapValidity::INVALID;
+            *map.validity = MapValidity::INVALID;
             return;
         }
     }
 
-    map.validity = MapValidity::VALID;
+    *map.validity = MapValidity::VALID;
 }
 
-std::string Map::getImage() const { return image; }
-std::string Map::getAuthor() const { return author; }
-bool Map::getWrap() const { return wrap; }
-ScrollDirection Map::getScroll() const { return scroll; }
-MapValidity Map::getValidity() const { return validity; }
+std::string Map::getImage() const { return *image; }
+std::string Map::getAuthor() const { return *author; }
+bool Map::getWrap() const { return *wrap; }
+ScrollDirection Map::getScroll() const { return *scroll; }
+MapValidity Map::getValidity() const { return *validity; }
 bool Map::getWarn() const { return warn; }
 
 /* CONTINENT */
 
 Continent::Continent()
 {
-    name = "";
-    bonus = 0;
-    territoryCount = 0;
+    name = new std::string("");
+    bonus = new uint16_t(0);
+    territoryCount = new size_t(0);
 }
 
 Continent::Continent(const Continent &continent)
@@ -421,6 +425,11 @@ Continent::Continent(const Continent &continent)
     name = continent.name;
     bonus = continent.bonus;
     territoryCount = continent.territoryCount;
+}
+
+Continent::~Continent()
+{
+    delete name, bonus, territoryCount;
 }
 
 Continent &Continent::operator=(const Continent &continent)
@@ -435,22 +444,22 @@ Continent &Continent::operator=(const Continent &continent)
 // Continent object stream insertion operator
 std::ostream &operator<<(std::ostream &os, const Continent &continent)
 {
-    os << "Continent: { Name: " << continent.name << ", Bonus: " << continent.bonus << " }";
+    os << "Continent: { Name: " << *continent.name << ", Bonus: " << *continent.bonus << " }";
 
     return os;
 }
 
-std::string Continent::getName() const { return name; }
-uint16_t Continent::getBonus() const { return bonus; }
-size_t Continent::getTerritoryCount() const { return territoryCount; }
+std::string Continent::getName() const { return *name; }
+uint16_t Continent::getBonus() const { return *bonus; }
+size_t Continent::getTerritoryCount() const { return *territoryCount; }
 
 /* TERRITORY */
 
 Territory::Territory()
 {
-    name = "";
-    x = 0;
-    y = 0;
+    name = new std::string("");
+    x = new uint16_t(0);
+    y = new uint16_t(0);
 
     continent = std::make_shared<Continent>();
 }
@@ -460,6 +469,11 @@ Territory::Territory(const Territory &territory) : continent(territory.continent
     name = territory.name;
     x = territory.x;
     y = territory.y;
+}
+
+Territory::~Territory()
+{
+    delete name, x, y;
 }
 
 Territory &Territory::operator=(const Territory &territory)
@@ -475,12 +489,12 @@ Territory &Territory::operator=(const Territory &territory)
 // Territory object stream insertion operator
 std::ostream &operator<<(std::ostream &os, const Territory &territory)
 {
-    os << "Territory: { Name: " << territory.name << ", X: " << territory.x << ", Y: " << territory.y << ", Continent: " << territory.continent->getName() << " }";
+    os << "Territory: { Name: " << *territory.name << ", X: " << *territory.x << ", Y: " << *territory.y << ", Continent: " << territory.continent->getName() << " }";
 
     return os;
 }
 
-std::string Territory::getName() const { return name; }
-uint16_t Territory::getX() const { return x; }
-uint16_t Territory::getY() const { return y; }
+std::string Territory::getName() const { return *name; }
+uint16_t Territory::getX() const { return *x; }
+uint16_t Territory::getY() const { return *y; }
 const std::shared_ptr<Continent> &Territory::getContinent() const { return continent; }
