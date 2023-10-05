@@ -11,6 +11,7 @@
 #include <regex>
 #include <unordered_map>
 #include <unordered_set>
+#include <iostream>
 
 // forward declarations
 class Map;
@@ -59,13 +60,14 @@ class Continent
     friend class MapLoader;
 
 private:
-    uint16_t bonus;
-    std::string name;
-    size_t territoryCount;
+    uint16_t *bonus;
+    std::string *name;
+    size_t *territoryCount;
 
 public:
     Continent();
     Continent(const Continent &continent);
+    ~Continent();
 
     Continent &operator=(const Continent &continent);
     friend std::ostream &operator<<(std::ostream &os, const Continent &continent);
@@ -82,12 +84,13 @@ class Territory
 private:
     std::shared_ptr<Continent> continent;
 
-    uint16_t x, y;
-    std::string name;
+    uint16_t *x, *y;
+    std::string *name;
 
 public:
     Territory();
     Territory(const Territory &territory);
+    ~Territory();
 
     Territory &operator=(const Territory &territory);
     friend std::ostream &operator<<(std::ostream &os, const Territory &territory);
@@ -107,16 +110,17 @@ private:
     std::unordered_map<std::string, std::shared_ptr<Territory>> territories;
     std::unordered_map<std::string, std::shared_ptr<Continent>> continents;
 
-    std::string image;
-    std::string author;
-    bool wrap;
-    ScrollDirection scroll;
-    MapValidity validity;
-    bool warn;
+    std::string *image;
+    std::string *author;
+    bool *wrap;
+    ScrollDirection *scroll;
+    MapValidity *validity;
+    bool *warn;
 
 public:
     Map();
     Map(const Map &map);
+    ~Map();
 
     Map &operator=(const Map &map);
     friend std::ostream &operator<<(std::ostream &os, const Map &map);
