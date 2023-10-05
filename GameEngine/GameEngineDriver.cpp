@@ -12,7 +12,7 @@ void testGameStates()
 
     while (gameEngine->getPhase() != "end")
     {
-        std::cout << "\n" << *gameEngine << endl;
+        cout << "\n" << *gameEngine << endl;
         cout << "Enter a command from the list below (# or name):" << endl;
         cout << gameEngine->getCurrCommandsList() << endl;
 
