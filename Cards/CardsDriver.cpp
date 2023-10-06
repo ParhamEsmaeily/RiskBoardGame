@@ -21,3 +21,11 @@ void test_cards(int no_cards = 15) {
     hand.play(card_type(i % 5), deck);
   }
 }
+
+int main(){
+ test_cards();
+
+    return 0;
+}
+
+
