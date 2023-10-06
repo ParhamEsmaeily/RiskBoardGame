@@ -5,10 +5,12 @@
 #include <memory>
 #include <vector>
 
-using std::string;
-using std::shared_ptr;
-using std::vector;
 using std::ostream;
+using std::shared_ptr;
+using std::string;
+using std::vector;
+
+void testGameStates();
 
 class State; // Forward declaration
 
@@ -17,7 +19,7 @@ class Command
 public:
     shared_ptr<string> action;
     shared_ptr<State> nextState;
-    Command()= default;
+    Command() = default;
     Command(string action, shared_ptr<State> nextState);
 
     Command(Command const &other);

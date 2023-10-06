@@ -59,9 +59,9 @@ void testLoadMaps()
     }
 }
 
-int main()
+/* int main()
 {
     testLoadMaps();
 
     return 0;
-}
+} */

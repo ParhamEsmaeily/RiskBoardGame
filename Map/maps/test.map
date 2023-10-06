@@ -1,0 +1,109 @@
+[Map]
+author=Tre (Houston Texas)
+image=The Lost World.bmp
+wrap=yes
+scroll=no
+warn=yes
+
+[Continents]
+West Rangia=3
+East Rangia=4
+Penninsia=4
+Shoria=3
+Range Island=4
+The L Islands=4
+Grand Centralia=6
+The Confederation of Centralia=4
+The Lore Islands=3
+Eyesland=2
+Breakaway Island=2
+
+
+[Territories]
+Northwest Ranges,181,32,West Rangia,South Ranges,Southwest Ranges,North Ranges,Southwest Ranges,South Ranges
+North Ranges,253,39,West Rangia,Southwest Ranges,South Ranges,Northeast Ranges,Northwest Ranges,Northeast Ranges
+Southwest Ranges,164,56,West Rangia,North Ranges,South Ranges,North Easterland,Northwest Ranges
+South Ranges,236,61,West Rangia,North Ranges,Southwest Ranges,Northeast Ranges,Mid Southeast Ranges,Northwest Ranges
+Northeast Ranges,320,62,West Rangia,Mid Southeast Ranges,West Province,North Ranges,South Ranges
+Mid Southeast Ranges,318,82,West Rangia,South Ranges,Northeast Ranges,Southeast Ranges,West Province
+Southeast Ranges,345,105,West Rangia,West Province,Mid Southeast Ranges
+
+West Province,392,92,East Rangia,Mid Southeast Ranges,Southeast Ranges,Northeast Ranges,Buck Territory,Meriquita
+Buck Territory,414,42,East Rangia,West Province,Meriquita,Innerland,Bone Ranges
+Meriquita,430,78,East Rangia,West Province,Buck Territory,Innerland,West Rangialand
+Innerland,465,62,East Rangia,Meriquita,Buck Territory,Bone Ranges
+Bone Ranges,513,58,East Rangia,Buck Territory,Innerland,Housia,North Rangialand
+Housia,568,77,East Rangia,Bone Ranges,Northwest Penninsia,West Penninsia,North Rangialand
+West Rangialand,475,119,East Rangia,Meriquita,South Rangialand,North Rangialand
+North Rangialand,531,127,East Rangia,Bone Ranges,Housia,South Rangialand,West Rangialand
+South Rangialand,536,156,East Rangia,West Rangialand,North Rangialand,Northeast Centralia
+
+Northwest Penninsia,626,81,Penninsia,Housia,East Penninsia,West Penninsia
+West Penninsia,617,121,Penninsia,Housia,Northwest Penninsia,East Penninsia
+East Penninsia,675,137,Penninsia,Northwest Penninsia,West Penninsia,Mid Penninsia,Northwest Shoria,Southwest Shoria,West Range Island,Northeast Centralia
+Mid Penninsia,722,283,Penninsia,East Penninsia,South Penninsia,Southwest Range Island
+South Penninsia,708,329,Penninsia,Mid Penninsia,Northeast Centralia,East Centralia
+
+Northwest Shoria,731,56,Shoria,East Penninsia,Southwest Shoria,Mid Shoria
+Southwest Shoria,735,89,Shoria,East Penninsia,Northwest Shoria,Mid Shoria,North Range Island
+Mid Shoria,820,66,Shoria,Northwest Shoria,Southwest Shoria,Long Shoria,East Shoria,North Range Island
+Long Shoria,893,148,Shoria,Mid Shoria,East Shoria,Mid East Shoria,South Shoria,East Range Island
+East Shoria,908,114,Shoria,Mid Shoria,Long Shoria,Mid East Shoria
+Mid East Shoria,913,212,Shoria,Long Shoria,East Shoria,South Shoria
+South Shoria,901,273,Shoria,Long Shoria,Mid East Shoria
+
+North Range Island,796,126,Range Island,Southwest Shoria,Mid Shoria,East Range Island,West Range Island,Central Range Island
+East Range Island,852,166,Range Island,Long Shoria,North Range Island,Central Range Island
+West Range Island,727,165,Range Island,East Penninsia,North Range Island,Central Range Island,Southwest Range Island
+Central Range Island,787,168,Range Island,North Range Island,East Range Island,West Range Island,Southeast Range Island
+Southeast Range Island,803,240,Range Island,Southwest Range Island,Central Range Island
+Southwest Range Island,760,243,Range Island,Southeast Range Island,West Range Island,Mid Penninsia
+
+North Easterland,215,113,The L Islands,Northeast Westerland,East Easterland,West Easterland,Southwest Ranges
+East Easterland,244,149,The L Islands,North Easterland,West Easterland,Northwest Centralia
+South Easterland,199,185,The L Islands,South Westerland,West Easterland,North State
+West Easterland,218,147,The L Islands,Northeast Westerland,South Easterland,East Easterland,North Easterland
+Northeast Westerland,154,127,The L Islands,North Easterland,West Easterland,Northwest Westerland,South Westerland
+Northwest Westerland,119,130,The L Islands,Northeast Westerland,South Westerland,West Westerland
+West Westerland,100,186,The L Islands,South Westerland,Northwest Westerland
+South Westerland,143,210,The L Islands,North State,West Westerland,Northeast Westerland,Northwest Westerland,South Easterland
+
+North Lore,113,408,The Lore Islands,West State,Island State,Mid Lore
+Mid Lore,149,481,The Lore Islands,North Lore,Southeast Lore,Southwest Lore,Island State,South State
+Southeast Lore,218,535,The Lore Islands,Mid Lore,Nosia
+Southwest Lore,85,517,The Lore Islands,Mid Lore,West Lore
+West Lore,72,476,The Lore Islands,Southwest Lore
+
+Nosia,307,519,Eyesland,Southeast Lore,Eyesia,Backia,West Rang
+Eyesia,346,531,Eyesland,Nosia,Bodia,Backia
+Bodia,391,535,Eyesland,Eyesia,Backia,Rearia
+Backia,427,512,Eyesland,Nosia,Bodia,Eyesia,Rearia,East Rang
+Rearia,467,558,Eyesland,Backia,Bodia
+
+The North,760,415,Breakaway Island,The East,East Centralia
+The East,794,484,Breakaway Island,The North,The South,The West
+The South,816,542,Breakaway Island,The East,The West
+The West,779,540,Breakaway Island,The South,The East,Southeast Centralia
+
+North State,237,300,The Confederation of Centralia,Northwest Centralia,Mid West Centralia,Northeast State,West State,South Easterland,South Westerland
+West State,211,365,The Confederation of Centralia,North State,Island State,Northeast State,South State,North Lore
+South State,261,413,The Confederation of Centralia,Island State,West Rang,West State,Northeast State,Southeast State,Mid Lore
+Island State,197,412,The Confederation of Centralia,West State,South State,North Lore,Mid Lore
+Northeast State,295,344,The Confederation of Centralia,North State,Southeast State,South State,West State,West Centralia
+Southeast State,329,384,The Confederation of Centralia,Northeast State,South State,West Rang,West Centralia,Boot Centralia
+West Rang,333,432,The Confederation of Centralia,South State,Southeast State,East Rang,Nosia
+
+Northwest Centralia,324,204,Grand Centralia,East Easterland,Mid West Centralia,North Centralia,North State
+Northeast Centralia,604,216,Grand Centralia,South Rangialand,East Penninsia,South Penninsia,East Centralia, North Centralia
+Mid West Centralia,360,269,Grand Centralia,Northwest Centralia,North Centralia,Leggalin,Hookland,West Centralia,North State
+Southeast Centralia,611,454,Grand Centralia,East Centralia,Leggalin,South Centralia,The West
+West Centralia,353,341,Grand Centralia,Mid West Centralia,Hookland,Boot Centralia,Northeast State,Southeast State
+Boot Centralia,414,395,Grand Centralia,West Centralia,Hookland,Sperrian,South Centralia,East Rang,Southeast State
+East Centralia,634,349,Grand Centralia,South Penninsia,Northeast Centralia,Southeast Centralia,Leggalin,The North
+South Centralia,527,460,Grand Centralia,Southeast Centralia,Leggalin,Sperrian,Boot Centralia,East Rang
+Leggalin,495,315,Grand Centralia,Hookland,Mid West Centralia,North Centralia,East Centralia,Southeast Centralia,South Centralia,Sperrian
+North Centralia,462,222,Grand Centralia,Northeast Centralia,Northwest Centralia,Leggalin,Mid West Centralia
+Hookland,400,330,Grand Centralia,Boot Centralia,West Centralia,Mid West Centralia,Leggalin,Sperrian
+Sperrian,517,383,Grand Centralia,South Centralia,Leggalin,Boot Centralia,Hookland
+East Rang,410,452,Grand Centralia,Boot Centralia,South Centralia,Backia,West Rang
+
