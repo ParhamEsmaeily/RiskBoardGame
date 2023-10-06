@@ -7,14 +7,14 @@ set(CMAKE_CXX_STANDARD 17)
 
 # Add source files to the project
 set(SOURCES 
-    ./CardsDriver.cpp
-    ./Cards.cpp
+    ./OrdersDriver.cpp
+    ./Orders.cpp
 )
 
 # Add header files to the project
 set(HEADERS
-    ./Cards.h
+    ./Orders.h
 )
 
 # Create an executable from the source files
-add_executable(CardsDriver ${SOURCES} ${HEADERS})
+add_executable(OrdersDriver ${SOURCES} ${HEADERS})

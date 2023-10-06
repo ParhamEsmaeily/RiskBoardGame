@@ -13,6 +13,8 @@
 #include <unordered_set>
 #include <iostream>
 
+void testLoadMaps();
+
 // forward declarations
 class Map;
 class Continent;

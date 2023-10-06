@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+void test_cards(int no_cards = 15);
+
 /*
   Five card_type available:
   0- bomb,
@@ -13,14 +15,22 @@
   3- airlift,
   4- diplomacy.
 */
-enum card_type { bomb, reinforcement, blockade, airlift, diplomacy };
+enum card_type
+{
+  bomb,
+  reinforcement,
+  blockade,
+  airlift,
+  diplomacy
+};
 
-namespace cd {
-/*
-Maps enum value to a string value. Enum value directly does not give a string
-value.
-*/
-std::string type_map(const int);
+namespace cd
+{
+  /*
+  Maps enum value to a string value. Enum value directly does not give a string
+  value.
+  */
+  std::string type_map(const int);
 } // namespace cd
 
 class Card;
@@ -35,7 +45,8 @@ using card_vector = std::vector<card_ptr>;
 /*
     Warzone card.
 */
-class Card {
+class Card
+{
 public:
   // Type of the card. 5 types available.
   const card_type type;
@@ -55,7 +66,8 @@ public:
   */
   const std::string value() const noexcept;
 
-  friend std::ostream &operator<<(std::ostream &os, const Card &c) {
+  friend std::ostream &operator<<(std::ostream &os, const Card &c)
+  {
     // Mapping is made from enum index to the proper string type.
     os << "Card is of type: " << cd::type_map(c.type);
     return os;
@@ -66,7 +78,8 @@ public:
   Base class when holding cards is necessary.
   Container of cards.
 */
-class Buffer {
+class Buffer
+{
 protected:
   card_vector buffer;
 
@@ -117,7 +130,8 @@ public:
 /*
   Finite collection of Warzone cards.
 */
-class Hand : public Buffer {
+class Hand : public Buffer
+{
 public:
   /*
     The card with desired type will be played, and removed from the player's
@@ -130,7 +144,8 @@ public:
 /*
   Contains finite collection of Warzone cards.
 */
-class Deck : public Buffer {
+class Deck : public Buffer
+{
 public:
   /*
     Draw a card at random from the cards remaining in the deck.

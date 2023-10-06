@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "Map.h"
-#include "Map.cpp"
 
 void testLoadMap(const std::string &mapLocation)
 {
@@ -50,7 +49,7 @@ void testLoadMap(const std::string &mapLocation)
 
 void testLoadMaps()
 {
-    const auto maps = {"../maps/test.map", "../maps/world.map"};
+    const auto maps = {"maps/test.map", "maps/world.map"};
 
     for (auto &&map : maps)
     {
@@ -60,9 +59,9 @@ void testLoadMaps()
     }
 }
 
-int main()
+/* int main()
 {
     testLoadMaps();
 
     return 0;
-}
+} */

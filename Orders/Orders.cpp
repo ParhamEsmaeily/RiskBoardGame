@@ -12,17 +12,17 @@ OrdersList::OrdersList(vector<shared_ptr<Order>> list)
 }
 
 /**Copy constructor*/
-OrdersList::OrdersList(const OrdersList& other)
+OrdersList::OrdersList(const OrdersList &other)
 {
     this->list = other.list;
 }
 
 /**[] operator override*/
-std::shared_ptr<Order>& OrdersList::operator[](const int i)
+std::shared_ptr<Order> &OrdersList::operator[](const int i)
 {
-    if(i>=this->size() || i<0)
+    if (i >= this->size() || i < 0)
     {
-        std::cout << "Index out of range (index=" << i <<").\nProgram will exit." << endl;
+        std::cout << "Index out of range (index=" << i << ").\nProgram will exit." << endl;
         exit(1);
     }
     return this->list[i];
@@ -30,12 +30,13 @@ std::shared_ptr<Order>& OrdersList::operator[](const int i)
 
 /**<< Operator override, I would like for this operator to be able to call the same operator,
  * but for its contained class. This will do for now.
-*/
-ostream& operator<<(ostream &os, OrdersList& olist) {
+ */
+ostream &operator<<(ostream &os, const OrdersList &olist)
+{
     os << "Orders list: \n";
-    for(int i=0; i<olist.size(); i++)
+    for (int i = 0; i < olist.size(); i++)
     {
-        os << i <<". "<< olist.list[i]->name <<": "<<olist.list[i]->description<<endl;
+        os << (i + 1) << ". " << olist.list[i]->name << ": " << olist.list[i]->description << endl;
     }
     return os;
 };
@@ -43,25 +44,25 @@ ostream& operator<<(ostream &os, OrdersList& olist) {
 /**Moves Order to new index in list*/
 bool OrdersList::move(int index, int destination)
 {
-    if(index == destination)
+    if (index == destination)
         return true;
-    if(index<0 || destination<0 || index>=this->size() || destination>=this->size())
+    if (index < 0 || destination < 0 || index >= this->size() || destination >= this->size())
     {
-        std::cout <<"Invalid parameters were passed(start index:"<<index<<" destination: "<<destination<<" size: "<<this->size()<<")."<<endl; 
+        std::cout << "Invalid parameters were passed(start index:" << index << " destination: " << destination << " size: " << this->size() << ")." << endl;
         return false;
     }
     shared_ptr<Order> temp = this->list.at(index);
-    this->list.erase(this->list.begin()+index);
-    this->list.insert(this->list.begin()+destination, temp);
+    this->list.erase(this->list.begin() + index);
+    this->list.insert(this->list.begin() + destination, temp);
     return true;
 }
 
 /**Removes Order from list*/
 bool OrdersList::remove(int index)
 {
-    if(this->list.size() >= index)
+    if (this->list.size() >= index)
     {
-        this->list.erase(this->list.begin()+index);
+        this->list.erase(this->list.begin() + index);
         return true;
     }
     cout << "Invalid index.";
@@ -71,10 +72,10 @@ bool OrdersList::remove(int index)
 /**Adds order to back of the list. I would like to pass param o as a const shared_ptr,
  * since I'm not changing the actual pointer, but it seems like I cannot. Is this because
  * vector::push_back() is not a const function?
-*/
-void OrdersList::add(std::shared_ptr<Order> o)
+ */
+void OrdersList::add(const Order &o)
 {
-    this->list.push_back(o);
+    this->list.emplace_back(make_shared<Order>(o));
 }
 
 /**Copy constructor*/
@@ -85,23 +86,25 @@ Order::Order(Order const &other)
 }
 
 /**<< operator override*/
-ostream &operator<<(ostream &os, Order &order) {
-    os << "Order: "<<order.name<<"\n"<<order.description<<endl;
+ostream &operator<<(ostream &os, Order &order)
+{
+    os << "Order: " << order.name << "\n"
+       << order.description << endl;
     return os;
 }
 
 bool Order::validate()
 {
-    std::cout <<this->name<<": No real implementation yet! Validated.";
+    std::cout << this->name << ": No real implementation yet! Validated.";
     return true;
 }
 
 void Order::execute()
 {
-    if(this->validate())
-        std::cout << "No real implementation yet! Executed."<<endl;
+    if (this->validate())
+        std::cout << "No real implementation yet! Executed." << endl;
     else
-        std::cout << "Cannot validate."<<endl;
+        std::cout << "Cannot validate." << endl;
 }
 
 Deploy::Deploy()
