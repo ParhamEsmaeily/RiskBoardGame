@@ -35,7 +35,7 @@ void testOrdersList()
     cout << "Test done." << endl;
 }
 
-#ifndef BUILD_MAIN_DRIVER
+#ifdef INCLUDE_MAIN
 
 int main()
 {

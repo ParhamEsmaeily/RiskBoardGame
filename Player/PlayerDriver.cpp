@@ -76,7 +76,7 @@ void testPlayers()
     p1 = p2 = NULL;
 }
 
-#ifndef BUILD_MAIN_DRIVER
+#ifdef INCLUDE_MAIN
 
 int main()
 {

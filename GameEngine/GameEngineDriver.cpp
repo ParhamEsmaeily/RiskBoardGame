@@ -24,7 +24,7 @@ void testGameStates()
     }
 }
 
-#ifndef BUILD_MAIN_DRIVER
+#ifdef INCLUDE_MAIN
 
 int main()
 {

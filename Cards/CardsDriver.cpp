@@ -26,7 +26,7 @@ void test_cards(int no_cards)
   }
 }
 
-#ifndef BUILD_MAIN_DRIVER
+#ifdef INCLUDE_MAIN
 
 int main()
 {

@@ -1,6 +1,5 @@
 #include "Player.h"
-#include "../Orders/Orders.h"
-#include "../Cards/Cards.h"
+
 using namespace std;
 
 Player::Player()

@@ -59,7 +59,7 @@ void testLoadMaps()
     }
 }
 
-#ifndef BUILD_MAIN_DRIVER
+#ifdef INCLUDE_MAIN
 
 int main()
 {
