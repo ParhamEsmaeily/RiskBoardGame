@@ -23,14 +23,3 @@ void testGameStates()
         gameEngine->executeCommand(input);
     }
 }
-
-#ifdef INCLUDE_MAIN
-
-int main()
-{
-    testGameStates();
-
-    return 0;
-}
-
-#endif

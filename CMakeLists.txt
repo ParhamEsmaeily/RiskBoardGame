@@ -7,26 +7,28 @@ set(CMAKE_CXX_STANDARD 17)
 
 # Add source file to the root project
 set(SOURCES
+    Cards/Cards.cpp
+    Cards/CardsDriver.cpp
+    GameEngine/GameEngine.cpp
+    GameEngine/GameEngineDriver.cpp
+    Map/Map.cpp
+    Map/MapDriver.cpp
+    Orders/Orders.cpp
+    Orders/OrdersDriver.cpp
+    Player/Player.cpp
+    Player/PlayerDriver.cpp
     driver.cpp
 )
 
-# Add header files to the root project
-set(HEADERS
+# Add include directories to the root project
+set(INCLUDE_DIRS
+    Cards
+    GameEngine
+    Map
+    Orders
+    Player
 )
 
-set(BUILD_CARDS_MAIN CACHE BOOL FALSE FORCE)
-set(BUILD_GAME_ENGINE_MAIN CACHE BOOL FALSE FORCE)
-set(BUILD_MAP_MAIN CACHE BOOL FALSE FORCE)
-set(BUILD_ORDERS_MAIN CACHE BOOL FALSE FORCE)
-set(BUILD_PLAYER_MAIN CACHE BOOL FALSE FORCE)
-
-# Add individual drivers
-add_subdirectory(Cards)
-add_subdirectory(GameEngine)
-add_subdirectory(Map)
-add_subdirectory(Orders)
-add_subdirectory(Player)
-
 # Create an executable from the source files
-add_executable(MainDriver ${SOURCES} ${HEADERS})
-target_link_libraries(MainDriver PRIVATE CardsLib GameEngineLib MapLib OrdersLib PlayerLib)
+add_executable(MainDriver ${SOURCES})
+target_include_directories(MainDriver PRIVATE ${INCLUDE_DIRS})

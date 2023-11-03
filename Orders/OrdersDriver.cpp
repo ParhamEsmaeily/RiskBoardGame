@@ -34,13 +34,3 @@ void testOrdersList()
 
     cout << "Test done." << endl;
 }
-
-#ifdef INCLUDE_MAIN
-
-int main()
-{
-    testOrdersList();
-    return 0;
-}
-
-#endif

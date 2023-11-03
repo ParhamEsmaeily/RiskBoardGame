@@ -25,14 +25,3 @@ void test_cards(int no_cards)
     hand.play(card_type(i % 5), deck);
   }
 }
-
-#ifdef INCLUDE_MAIN
-
-int main()
-{
-  test_cards();
-
-  return 0;
-}
-
-#endif

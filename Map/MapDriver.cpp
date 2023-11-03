@@ -58,14 +58,3 @@ void testLoadMaps()
         std::cout << std::endl;
     }
 }
-
-#ifdef INCLUDE_MAIN
-
-int main()
-{
-    testLoadMaps();
-
-    return 0;
-}
-
-#endif

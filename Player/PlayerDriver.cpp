@@ -75,14 +75,3 @@ void testPlayers()
     delete p1, p2;
     p1 = p2 = NULL;
 }
-
-#ifdef INCLUDE_MAIN
-
-int main()
-{
-    testPlayers();
-
-    return 0;
-}
-
-#endif
