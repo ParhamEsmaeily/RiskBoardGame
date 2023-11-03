@@ -26,9 +26,13 @@ void test_cards(int no_cards)
   }
 }
 
-/* int main()
+#ifndef BUILD_MAIN_DRIVER
+
+int main()
 {
   test_cards();
 
   return 0;
-} */
+}
+
+#endif

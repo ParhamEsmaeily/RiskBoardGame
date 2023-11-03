@@ -35,8 +35,12 @@ void testOrdersList()
     cout << "Test done." << endl;
 }
 
-/* int main()
+#ifndef BUILD_MAIN_DRIVER
+
+int main()
 {
     testOrdersList();
     return 0;
-} */
+}
+
+#endif

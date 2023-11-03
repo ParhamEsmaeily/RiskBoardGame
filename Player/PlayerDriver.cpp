@@ -76,9 +76,13 @@ void testPlayers()
     p1 = p2 = NULL;
 }
 
-/* int main()
+#ifndef BUILD_MAIN_DRIVER
+
+int main()
 {
     testPlayers();
 
     return 0;
-} */
+}
+
+#endif

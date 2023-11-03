@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10) # Minimum version of CMake required
+cmake_minimum_required(VERSION 3.19) # Minimum version of CMake required
 
 project(RiskBoardGame) # Name of your project
 

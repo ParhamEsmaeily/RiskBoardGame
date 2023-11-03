@@ -59,9 +59,13 @@ void testLoadMaps()
     }
 }
 
-/* int main()
+#ifndef BUILD_MAIN_DRIVER
+
+int main()
 {
     testLoadMaps();
 
     return 0;
-} */
+}
+
+#endif

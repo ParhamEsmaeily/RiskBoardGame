@@ -24,9 +24,13 @@ void testGameStates()
     }
 }
 
-/* int main()
+#ifndef BUILD_MAIN_DRIVER
+
+int main()
 {
     testGameStates();
 
     return 0;
-} */
+}
+
+#endif
