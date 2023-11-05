@@ -7,9 +7,10 @@
 #include "Map/Map.h"
 #include "Player/Player.h"
 
-int main()
+int main(int argc, char const *argv[])
 {
     int choice = -1;
+    std::vector<std::string> argsVector = std::vector<std::string>(argv + 1, argv + argc); // create a vector of the command line arguments
 
     while (true)
     {
@@ -35,8 +36,29 @@ int main()
             testGameStates();
             break;
         case 6:
-            testCommandProcessor(true);
+        {
+            const auto consoleFlagIterator = std::find(argsVector.begin(), argsVector.end(), "-console");
+            if (consoleFlagIterator != argsVector.end())
+            {
+                testCommandProcessor();
+                break;
+            }
+
+            auto fileFlagIterator = std::find(argsVector.begin(), argsVector.end(), "-file");
+
+            if (fileFlagIterator != argsVector.end())
+            {
+                // advance the iterator by 1 to get the file name
+                std::advance(fileFlagIterator, 1);
+                testCommandProcessor(*fileFlagIterator);
+                break;
+            }
+
+            std::cout << "Invalid command source provided. Please specify the '-console' or '-file <path>' flag.\n"
+                      << std::endl;
+
             break;
+        }
         default:
             std::cout << "Byyyye ;)" << std::endl;
             return 0;

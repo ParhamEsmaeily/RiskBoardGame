@@ -40,7 +40,7 @@ void Command::saveEffect(const std::string &effect)
 /** Ostream << operator */
 ostream &operator<<(ostream &os, const Command &command)
 {
-    os << "Action: " << *command.action << " Next State: " << *command.nextState->phase;
+    os << "Action: " << *command.action << ", Next State: " << *command.nextState->phase;
     return os;
 };
 

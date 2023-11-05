@@ -11,6 +11,7 @@ set(SOURCES
     Cards/CardsDriver.cpp
     CommandProcessor/CommandProcessor.cpp
     CommandProcessor/CommandProcessorDriver.cpp
+    CommandProcessor/FileLineReader.cpp
     GameEngine/GameEngine.cpp
     GameEngine/GameEngineDriver.cpp
     Map/Map.cpp
