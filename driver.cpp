@@ -12,6 +12,19 @@ int main(int argc, char const *argv[])
     int choice = -1;
     std::vector<std::string> argsVector = std::vector<std::string>(argv + 1, argv + argc); // create a vector of the command line arguments
 
+    const auto testRunIterator = std::find(argsVector.begin(), argsVector.end(), "-test");
+
+    // if the '-test' flag is not provided, run the game
+    if (testRunIterator == argsVector.end())
+    {
+        // run actual game
+
+        std::cout << "Running game..." << std::endl;
+
+        return 0;
+    }
+
+    // otherwise, if the '-test' flag is provided, run the tests and exit
     while (true)
     {
         std::cout << "Choose your poison \n1: Test Maps\n2: Test Players\n3: Test Orders\n4: Test Cards\n5: Test Game Engine\n6: Test Command Processor\nElse: exit ";
@@ -37,6 +50,7 @@ int main(int argc, char const *argv[])
             break;
         case 6:
         {
+            // if the '-console' flag is provided, run the command processor using the console as source
             const auto consoleFlagIterator = std::find(argsVector.begin(), argsVector.end(), "-console");
             if (consoleFlagIterator != argsVector.end())
             {
@@ -44,6 +58,7 @@ int main(int argc, char const *argv[])
                 break;
             }
 
+            // if the '-file' flag is provided, run the command processor using the file as source
             auto fileFlagIterator = std::find(argsVector.begin(), argsVector.end(), "-file");
 
             if (fileFlagIterator != argsVector.end())
