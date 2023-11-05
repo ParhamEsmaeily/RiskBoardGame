@@ -336,6 +336,16 @@ SharedTerritoriesVector Map::getAdjacentTerritories(const Map &map, const std::s
     return adjacentTerritories;
 }
 
+bool Map::areAdjacent(const Map &map, const Territory &territory1, const Territory &territory2)
+{
+    return Map::areAdjacent(map, territory1.getName(), territory2.getName());
+}
+
+bool Map::areAdjacent(const Map &map, const std::string &territory1, const std::string &territory2)
+{
+    return std::find(map.adjacency.at(territory1).begin(), map.adjacency.at(territory1).end(), territory2) != map.adjacency.at(territory1).end();
+}
+
 void Map::countTraversedTerritories(const Map &map, const std::string &territory, std::unordered_set<std::string> &visited)
 {
     visited.insert(territory);

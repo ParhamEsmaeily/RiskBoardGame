@@ -133,6 +133,8 @@ public:
     static SharedTerritoriesVector getAllTerritoriesInContinent(const Map &map, const std::string &continent);
     static SharedTerritoriesVector getAdjacentTerritories(const Map &map, const Territory &territory);
     static SharedTerritoriesVector getAdjacentTerritories(const Map &map, const std::string &territory);
+    static bool areAdjacent(const Map &map, const Territory &territory1, const Territory &territory2);
+    static bool areAdjacent(const Map &map, const std::string &territory1, const std::string &territory2);
 
     static void countTraversedTerritories(const Map &map, const std::string &territory, std::unordered_set<std::string> &visited);
     static void countTraversedTerritoriesInContinent(const Map &map, const std::string &continent, const std::string &territory, std::unordered_set<std::string> &visited);
