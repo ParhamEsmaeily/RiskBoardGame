@@ -75,10 +75,3 @@ void testPlayers()
     delete p1, p2;
     p1 = p2 = NULL;
 }
-
-/* int main()
-{
-    testPlayers();
-
-    return 0;
-} */

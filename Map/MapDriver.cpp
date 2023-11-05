@@ -58,10 +58,3 @@ void testLoadMaps()
         std::cout << std::endl;
     }
 }
-
-/* int main()
-{
-    testLoadMaps();
-
-    return 0;
-} */

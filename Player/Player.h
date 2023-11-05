@@ -3,8 +3,9 @@
 #include <vector>
 #include <iostream>
 
-#include "../Orders/Orders.h"
-#include "../Map/Map.h"
+#include "Cards.h"
+#include "Orders.h"
+#include "Map.h"
 
 using namespace std;
 
