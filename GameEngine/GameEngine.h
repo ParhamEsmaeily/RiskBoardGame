@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include "Player.h"
 
 using std::ostream;
 using std::shared_ptr;
@@ -43,11 +44,15 @@ class GameEngine
 {
     shared_ptr<State> currState;
     void initGame();
+    static void reinforcementPhase(vector<Player *> players, shared_ptr<Map> map);
+    void issueOrdersPhase();
+    void executeOrdersPhase();
 
 public:
     string getCurrCommandsList();
     string executeCommand(string input);
     string getPhase();
+    void mainGameLoop(); // move to private after testing
 
     GameEngine();
     GameEngine(GameEngine const &other);

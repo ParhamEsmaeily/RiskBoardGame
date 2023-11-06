@@ -1,7 +1,9 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <map>
 #include "GameEngine.h"
+#include "Player.h"
 
 using std::cin;
 using std::make_shared;
@@ -202,3 +204,103 @@ string GameEngine::executeCommand(string input) {
 
     return *currState->phase;
 }
+
+/*
+ * Part 3: Main Game Loop
+ */
+
+void GameEngine::reinforcementPhase(vector<Player *> players, shared_ptr<Map> gameMap) {
+    const auto continents = Map::getAllContinents(*gameMap);
+
+    // for each player, give reinforcements based on territories owned
+    for (auto && player : players) {
+        int reinforcements = 0;
+        map<string, int> num_terr_per_continent;
+        // count number of territories owned per continent for this player
+        for (auto &&territory : player->getTerritories())
+        {
+            cout << *territory << endl;
+            string territoryContinent = territory->getContinent()->getName();
+            bool missing_from_map = num_terr_per_continent.find(territoryContinent) == num_terr_per_continent.end();
+
+            if (missing_from_map) {
+                num_terr_per_continent[territoryContinent] = 1;
+            } else {
+                num_terr_per_continent[territoryContinent]++;
+            }
+        }
+
+        // print number of territories owned per continent for this player
+        for (auto &&continent : continents) {
+            if (num_terr_per_continent.find(continent->getName()) != num_terr_per_continent.end()) {
+                std::cout << "Player " << player->getName() << " owns " << num_terr_per_continent[continent->getName()]
+                          << " territories in " << continent->getName() << std::endl;
+            }
+        }
+
+        // check if player owns all territories in a continent by matching the number of territories owned per continent
+        // with the total number of territories in that continent
+        for (auto &&continent : continents) {
+            if (num_terr_per_continent.find(continent->getName()) != num_terr_per_continent.end()) {
+                if (num_terr_per_continent[continent->getName()] == continent->getTerritoryCount()) {
+                    std::cout << "Player " << player->getName() << " owns all territories in " << continent->getName()
+                              << std::endl;
+                    reinforcements += continent->getBonus();
+                }
+            }
+        }
+
+        // 1 army for every 3 territories owned rounded down
+        reinforcements += static_cast<int>(player->getTerritories().size() / 3);
+
+        // minimum of 3 reinforcements
+        if(reinforcements < 3) { reinforcements = 3; }
+
+        // give player reinforcements
+        for (int i = 0; i < reinforcements; i++) {
+            player->getHand()->insert(Card(card_type::reinforcement));
+        }
+    }
+}
+
+void GameEngine::issueOrdersPhase() {
+
+}
+
+void GameEngine::executeOrdersPhase() {
+
+}
+
+void GameEngine::mainGameLoop() {
+    vector<Player *> players;
+    const auto gameMap = MapLoader::loadMap("../maps/world.map");
+    const auto territories = Map::getAllTerritories(*gameMap);
+
+
+    // Test players by adding territories
+    auto *p1 = new Player(1, "p1");
+    auto *p2 = new Player(2, "p2");
+    players.push_back(p1);
+    players.push_back(p2);
+
+    for (const auto & t : territories)
+    {
+        Territory *territory = &*t;
+        p1 ->addTerritory(territory);
+//        if (index < territories.size() / 2)
+//        {
+//            p1->addTerritory(territory);
+//        }
+//        else
+//        {
+//            p2->addTerritory(territory);
+//        }
+    }
+
+//    while(getPhase() != "end") {
+        reinforcementPhase(players, gameMap);
+        issueOrdersPhase();
+        executeOrdersPhase();
+//    }
+}
+
