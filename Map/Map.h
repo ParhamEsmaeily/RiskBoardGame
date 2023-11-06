@@ -131,6 +131,15 @@ public:
     static SharedTerritoriesVector getAllTerritories(const Map &map);
     static SharedTerritoriesVector getAllTerritoriesInContinent(const Map &map, const Continent &continent);
     static SharedTerritoriesVector getAllTerritoriesInContinent(const Map &map, const std::string &continent);
+
+    /// @brief Checks if the list of passed territories are all part of the same continent and if the continent has no other territories
+    /// @return true if all territories are in the same continent and the continent has no other territories
+    static bool areAllTerritoriesInContinentExclusive(const Map &map, const std::string &continent, const std::vector<std::string> &territories);
+
+    /// @brief Checks if the list of passed territories are all part of the same continent
+    /// @return true if all territories are in the same continent
+    static bool areAllTerritoriesInContinent(const Map &map, const std::string &continent, const std::vector<std::string> &territories);
+
     static SharedTerritoriesVector getAdjacentTerritories(const Map &map, const Territory &territory);
     static SharedTerritoriesVector getAdjacentTerritories(const Map &map, const std::string &territory);
     static bool areAdjacent(const Map &map, const Territory &territory1, const Territory &territory2);

@@ -318,6 +318,35 @@ SharedTerritoriesVector Map::getAllTerritoriesInContinent(const Map &map, const 
     return territoriesInContinent;
 }
 
+bool Map::areAllTerritoriesInContinentExclusive(const Map &map, const std::string &continent, const std::vector<std::string> &territories)
+{
+    auto territoriesTraversed = 0;
+
+    // check if all territories are in the same continent
+    for (auto &&territoryName : territories)
+    {
+        if (map.territories.at(territoryName)->getContinent()->getName() != continent)
+            return false;
+
+        territoriesTraversed++;
+    }
+
+    // check if the continent has no other territories
+    return territoriesTraversed == map.continents.at(continent)->getTerritoryCount();
+}
+
+bool Map::areAllTerritoriesInContinent(const Map &map, const std::string &continent, const std::vector<std::string> &territories)
+{
+    // check if all territories are in the same continent
+    for (auto &&territoryName : territories)
+    {
+        if (map.territories.at(territoryName)->getContinent()->getName() != continent)
+            return false;
+    }
+
+    return true;
+}
+
 // This function is included for convenience, works identically to its overloaded version.
 SharedTerritoriesVector Map::getAdjacentTerritories(const Map &map, const Territory &territory)
 {
