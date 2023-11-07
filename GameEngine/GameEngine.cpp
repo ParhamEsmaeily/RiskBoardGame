@@ -278,44 +278,46 @@ void GameEngine::issueOrdersPhase(vector<Player *> players, const Map &gameMap) 
     cout << "Issue Orders Phase End" << endl;
 }
 
-void GameEngine::executeOrdersPhase() {
+void GameEngine::executeOrdersPhase(vector<Player *> players) {
+    cout << "Execute Orders Phase Starting" << endl;
 
-}
+    // while all players still have orders left
+    size_t players_with_deploys_left = players.size();
+    while (true) {
+        bool all_players_have_no_orders = true;
 
-void GameEngine::mainGameLoop() {
-    vector<Player *> players;
-    // Test: load map
-    const shared_ptr<Map> gameMap = MapLoader::loadMap("../maps/world.map");
-    const auto territories = Map::getAllTerritories(*gameMap);
-
-    // Test: add players and add territories to them
-    auto *p1 = new Player(1, "p1");
-    auto *p2 = new Player(2, "p2");
-    players.push_back(p1);
-    players.push_back(p2);
-
-    // Test: split territories between p1 and p2 (90% and 10%)
-    for (size_t index = 0; index < territories.size(); ++index)
-    {
-        Territory *territory = &*territories[index];
-        if (index < territories.size() * 0.9)
-        {
-            p1->addTerritory(territory);
+        // for each player, check if they have orders left
+        for (auto && player : players) {
+            if (!player->getPlayerOrderList()->list.empty()) {
+                all_players_have_no_orders = false;
+                break;
+            }
         }
-        else
-        {
-            p2->addTerritory(territory);
+        // if all players have no orders left, break out of loop
+        if (all_players_have_no_orders) {
+            break;
+        }
+
+        // for each player, execute orders
+        for (auto && player : players) {
+            // execute deploy orders first, then when all players have no deploy orders left, execute the rest
+            if (!player->getPlayerOrderList()->list.empty() &&
+                (player->getPlayerOrderList()->list[0]->name == "Deploy" || players_with_deploys_left <= 0)) {
+                cout << "Player " << player->getName() << " executing orders" << endl;
+
+                player->getPlayerOrderList()->list[0]->execute();
+                player->getPlayerOrderList()->remove(0);
+            }
+            else if (players_with_deploys_left > 0){
+                players_with_deploys_left--;
+            }
         }
     }
 
+    cout << "Execute Orders Phase End" << endl;
+}
 
-    // Test: move current state to reinforcement phase
-    executeCommand("loadmap");
-    executeCommand("validate");
-    executeCommand("addplayers");
-    executeCommand("assigncountries");
-
-
+void GameEngine::mainGameLoop(vector<Player *> players, const Map &gameMap) {
     // Check if gamestart was called
     if(getPhase() != "assign reinforcements")
     {
@@ -323,18 +325,29 @@ void GameEngine::mainGameLoop() {
         return;
     }
 
-    //while(getPhase() != "end") {
-        reinforcementPhase(players, *gameMap);
+    while(getPhase() != "end") {
+        // check if a player has no territories (delete function because players don't start with 0 territories)
+        for (auto && player : players) {
+            if(player->getTerritories().empty()) {
+                cout << player->getName() << " has no territories left. Player will be removed." << endl;
+                // remove player from list of players
+                players.erase(std::remove(players.begin(), players.end(), player), players.end());
+                break;
+            }
+        }
+
+        reinforcementPhase(players, gameMap);
         executeCommand("issueorder");
 
-        issueOrdersPhase(players, *gameMap);
+        issueOrdersPhase(players, gameMap);
+        executeCommand("endissueorders");
 
-        executeOrdersPhase();
+        executeOrdersPhase(players);
 
         // check if a player has no territories
         for (auto && player : players) {
             if(player->getTerritories().empty()) {
-                cout << player->getName() << " has no territories. Player will be removed." << endl;
+                cout << player->getName() << " has no territories left. Player will be removed." << endl;
                 // remove player from list of players
                 players.erase(std::remove(players.begin(), players.end(), player), players.end());
                 break;
@@ -345,9 +358,14 @@ void GameEngine::mainGameLoop() {
         if(players.size() == 1) {
             cout << players[0]->getName() << " has won the game!" << endl;
             // must be in execute orders state to win
-            // executeCommand("win");
-            // return;
+            executeCommand("win");
+            return;
         }
-    //}
+
+        executeCommand("endexecorders");
+
+        // Stops after 1 loop (to delete)
+        break;
+    }
 }
 

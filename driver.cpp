@@ -8,40 +8,35 @@
 
 int main()
 {
-    auto * gameEngine = new GameEngine();
-    gameEngine->mainGameLoop();
+    int choice = -1;
 
+    while (true)
+    {
+        std::cout << "Choose your poison (1: Test Maps, 2: Test Players, 3: Test Orders, 4: Test Cards & 5: Test Game Engine, else: exit): ";
+        std::cin >> choice;
 
-
-//    int choice = -1;
-//
-//    while (true)
-//    {
-//        std::cout << "Choose your poison (1: Test Maps, 2: Test Players, 3: Test Orders, 4: Test Cards & 5: Test Game Engine, else: exit): ";
-//        std::cin >> choice;
-//
-//        switch (choice)
-//        {
-//        case 1:
-//            testLoadMaps();
-//            break;
-//        case 2:
-//            testPlayers();
-//            break;
-//        case 3:
-//            testOrdersList();
-//            break;
-//        case 4:
-//            test_cards();
-//            break;
-//        case 5:
-//            testGameStates();
-//            break;
-//        default:
-//            std::cout << "Byyyye ;)" << std::endl;
-//            return 0;
-//        }
-//    }
+        switch (choice)
+        {
+        case 1:
+            testLoadMaps();
+            break;
+        case 2:
+            testPlayers();
+            break;
+        case 3:
+            testOrdersList();
+            break;
+        case 4:
+            test_cards();
+            break;
+        case 5:
+            testGameStates();
+            break;
+        default:
+            std::cout << "Byyyye ;)" << std::endl;
+            return 0;
+        }
+    }
 
     return 0;
 }

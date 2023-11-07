@@ -12,6 +12,7 @@ using std::string;
 using std::vector;
 
 void testGameStates();
+void testMainGameLoop();
 
 class State; // Forward declaration
 
@@ -46,16 +47,17 @@ class GameEngine
     void initGame();
     void reinforcementPhase(vector<Player *> players, const Map &map);
     void issueOrdersPhase(vector<Player *> players, const Map &map);
-    void executeOrdersPhase();
+    void executeOrdersPhase(vector<Player *> players);
 
 public:
     string getCurrCommandsList();
     string executeCommand(string input);
     string getPhase();
-    void mainGameLoop(); // move to private after testing
 
     GameEngine();
     GameEngine(GameEngine const &other);
     GameEngine &operator=(const GameEngine &other);
     friend ostream &operator<<(ostream &os, const GameEngine &gameEngine);
+
+    void mainGameLoop(vector<Player *> players, const Map &map);
 };
