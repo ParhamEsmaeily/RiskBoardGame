@@ -19,12 +19,17 @@ class Command
 public:
     shared_ptr<string> action;
     shared_ptr<State> nextState;
+    vector<string> validStates;
+    shared_ptr<string> effect;
+
     Command() = default;
     Command(string action, shared_ptr<State> nextState);
 
     Command(Command const &other);
     Command &operator=(const Command &other);
     friend ostream &operator<<(ostream &os, const Command &command);
+
+    void saveEffect(const std::string &effect);
 };
 
 class State
