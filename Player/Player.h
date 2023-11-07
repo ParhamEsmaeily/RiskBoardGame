@@ -52,9 +52,9 @@ public:
 
     // methods
 
-    vector<Territory *> toAttack();          // return a list of territories to be Attacked
+    vector<Territory *> toAttack(const Map &gameMap);          // return a list of territories to be Attacked
     vector<Territory *> toDefend();          // return a list of territories to be defended
-    void issueOrder(const Order &o);         // testing purposes to add orders to orderList
+    void issueOrder(const Map &gameMap);         // uses the console to add orders to the player's list of orders
     void addTerritory(Territory *territory); // add territories to player
 
     // sets

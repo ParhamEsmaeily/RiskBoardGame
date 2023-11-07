@@ -50,7 +50,7 @@ void testPlayers()
     //  cout << "Player's orders list:" << endl;
     Order test_order = Advance();
 
-    p1->issueOrder(test_order);
+//    p1->issueOrder(test_order);
 
     cout << *(p1->getPlayerOrderList()) << endl;
 
@@ -65,11 +65,11 @@ void testPlayers()
     {
         cout << *t << endl;
     }
-    cout << "Territories to attack:" << endl;
-    for (Territory *t : p2->toAttack())
-    {
-        cout << *t << endl;
-    }
+    cout << "Territories to attack: uncomment this if needed" << endl;
+//    for (Territory *t : p2->toAttack())
+//    {
+//        cout << *t << endl;
+//    }
 
     // cleanup
     delete p1, p2;

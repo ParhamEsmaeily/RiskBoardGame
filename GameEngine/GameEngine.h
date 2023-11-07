@@ -44,8 +44,8 @@ class GameEngine
 {
     shared_ptr<State> currState;
     void initGame();
-    static void reinforcementPhase(vector<Player *> players, shared_ptr<Map> map);
-    void issueOrdersPhase();
+    void reinforcementPhase(vector<Player *> players, const Map &map);
+    void issueOrdersPhase(vector<Player *> players, const Map &map);
     void executeOrdersPhase();
 
 public:
