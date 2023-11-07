@@ -9,9 +9,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(SOURCES
     Cards/Cards.cpp
     Cards/CardsDriver.cpp
-    CommandProcessor/CommandProcessor.cpp
-    CommandProcessor/CommandProcessorDriver.cpp
-    CommandProcessor/FileLineReader.cpp
     GameEngine/GameEngine.cpp
     GameEngine/GameEngineDriver.cpp
     Map/Map.cpp
@@ -20,17 +17,19 @@ set(SOURCES
     Orders/OrdersDriver.cpp
     Player/Player.cpp
     Player/PlayerDriver.cpp
+    LoggingObserver/LoggingObserver.cpp
+    LoggingObserver/LoggingObserverDriver.cpp
     driver.cpp
 )
 
 # Add include directories to the root project
 set(INCLUDE_DIRS
     Cards
-    CommandProcessor
     GameEngine
     Map
     Orders
     Player
+    LoggingObserver
 )
 
 # Create an executable from the source files
