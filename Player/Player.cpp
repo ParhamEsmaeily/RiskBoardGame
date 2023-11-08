@@ -92,14 +92,14 @@ vector<Territory *> Player::toDefend()
 vector<Territory *> Player::toAttack(const Map &gameMap)
 {
     std::set<Territory *> all_adjacent_territories;
-    std::set<Territory *> owned_territories (this->territories.begin(), this->territories.end());
+    std::set<Territory *> owned_territories(this->territories.begin(), this->territories.end());
 
     // get all adjacent territories (including owned territories)
     for (Territory *t : this->territories)
     {
-        for (const std::shared_ptr<Territory>& adjacent_territory : Map::getAdjacentTerritories(gameMap, *t))
+        for (const std::shared_ptr<Territory> &adjacent_territory : Map::getAdjacentTerritories(gameMap, *t))
         {
-            all_adjacent_territories.insert(&*adjacent_territory);
+            all_adjacent_territories.insert(adjacent_territory.get());
         }
     }
 
@@ -107,12 +107,11 @@ vector<Territory *> Player::toAttack(const Map &gameMap)
     // territories to get only attack-able territories
     vector<Territory *> attack_territories;
     std::set_difference(
-            all_adjacent_territories.begin(),
-            all_adjacent_territories.end(),
-            owned_territories.begin(),
-            owned_territories.end(),
-            std::inserter(attack_territories, attack_territories.begin())
-    );
+        all_adjacent_territories.begin(),
+        all_adjacent_territories.end(),
+        owned_territories.begin(),
+        owned_territories.end(),
+        std::inserter(attack_territories, attack_territories.begin()));
 
     return attack_territories;
 }
@@ -129,12 +128,14 @@ void Player::issueOrder(const Map &gameMap)
     // Create a map of card types and their count of the player's hand
     map<card_type, int> cards_count;
     int nb_reinforcement_cards = 0;
-    for (card_type card: this->getHand()->show_cards())
+    for (card_type card : this->getHand()->show_cards())
     {
-        if (card != card_type::reinforcement) {
+        if (card != card_type::reinforcement)
+        {
             cards_count[card]++;
         }
-        else {
+        else
+        {
             nb_reinforcement_cards++;
         }
     }
@@ -146,12 +147,13 @@ void Player::issueOrder(const Map &gameMap)
         /*
         / Issue Deploy() orders until the player has no more reinforcement cards
         */
-        while(nb_reinforcement_cards > 0) {
+        while (nb_reinforcement_cards > 0)
+        {
             string terr_name;
             string str_reinforcements;
             bool orderAdded = false;
 
-            cout << getName() <<"'s turn, choose a territory to deploy reinforcements by writing the name: ";
+            cout << getName() << "'s turn, choose a territory to deploy reinforcements by writing the name: ";
             getline(cin, terr_name);
             cout << endl;
             cout << "Choose the number of reinforcements to send (" << nb_reinforcement_cards << " available): ";
@@ -178,10 +180,12 @@ void Player::issueOrder(const Map &gameMap)
             }
 
             int num_reinforcements = std::stoi(str_reinforcements);
-            if (orderAdded && num_reinforcements <= nb_reinforcement_cards && num_reinforcements > 0) {
+            if (orderAdded && num_reinforcements <= nb_reinforcement_cards && num_reinforcements > 0)
+            {
                 nb_reinforcement_cards -= num_reinforcements;
             }
-            else {
+            else
+            {
                 cout << "Invalid order." << endl;
             }
         }
@@ -189,12 +193,13 @@ void Player::issueOrder(const Map &gameMap)
         /*
         / Other orders
         */
-         while(input != "end turn") {
+        while (input != "end turn")
+        {
 
-             // print all cards in hand
+            // print all cards in hand
             cout << getName() << "'s cards in hand:" << endl;
             cout << "advance: infinite" << endl;
-            for (auto const& [card, count] : cards_count)
+            for (auto const &[card, count] : cards_count)
             {
                 cout << cd::type_map(card) << ": " << count << " available" << endl;
             }
@@ -204,7 +209,10 @@ void Player::issueOrder(const Map &gameMap)
             getline(cin, input);
 
             // create an order based on the input
-            if (input == "end turn") { break; }
+            if (input == "end turn")
+            {
+                break;
+            }
             else if (input == "advance")
             {
                 // print all territories to attack (for visibility)

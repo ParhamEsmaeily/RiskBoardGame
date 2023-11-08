@@ -12,7 +12,7 @@ int main()
 
     while (true)
     {
-        std::cout << "Choose your poison (1: Test Maps, 2: Test Players, 3: Test Orders, 4: Test Cards & 5: Test Game Engine, else: exit): ";
+        std::cout << "Choose your poison (1: Test Maps, 2: Test Players, 3: Test Orders, 4: Test Cards, 5: Test Game Engine & 6: Test Main Game Loop, else: exit): ";
         std::cin >> choice;
 
         switch (choice)
@@ -31,6 +31,9 @@ int main()
             break;
         case 5:
             testGameStates();
+            break;
+        case 6:
+            testMainGameLoop();
             break;
         default:
             std::cout << "Byyyye ;)" << std::endl;

@@ -27,7 +27,8 @@ void testGameStates()
     gameEngine = nullptr;
 }
 
-void testMainGameLoop() {
+void testMainGameLoop()
+{
     GameEngine gameEngine;
     vector<Player *> players;
 
@@ -72,11 +73,11 @@ void testMainGameLoop() {
     }
 
     // Test: print number of territories for each player
-    cout << "p1: " << p1->getTerritories().size() << " territories owned."<< endl;
-    cout << "p2: " << p2->getTerritories().size() << " territories owned."<< endl;
-    cout << "p3: " << p3->getTerritories().size() << " territories owned."<< endl;
-    cout << "p4: " << p4->getTerritories().size() << " territories owned."<< endl;
-    cout << "p5: " << p5->getTerritories().size() << " territories owned."<< endl;
+    cout << "p1: " << p1->getTerritories().size() << " territories owned." << endl;
+    cout << "p2: " << p2->getTerritories().size() << " territories owned." << endl;
+    cout << "p3: " << p3->getTerritories().size() << " territories owned." << endl;
+    cout << "p4: " << p4->getTerritories().size() << " territories owned." << endl;
+    cout << "p5: " << p5->getTerritories().size() << " territories owned." << endl;
 
     // Test: move current state to reinforcement phase
     gameEngine.executeCommand("loadmap");
@@ -88,7 +89,6 @@ void testMainGameLoop() {
 
     delete p1, p2, p3, p4, p5;
     p1 = p2 = p3 = p4 = p5 = nullptr;
-
 
     cout << "---------------------------" << endl;
     cout << "Test Game 2 (Win condition)" << endl;
@@ -105,7 +105,7 @@ void testMainGameLoop() {
     // Test: give all territories to p6
     for (int i = 0; i < size; i++)
     {
-        p6->addTerritory(&*territories[i]);
+        p6->addTerritory(territories[i].get());
     }
 
     // Test: move current state to reinforcement phase
