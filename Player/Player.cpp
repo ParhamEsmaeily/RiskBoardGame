@@ -97,8 +97,7 @@ vector<Territory *> Player::toAttack(const Map &gameMap)
     // get all adjacent territories (including owned territories)
     for (Territory *t : this->territories)
     {
-        std::vector<std::shared_ptr<Territory>> adjacent_territories {Map::getAdjacentTerritories(gameMap, *t)};
-        for (const std::shared_ptr<Territory>& adjacent_territory : adjacent_territories)
+        for (const std::shared_ptr<Territory>& adjacent_territory : Map::getAdjacentTerritories(gameMap, *t))
         {
             all_adjacent_territories.insert(&*adjacent_territory);
         }

@@ -52,7 +52,7 @@ void testMainGameLoop() {
     cout << size << " total territories" << endl;
     for (int i = 0; i < size; i++)
     {
-        Territory *territory = &*territories[i];
+        auto *territory = &*territories[i];
         if (i < size * 0.1)
         {
             p1->addTerritory(territory);
