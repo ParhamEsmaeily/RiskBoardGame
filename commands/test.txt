@@ -1,0 +1,7 @@
+loadmap world.map
+validatemap
+addplayer P1
+addplayer P2
+gamestart
+replay
+quit

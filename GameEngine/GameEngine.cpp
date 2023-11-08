@@ -7,97 +7,115 @@
 
 using std::cin;
 using std::make_shared;
-using std::shared_ptr;
 using std::ostream;
+using std::shared_ptr;
 using std::string;
 
 /**
  * Command Class Constructor
  */
-Command::Command(string action, shared_ptr<State> nextState) {
+Command::Command(string action, shared_ptr<State> nextState)
+{
     this->action = make_shared<string>(action);
     this->nextState = nextState;
 }
 
 /** Copy Constructor */
-Command::Command(const Command &other) {
+Command::Command(const Command &other)
+{
     this->action = other.action;
     this->nextState = other.nextState;
 };
 
 /** Assignment Constructor */
-Command &Command::operator=(const Command &other) {
+Command &Command::operator=(const Command &other)
+{
     this->action = other.action;
     this->nextState = other.nextState;
     return *this;
+}
+void Command::saveEffect(const std::string &effect)
+{
+    this->effect = make_shared<string>(effect);
 };
 
 /** Ostream << operator */
-ostream &operator<<(ostream &os, const Command &command) {
-    os << "Action: " << *command.action << " Next State: " << *command.nextState->phase;
+ostream &operator<<(ostream &os, const Command &command)
+{
+    os << "Action: " << *command.action << ", Next State: " << *command.nextState->phase;
     return os;
 };
-
 
 /**
  * State Class Constructor
  */
-State::State(string phase) {
+State::State(string phase)
+{
     this->phase = make_shared<string>(phase);
 }
 
 /** Copy Constructor */
-State::State(const State &other) {
+State::State(const State &other)
+{
     this->phase = other.phase;
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         this->commands[i] = other.commands[i];
     }
 }
 
 /** Assignment Constructor */
-State &State::operator=(const State &other) {
+State &State::operator=(const State &other)
+{
     this->phase = other.phase;
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         this->commands[i] = other.commands[i];
     }
     return *this;
 }
 
 /** Ostream << operator */
-ostream &operator<<(ostream &os, const State &state) {
+ostream &operator<<(ostream &os, const State &state)
+{
     os << "Phase: " << state.phase << std::endl;
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         os << "Command " << i << ": " << *state.commands[i] << std::endl;
     }
     return os;
 };
 
-
 /**
  * GameEngine Class Constructor
  */
-GameEngine::GameEngine() {
+GameEngine::GameEngine()
+{
     initGame();
 }
 
 /** Copy Constructor */
-GameEngine::GameEngine(const GameEngine &other) {
+GameEngine::GameEngine(const GameEngine &other)
+{
     this->currState = other.currState;
 }
 
 /** Assignment Constructor */
-GameEngine &GameEngine::operator=(const GameEngine &other) {
+GameEngine &GameEngine::operator=(const GameEngine &other)
+{
     this->currState = other.currState;
     return *this;
 }
 
 /** Ostream << operator */
-ostream &operator<<(ostream &os, const GameEngine &gameEngine) {
+ostream &operator<<(ostream &os, const GameEngine &gameEngine)
+{
     os << "Current State: " << *gameEngine.currState->phase;
     return os;
 };
 
-string GameEngine::getPhase() {
+string GameEngine::getPhase()
+{
     return *currState->phase;
 };
 
@@ -105,7 +123,8 @@ string GameEngine::getPhase() {
  * Initializes the game by creating the states and commands
  * and assigning them to each other.
  */
-void GameEngine::initGame() {
+void GameEngine::initGame()
+{
     /*
      *  Create 'Startup' section of the game
      */
@@ -168,13 +187,16 @@ void GameEngine::initGame() {
  * Returns a string of the current available commands
  * in the currState for the console to display
  */
-string GameEngine::getCurrCommandsList() {
+string GameEngine::getCurrCommandsList()
+{
     string commandList = "  ";
     int index = 1;
 
     // Iterate through the commands in the currState
-    for (const auto &command: currState->commands) {
-        if (!command->action->empty()) {
+    for (const auto &command : currState->commands)
+    {
+        if (!command->action->empty())
+        {
             commandList += std::to_string(index) + "." + *command->action + " ";
         }
         index++;
@@ -186,19 +208,23 @@ string GameEngine::getCurrCommandsList() {
 /*
  * Executes the command and returns the phase of the next state
  */
-string GameEngine::executeCommand(string input) {
+string GameEngine::executeCommand(string input)
+{
     bool commandExecuted = false;
 
-    for (int i = 0; i < currState->commands.size(); i++) {
+    for (int i = 0; i < currState->commands.size(); i++)
+    {
         if (input == *currState->commands[i]->action ||
-            (input == std::to_string(i + 1) && !currState->commands[i]->action->empty())) {
+            (input == std::to_string(i + 1) && !currState->commands[i]->action->empty()))
+        {
             currState = currState->commands[i]->nextState;
             commandExecuted = true;
             break; // Exit loop
         }
     }
 
-    if (!commandExecuted) {
+    if (!commandExecuted)
+    {
         std::cout << "Invalid command. Try again." << std::endl;
     }
 
