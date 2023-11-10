@@ -148,7 +148,7 @@ FileCommandProcessorAdapter::FileCommandProcessorAdapter(const FileCommandProces
 FileCommandProcessorAdapter::~FileCommandProcessorAdapter()
 {
     // redundant destructor
-    CommandProcessor::~CommandProcessor();
+    //CommandProcessor::~CommandProcessor();
 }
 
 FileCommandProcessorAdapter &FileCommandProcessorAdapter::operator=(const FileCommandProcessorAdapter &_other)
