@@ -1,8 +1,9 @@
 #pragma once
+#include "../LoggingObserver/LoggingObserver.h"
 
 #include <iostream>
-#include <string>
 #include <memory>
+#include <string>
 #include <vector>
 
 using std::ostream;
@@ -14,43 +15,48 @@ void testGameStates();
 
 class State; // Forward declaration
 
-class Command
-{
+class Command : private ILoggable, private Subject {
 public:
-    shared_ptr<string> action;
-    shared_ptr<State> nextState;
-    Command() = default;
-    Command(string action, shared_ptr<State> nextState);
+  shared_ptr<string> action;
+  shared_ptr<State> nextState;
+  vector<string> validStates;
+  shared_ptr<string> effect;
 
-    Command(Command const &other);
-    Command &operator=(const Command &other);
-    friend ostream &operator<<(ostream &os, const Command &command);
+  Command() = default;
+  Command(string action, shared_ptr<State> nextState);
+
+  Command(Command const &other);
+  Command &operator=(const Command &other);
+  friend ostream &operator<<(ostream &os, const Command &command);
+
+  void saveEffect(const std::string &effect);
+  std::string stringToLog() const override;
 };
 
-class State
-{
+class State {
 public:
-    shared_ptr<string> phase;
-    vector<shared_ptr<Command>> commands;
-    explicit State(string phase);
+  shared_ptr<string> phase;
+  vector<shared_ptr<Command>> commands;
+  explicit State(string phase);
 
-    State(State const &other);
-    State &operator=(const State &other);
-    friend ostream &operator<<(ostream &os, const State &state);
+  State(State const &other);
+  State &operator=(const State &other);
+  friend ostream &operator<<(ostream &os, const State &state);
 };
 
-class GameEngine
-{
-    shared_ptr<State> currState;
-    void initGame();
+class GameEngine : private ILoggable, private Subject {
+  shared_ptr<State> currState;
+  void initGame();
 
 public:
-    string getCurrCommandsList();
-    string executeCommand(string input);
-    string getPhase();
+  string getCurrCommandsList();
+  string executeCommand(string input);
+  string getPhase();
 
-    GameEngine();
-    GameEngine(GameEngine const &other);
-    GameEngine &operator=(const GameEngine &other);
-    friend ostream &operator<<(ostream &os, const GameEngine &gameEngine);
+  std::string stringToLog() const override;
+
+  GameEngine();
+  GameEngine(GameEngine const &other);
+  GameEngine &operator=(const GameEngine &other);
+  friend ostream &operator<<(ostream &os, const GameEngine &gameEngine);
 };

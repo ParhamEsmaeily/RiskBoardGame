@@ -34,9 +34,3 @@ void testOrdersList()
 
     cout << "Test done." << endl;
 }
-
-/* int main()
-{
-    testOrdersList();
-    return 0;
-} */

@@ -23,10 +23,3 @@ void testGameStates()
         gameEngine->executeCommand(input);
     }
 }
-
-/* int main()
-{
-    testGameStates();
-
-    return 0;
-} */

@@ -1,33 +1,41 @@
-cmake_minimum_required(VERSION 3.10) # Minimum version of CMake required
+cmake_minimum_required(VERSION 3.19) # Minimum version of CMake required
 
 project(RiskBoardGame) # Name of your project
 
 # Set C++ standard (you can change this to any standard you prefer)
 set(CMAKE_CXX_STANDARD 17)
 
-# Add source files to the project
+# Add source file to the root project
 set(SOURCES
+    Cards/Cards.cpp
+    Cards/CardsDriver.cpp
+    CommandProcessor/CommandProcessor.cpp
+    CommandProcessor/CommandProcessorDriver.cpp
+    CommandProcessor/FileLineReader.cpp
+    GameEngine/GameEngine.cpp
+    GameEngine/GameEngineDriver.cpp
+    Map/Map.cpp
+    Map/MapDriver.cpp
+    Orders/Orders.cpp
+    Orders/OrdersDriver.cpp
+    Player/Player.cpp
+    Player/PlayerDriver.cpp
+    LoggingObserver/LoggingObserver.cpp
+    LoggingObserver/LoggingObserverDriver.cpp
     driver.cpp
-    ./Player/Player.cpp
-    ./Player/PlayerDriver.cpp
-    ./Map/Map.cpp
-    ./Map/MapDriver.cpp
-    ./GameEngine/GameEngine.cpp
-    ./GameEngine/GameEngineDriver.cpp
-    ./Cards/Cards.cpp
-    ./Cards/CardsDriver.cpp
-    ./Orders/Orders.cpp
-    ./Orders/OrdersDriver.cpp
 )
 
-# Add header files to the project
-set(HEADERS
-    ./Player/Player.h
-    ./Map/Map.h
-    ./GameEngine/GameEngine.h
-    ./Cards/Cards.h
-    ./Orders/Orders.h
+# Add include directories to the root project
+set(INCLUDE_DIRS
+    Cards
+    CommandProcessor
+    GameEngine
+    Map
+    Orders
+    Player
+    LoggingObserver
 )
 
 # Create an executable from the source files
-add_executable(MainDriver ${SOURCES} ${HEADERS})
+add_executable(MainDriver ${SOURCES})
+target_include_directories(MainDriver PRIVATE ${INCLUDE_DIRS})
