@@ -1,9 +1,10 @@
-#include "Player.h"
 #include <set>
 #include <map>
 
-#include "Cards/Cards.h"
-#include "Orders/Orders.h"
+#include "Cards.h"
+#include "Orders.h"
+
+#include "Player.h"
 
 using namespace std;
 
@@ -11,21 +12,23 @@ Player::Player() : playerId(0), name("player"), order_list(new OrdersList()) {}
 
 Player::Player(int playerID, string name)
     : playerId(playerID), name(name), order_list(new OrdersList()),
-      hand(new Hand()) {
-  // Deck deck;
+      hand(new Hand())
+{
+    // Deck deck;
 
-  // Random index generator.
-  std::random_device dev;
-  std::mt19937 rng(dev());
-  std::uniform_int_distribution<std::mt19937::result_type> dist6(0, 4);
-  for (int i = 0; i < 15; i++) {
-    int index = dist6(rng);
-    // int index2 = dist6(rng);
+    // Random index generator.
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    std::uniform_int_distribution<std::mt19937::result_type> dist6(0, 4);
+    for (int i = 0; i < 15; i++)
+    {
+        int index = dist6(rng);
+        // int index2 = dist6(rng);
 
-    // Inserts random cards inside both deck and the hand.
-    hand->insert(Type(index));
-    // deck.insert(Type(index2));
-  }
+        // Inserts random cards inside both deck and the hand.
+        hand->insert(CardType(index));
+        // deck.insert(Type(index2));
+    }
 }
 
 // constructor for player with all parameters, name id territories hand and
@@ -38,34 +41,39 @@ Player::Player(int playerID, string name, vector<Territory *> &territories,
 // create copy player obj
 Player::Player(const Player &p)
     : playerId(p.playerId), name(p.name), hand(new Hand(*(p.hand))),
-      order_list(new OrdersList(*(p.order_list))) {
-  for (Territory *t : p.territories) {
-    this->addTerritory(new Territory(*t));
-  }
+      order_list(new OrdersList(*(p.order_list)))
+{
+    for (Territory *t : p.territories)
+    {
+        this->addTerritory(new Territory(*t));
+    }
 }
 
 // destructor
-Player::~Player() {
-  /*     for (Territory *t : territories)
-      {
-          delete t;
-      } */
-  delete order_list;
-  delete hand;
+Player::~Player()
+{
+    /*     for (Territory *t : territories)
+        {
+            delete t;
+        } */
+    delete order_list;
+    delete hand;
 
-  territories.clear();
+    territories.clear();
 }
 
 // assign one Player object to another.
-Player &Player::operator=(const Player &p) {
-  playerId = p.playerId;
-  name = p.name;
-  for (Territory *t : p.territories) {
-    this->addTerritory(new Territory(*t));
-  }
-  this->hand = new Hand(*(p.hand));
-  this->order_list = new OrdersList(*(p.order_list));
-  return *this;
+Player &Player::operator=(const Player &p)
+{
+    playerId = p.playerId;
+    name = p.name;
+    for (Territory *t : p.territories)
+    {
+        this->addTerritory(new Territory(*t));
+    }
+    this->hand = new Hand(*(p.hand));
+    this->order_list = new OrdersList(*(p.order_list));
+    return *this;
 }
 
 vector<Territory *> Player::toDefend() { return this->territories; }
@@ -107,11 +115,11 @@ void Player::issueOrder(const Map &gameMap)
     }
 
     // Create a map of card types and their count of the player's hand
-    map<card_type, int> cards_count;
+    map<CardType, int> cards_count;
     int nb_reinforcement_cards = 0;
-    for (card_type card : this->getHand()->show_cards())
+    for (CardType card : this->getHand()->show_cards())
     {
-        if (card != card_type::reinforcement)
+        if (card != CardType::reinforcement)
         {
             cards_count[card]++;
         }
@@ -182,7 +190,7 @@ void Player::issueOrder(const Map &gameMap)
             cout << "advance: infinite" << endl;
             for (auto const &[card, count] : cards_count)
             {
-                cout << cd::type_map(card) << ": " << count << " available" << endl;
+                cout << cd::map(card) << ": " << count << " available" << endl;
             }
 
             // ask for an order
@@ -227,25 +235,25 @@ void Player::issueOrder(const Map &gameMap)
                 // TODO: add params to Advance constructor
                 this->order_list->add(Advance());
             }
-            else if (input == "bomb" && cards_count[card_type::bomb] > 0)
+            else if (input == "bomb" && cards_count[CardType::bomb] > 0)
             {
                 this->order_list->add(Bomb());
-                cards_count[card_type::bomb]--;
+                cards_count[CardType::bomb]--;
             }
-            else if (input == "blockade" && cards_count[card_type::blockade] > 0)
+            else if (input == "blockade" && cards_count[CardType::blockade] > 0)
             {
                 this->order_list->add(Blockade());
-                cards_count[card_type::blockade]--;
+                cards_count[CardType::blockade]--;
             }
-            else if (input == "airlift" && cards_count[card_type::airlift] > 0)
+            else if (input == "airlift" && cards_count[CardType::airlift] > 0)
             {
                 this->order_list->add(Airlift());
-                cards_count[card_type::airlift]--;
+                cards_count[CardType::airlift]--;
             }
-            else if (input == "negotiate" && cards_count[card_type::diplomacy] > 0)
+            else if (input == "negotiate" && cards_count[CardType::diplomacy] > 0)
             {
                 this->order_list->add(Negotiate());
-                cards_count[card_type::diplomacy]--;
+                cards_count[CardType::diplomacy]--;
             }
             else
             {
@@ -253,14 +261,16 @@ void Player::issueOrder(const Map &gameMap)
             }
         }
     }
+}
 
 // issueOrder: creates an order object and adds it to the list of orders
 //  void Player::issueOrder(){
 //      order_list->add(new Deploy);
 //  }
 
-void Player::addTerritory(Territory *t) {
-  territories.push_back(t); // to add t to player
+void Player::addTerritory(Territory *t)
+{
+    territories.push_back(t); // to add t to player
 }
 
 // getters
@@ -274,12 +284,14 @@ OrdersList *Player ::getPlayerOrderList() { return order_list; }
 vector<Territory *> Player::getTerritories() { return territories; }
 
 // setters
-void Player::setPlayerOrderList(OrdersList *orders) {
-  this->order_list = orders;
+void Player::setPlayerOrderList(OrdersList *orders)
+{
+    this->order_list = orders;
 }
 
 void Player::setTerritories(vector<Territory *> t) { this->territories = t; }
 
-ostream &operator<<(ostream &os, Player &p) {
-  return os << "Name: " << p.getName() << " ID: " << p.getPlayerId();
+ostream &operator<<(ostream &os, Player &p)
+{
+    return os << "Name: " << p.getName() << " ID: " << p.getPlayerId();
 }

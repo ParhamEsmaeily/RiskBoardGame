@@ -1,11 +1,12 @@
 #pragma once
-#include "../LoggingObserver/LoggingObserver.h"
 
 #include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "Player.h"
+#include "LoggingObserver.h"
 
 using std::ostream;
 using std::shared_ptr;
@@ -17,7 +18,8 @@ void testMainGameLoop();
 
 class State; // Forward declaration
 
-class Command : private ILoggable, private Subject {
+class Command : private ILoggable, private Subject
+{
 public:
   shared_ptr<string> action;
   shared_ptr<State> nextState;
@@ -35,7 +37,8 @@ public:
   std::string stringToLog() const override;
 };
 
-class State {
+class State
+{
 public:
   shared_ptr<string> phase;
   vector<shared_ptr<Command>> commands;
@@ -46,22 +49,25 @@ public:
   friend ostream &operator<<(ostream &os, const State &state);
 };
 
-class GameEngine : private ILoggable, private Subject {
+class GameEngine : private ILoggable, private Subject
 {
-    shared_ptr<State> currState;
-    void initGame();
-    void reinforcementPhase(vector<Player *> players, const Map &map);
-    void issueOrdersPhase(vector<Player *> players, const Map &map);
-    void executeOrdersPhase(vector<Player *> players);
+  shared_ptr<State> currState;
+  void initGame();
+  void reinforcementPhase(vector<Player *> players, const Map &map);
+  void issueOrdersPhase(vector<Player *> players, const Map &map);
+  void executeOrdersPhase(vector<Player *> players);
 
 public:
-    string getCurrCommandsList();
-    string executeCommand(string input);
-    string getPhase();
+  string getCurrCommandsList();
+  string executeCommand(string input);
+  string getPhase();
 
-    GameEngine();
-    GameEngine(GameEngine const &other);
-    GameEngine &operator=(const GameEngine &other);
-    friend ostream &operator<<(ostream &os, const GameEngine &gameEngine);
+  GameEngine();
+  GameEngine(GameEngine const &other);
+  GameEngine &operator=(const GameEngine &other);
+  friend ostream &operator<<(ostream &os, const GameEngine &gameEngine);
 
-    void mainGameLoop(vector<Player *> players, const Map &map);
+  void mainGameLoop(vector<Player *> players, const Map &map);
+
+  std::string stringToLog() const override;
+};

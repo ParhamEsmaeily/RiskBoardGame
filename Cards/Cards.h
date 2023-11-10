@@ -16,14 +16,22 @@
   airlift,
   diplomacy.
 */
-enum class Type : char { bomb, reinforcement, blockade, airlift, diplomacy };
+enum class CardType : char
+{
+  bomb,
+  reinforcement,
+  blockade,
+  airlift,
+  diplomacy
+};
 
-namespace cd {
-/*
-Maps class enum value to a string value.
-Used internally inside the stream insertion operator overload.
-*/
-const std::string map(const Type);
+namespace cd
+{
+  /*
+  Maps class enum value to a string value.
+  Used internally inside the stream insertion operator overload.
+  */
+  const std::string map(const CardType);
 } // namespace cd
 
 void test_cards(int = 15);
@@ -35,7 +43,7 @@ class Hand;
 // Forward-Declaration.`
 
 // Stream insertion overload.
-std::ostream &operator<<(std::ostream &, const Type &);
+std::ostream &operator<<(std::ostream &, const CardType &);
 
 std::ostream &operator<<(std::ostream &, const Card &);
 
@@ -57,16 +65,17 @@ using card_vector = std::vector<card_ptr>;
     To declare a type for the card, use Type::type where type is to be
    chosen.
 */
-class Card {
+class Card
+{
 public:
   // Type of the card. 5 types available.
   // Type::type to be used. Check enum class for further details.
-  const Type m_type;
+  const CardType m_type;
 
   Card() = delete; // Assures class is called w/ initializer.
   // Takes rvalue as argument. Better optimization.
-  Card(Type &&);
-  Card(const Type &);
+  Card(CardType &&);
+  Card(const CardType &);
   // Move constructor.
   Card(Card &&);
   Card(const Card &);
@@ -94,7 +103,8 @@ public:
   Base class when holding cards is necessary.
   Container of cards.
 */
-class Buffer {
+class Buffer
+{
 public:
   card_vector m_buffer;
 
@@ -119,14 +129,14 @@ public:
     Inserts a card of the proper type inside the player's Hand.
     Creates a new card.
   */
-  void insert(const Type) noexcept;
+  void insert(const CardType) noexcept;
 
   /*
     Returns a vector of all the cards, as types, contained inside the hand.
     The vector can be implicitely converted to a vector of cards inside a
     for-each loop.
   */
-  std::vector<Type> show_cards() const noexcept;
+  std::vector<CardType> show_cards() const noexcept;
 
   /*
     Returns number of cards left inside the player's hand.
@@ -147,7 +157,8 @@ public:
 /*
   Finite collection of Warzone cards.
 */
-class Hand : public Buffer {
+class Hand : public Buffer
+{
 public:
   Hand();
   Hand(const Hand &);
@@ -157,7 +168,7 @@ public:
     hands. The card is then placed back in the deck.
     Returns false if the card is not in the player's hand.
   */
-  bool play(const Type, Deck &);
+  bool play(const CardType, Deck &);
 
   /*
     Deep copy of the Hand is made.
@@ -168,7 +179,8 @@ public:
 /*
   Contains finite collection of Warzone cards.
 */
-class Deck : public Buffer {
+class Deck : public Buffer
+{
 public:
   Deck();
   Deck(const Deck &);
