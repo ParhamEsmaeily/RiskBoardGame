@@ -20,6 +20,8 @@ set(SOURCES
     Orders/OrdersDriver.cpp
     Player/Player.cpp
     Player/PlayerDriver.cpp
+    LoggingObserver/LoggingObserver.cpp
+    LoggingObserver/LoggingObserverDriver.cpp
     driver.cpp
 )
 
@@ -31,6 +33,7 @@ set(INCLUDE_DIRS
     Map
     Orders
     Player
+    LoggingObserver
 )
 
 # Create an executable from the source files
