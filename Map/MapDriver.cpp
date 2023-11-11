@@ -6,7 +6,7 @@ void testLoadMap(const std::string &mapLocation)
 {
     const auto map = MapLoader::loadMap(mapLocation);
 
-    Map::validate(*map);
+    Map::validate(map.get());
 
     std::cout << *map << std::endl;
 

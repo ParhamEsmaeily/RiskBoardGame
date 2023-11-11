@@ -48,6 +48,8 @@ public:
   CommandProcessor* commandProcessor;
   GameEngine();
   GameEngine(GameEngine const &other);
+  ~GameEngine();
+  
   GameEngine &operator=(const GameEngine &other);
   friend ostream &operator<<(ostream &os, const GameEngine &gameEngine);
 };

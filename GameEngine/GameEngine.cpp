@@ -13,11 +13,21 @@ using std::string;
 /**
  * GameEngine Class Constructor
  */
-GameEngine::GameEngine() { initGame(); }
+GameEngine::GameEngine() { 
+  map = new Map();
+
+  initGame(); 
+  }
 
 /** Copy Constructor */
 GameEngine::GameEngine(const GameEngine &other) {
   this->currState = other.currState;
+}
+
+GameEngine::~GameEngine()
+{
+  delete map;
+  map = nullptr;
 }
 
 /** Assignment Constructor */
@@ -185,13 +195,15 @@ void GameEngine::startupPhase() {
             // delete previous map if any
 
             // load the new map
-            string map_path = "../maps/world.map";
+            string map_path = "maps/world.map";
             //std::shared_ptr<Map> map = MapLoader::loadMap(map_path);
-            this->map = MapLoader::loadMap(map_path).get();
+            const auto map_shared_ptr = MapLoader::loadMap(map_path);
+            this->map = map_shared_ptr.get();
+
             std::cout<<"entered6\n";
             mapLoaded = true;
             std::cout<<mapLoaded<<"\n";
-            Map::validate(*map);
+            Map::validate(map);
 
 
             // if (this->map = nullptr) {//if null pointer
