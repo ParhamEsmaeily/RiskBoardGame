@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(SOURCES
     Cards/Cards.cpp
     Cards/CardsDriver.cpp
+    CommandProcessor/Command.cpp
     CommandProcessor/CommandProcessor.cpp
     CommandProcessor/CommandProcessorDriver.cpp
     CommandProcessor/FileLineReader.cpp

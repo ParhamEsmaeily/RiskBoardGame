@@ -375,72 +375,72 @@ bool Map::areAdjacent(const Map &map, const std::string &territory1, const std::
     return std::find(map.adjacency.at(territory1).begin(), map.adjacency.at(territory1).end(), territory2) != map.adjacency.at(territory1).end();
 }
 
-void Map::countTraversedTerritories(const Map &map, const std::string &territory, std::unordered_set<std::string> &visited)
+void Map::countTraversedTerritories(const Map &map, const std::string &territory, std::unordered_set<std::string> *visited)
 {
-    visited.insert(territory);
+    visited->insert(territory);
 
     for (auto &&territoryName : map.adjacency.at(territory))
     {
-        if (visited.find(territoryName) == visited.end())
+        if (visited->find(territoryName) == visited->end())
             Map::countTraversedTerritories(map, territoryName, visited);
     }
 }
 
-void Map::countTraversedTerritoriesInContinent(const Map &map, const std::string &continent, const std::string &territory, std::unordered_set<std::string> &visited)
+void Map::countTraversedTerritoriesInContinent(const Map &map, const std::string &continent, const std::string &territory, std::unordered_set<std::string> *visited)
 {
-    visited.insert(territory);
+    visited->insert(territory);
 
     for (auto &&territoryName : map.adjacency.at(territory))
     {
         // if we haven't visited this territory before and is part of the continent we're looking at, continue the traversal
-        if (visited.find(territoryName) == visited.end() && map.territories.at(territoryName)->getContinent()->getName() == continent)
+        if (visited->find(territoryName) == visited->end() && map.territories.at(territoryName)->getContinent()->getName() == continent)
             Map::countTraversedTerritoriesInContinent(map, continent, territoryName, visited);
     }
 }
 
-void Map::validate(Map &map)
+void Map::validate(Map *map)
 {
     std::unordered_set<std::string> visitedTerritories;
 
-    *map.validity = MapValidity::UNKNOWN;
+    *(map->validity) = MapValidity::UNKNOWN;
 
     // 1: Map should be a connected graph
 
-    Map::countTraversedTerritories(map, map.territories.begin()->first, visitedTerritories);
-    if (visitedTerritories.size() != map.territories.size())
+    Map::countTraversedTerritories(*map, map->territories.begin()->first, &visitedTerritories);
+    if (visitedTerritories.size() != map->territories.size())
     {
-        *map.validity = MapValidity::INVALID;
+        *(map->validity) = MapValidity::INVALID;
         return;
     }
 
-    for (auto &&pair : map.continents)
+    for (auto &&pair : map->continents)
     {
         visitedTerritories.clear();
 
         // 3: Each country belongs to one and only one continent
 
-        const auto territoriesInContinent = Map::getAllTerritoriesInContinent(map, pair.first);
+        const auto territoriesInContinent = Map::getAllTerritoriesInContinent(*map, pair.first);
 
         // if the # of known territories in a continent is not the same as the # of loaded territories, the map is invalid
         if (territoriesInContinent.size() != pair.second->getTerritoryCount())
         {
-            *map.validity = MapValidity::INVALID;
+            *(map->validity) = MapValidity::INVALID;
             return;
         }
 
         // 2: Continents are connected subgraphs
 
-        Map::countTraversedTerritoriesInContinent(map, pair.first, territoriesInContinent.front()->getName(), visitedTerritories);
+        Map::countTraversedTerritoriesInContinent(*map, pair.first, territoriesInContinent.front()->getName(), &visitedTerritories);
 
         // if the # of territories we traversed is not the same as the # of known territories in a continent, the map is invalid
         if (visitedTerritories.size() != territoriesInContinent.size())
         {
-            *map.validity = MapValidity::INVALID;
+            *(map->validity) = MapValidity::INVALID;
             return;
         }
     }
 
-    *map.validity = MapValidity::VALID;
+    *(map->validity) = MapValidity::VALID;
 }
 
 std::string Map::getImage() const { return *image; }

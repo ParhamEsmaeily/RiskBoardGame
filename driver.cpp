@@ -6,6 +6,7 @@
 #include "GameEngine/GameEngine.h"
 #include "Map/Map.h"
 #include "Player/Player.h"
+#include "Command.h"
 
 int main(int argc, char const *argv[])
 {
@@ -27,7 +28,7 @@ int main(int argc, char const *argv[])
     // otherwise, if the '-test' flag is provided, run the tests and exit
     while (true)
     {
-        std::cout << "Choose your poison \n1: Test Maps\n2: Test Players\n3: Test Orders\n4: Test Cards\n5: Test Game Engine\n6: Test Command Processor\nElse: exit ";
+        std::cout << "Choose your poison \n1: Test Maps\n2: Test Players\n3: Test Orders\n4: Test Cards\n5: Test Game Engine\n6: Test Command Processor\n7: Test startupPhase\nElse: exit ";
         std::cin >> choice;
         std::cout << std::endl;
 
@@ -74,6 +75,11 @@ int main(int argc, char const *argv[])
 
             break;
         }
+        case 7:{ GameEngine engine;
+            engine.startupPhase();
+        break;
+        }
+           
         default:
             std::cout << "Byyyye ;)" << std::endl;
             return 0;

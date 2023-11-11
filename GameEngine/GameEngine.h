@@ -4,6 +4,10 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "Command.h"
+#include "Map.h"
+#include "Player.h"
+#include "Cards.h"
 
 #include "Player.h"
 #include "LoggingObserver.h"
@@ -16,54 +20,33 @@ using std::vector;
 void testGameStates();
 void testMainGameLoop();
 
-class State; // Forward declaration
-
-class Command : private ILoggable, private Subject
-{
-public:
-  shared_ptr<string> action;
-  shared_ptr<State> nextState;
-  vector<string> validStates;
-  shared_ptr<string> effect;
-
-  Command() = default;
-  Command(string action, shared_ptr<State> nextState);
-
-  Command(Command const &other);
-  Command &operator=(const Command &other);
-  friend ostream &operator<<(ostream &os, const Command &command);
-
-  void saveEffect(const std::string &effect);
-  std::string stringToLog() const override;
-};
-
-class State
-{
-public:
-  shared_ptr<string> phase;
-  vector<shared_ptr<Command>> commands;
-  explicit State(string phase);
-
-  State(State const &other);
-  State &operator=(const State &other);
-  friend ostream &operator<<(ostream &os, const State &state);
-};
+// class State; // Forward declaration
+class CommandProcessor;
+class Map;
 
 class GameEngine : private ILoggable, private Subject
 {
   shared_ptr<State> currState;
   void initGame();
-  void reinforcementPhase(vector<Player *> players, const Map &map);
-  void issueOrdersPhase(vector<Player *> players, const Map &map);
-  void executeOrdersPhase(vector<Player *> players);
 
 public:
   string getCurrCommandsList();
   string executeCommand(string input);
   string getPhase();
 
+  void startupPhase();
+  Command *command;
+  vector<Player *> players;
+  std::string stringToLog() const override;
+  std::shared_ptr<Map> map;
+  Deck* deck;
+
+  CommandProcessor *commandProcessor;
+  
   GameEngine();
   GameEngine(GameEngine const &other);
+  ~GameEngine();
+
   GameEngine &operator=(const GameEngine &other);
   friend ostream &operator<<(ostream &os, const GameEngine &gameEngine);
 

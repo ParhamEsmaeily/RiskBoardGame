@@ -4,7 +4,7 @@
 #include <fstream>
 
 #include "FileLineReader.h"
-#include "GameEngine.h"
+#include "Command.h"
 
 void testCommandProcessor(const std::string &_fileName = "");
 
