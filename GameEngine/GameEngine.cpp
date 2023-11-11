@@ -2,78 +2,13 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include "Command.h"
+#include "Player.h"
 
 using std::make_shared;
 using std::ostream;
 using std::shared_ptr;
 using std::string;
-
-/**
- * Command Class Constructor
- */
-Command::Command(string action, shared_ptr<State> nextState) {
-  this->action = make_shared<string>(action);
-  this->nextState = nextState;
-}
-
-/** Copy Constructor */
-Command::Command(const Command &other) {
-  this->action = other.action;
-  this->nextState = other.nextState;
-};
-
-/** Assignment Constructor */
-Command &Command::operator=(const Command &other) {
-  this->action = other.action;
-  this->nextState = other.nextState;
-  return *this;
-}
-void Command::saveEffect(const std::string &effect) {
-  this->effect = make_shared<string>(effect);
-  Notify(this);
-};
-
-std::string Command::stringToLog() const {
-  return "Command stringToLog: " + *effect;
-}
-
-/** Ostream << operator */
-ostream &operator<<(ostream &os, const Command &command) {
-  os << "Action: " << *command.action
-     << ", Next State: " << *command.nextState->phase;
-  return os;
-};
-
-/**
- * State Class Constructor
- */
-State::State(string phase) { this->phase = make_shared<string>(phase); }
-
-/** Copy Constructor */
-State::State(const State &other) {
-  this->phase = other.phase;
-  for (int i = 0; i < 3; i++) {
-    this->commands[i] = other.commands[i];
-  }
-}
-
-/** Assignment Constructor */
-State &State::operator=(const State &other) {
-  this->phase = other.phase;
-  for (int i = 0; i < 3; i++) {
-    this->commands[i] = other.commands[i];
-  }
-  return *this;
-}
-
-/** Ostream << operator */
-ostream &operator<<(ostream &os, const State &state) {
-  os << "Phase: " << state.phase << std::endl;
-  for (int i = 0; i < 3; i++) {
-    os << "Command " << i << ": " << *state.commands[i] << std::endl;
-  }
-  return os;
-};
 
 /**
  * GameEngine Class Constructor
@@ -216,4 +151,136 @@ string GameEngine::executeCommand(string input) {
 std::string GameEngine::stringToLog() const {
   // Returns the current state of the game engine.
   return "GameEngine stringToLog: Phase " + *currState->phase;
+}
+
+//void GameEngine::startupPhase(CommandProcessor* cmdProcessor)
+void GameEngine::startupPhase() {
+    bool startupPhaselogic = false;
+    bool mapLoaded = false;
+    bool mapValidated = false;
+    bool playersAdded = false;
+    int playernum;
+    Command currentCommand;
+    string commandType;
+    std::cout<<"entered\n";
+    
+
+
+    while (!startupPhaselogic) {
+      std::cout<<"entered while loop\n";
+      std::cout << "\nEnter next command: "<<std::endl;
+      std::cin>>commandType;
+
+
+       string commandAction =commandType;
+
+
+       std::cout<<"entered command type: \n"<<commandAction<<"\n";
+
+       std::cout<<"maploaded outside"<<mapLoaded<<"\n";
+
+        if (commandAction == "loadmap" && !mapLoaded) {
+            // Logic to load the map
+            std::cout << "\n<<Loading the map...\n " <<std::endl;
+            // delete previous map if any
+
+            // load the new map
+            string map_path = "../maps/world.map";
+            //std::shared_ptr<Map> map = MapLoader::loadMap(map_path);
+            this->map = MapLoader::loadMap(map_path).get();
+            std::cout<<"entered6\n";
+            mapLoaded = true;
+            std::cout<<mapLoaded<<"\n";
+            Map::validate(*map);
+
+
+            // if (this->map = nullptr) {//if null pointer
+            //     string effect = "Could not load the map ";
+            //     command->saveEffect(effect);
+            //     //go_to_next_state = false;
+            //     std::cout<<"entered4\n";
+            // } else {
+            //     string effect = "Loaded map";
+            //     command->saveEffect(effect);
+            //     std::cout<<"entered5\n";
+            // }
+
+        } 
+
+        else if (commandAction == "validatemap"  && mapLoaded) {
+
+          
+
+          //&& this->map->getValidity() == MapValidity::VALID
+            // Logic to validate the map
+            // string effect = "Validated Map";
+            //     command->saveEffect(effect);
+
+            std::cout<<"mapvalidate  before\n";
+            mapValidated = true;
+            std::cout<<"mapvalidate  true\n";
+
+
+        } else if (commandAction  == "addplayer" && mapValidated && !playersAdded) {
+
+          std::cout<<"choose number of players"<<std::endl;
+          std::cin>>playernum;
+
+            // Logic to add players
+            if (playernum <=6 && playernum >=2) {
+              for(int i = 1; i<=playernum; i++){
+
+                //set player name and ID
+                std::string playerName = "player" + std::to_string(i);
+                //Player p = Player(i, playerName);
+                players.push_back(new Player (i, playerName));
+
+                std::cout<< "adding playerID: "<<i<<" & name: player"<<i<<std::endl;
+              }
+              // for(auto&& player: players){
+              //   std::cout<<*player<<std::endl;
+              // }
+              // string effect = "Validated Map";
+              //   command->saveEffect(effect);
+
+                std::cout<<"Hello";
+                playersAdded = true;
+                
+            }else{
+              std::cout<< "wrong number of players. choose between 2 and 6"<<std::endl;
+            }
+        } else if (commandAction == "gamestart" && playersAdded) {
+            // Logic to start the game
+            // a) Distribute territories
+            const auto territories = Map::getAllTerritories(*map);
+
+            auto size = static_cast<double>(territories.size());
+            cout << size << " total territories" << endl;
+            for (int i = 0; i < size; i++)
+           {   
+            auto *territory = &*territories[i];
+            int playerIndex = i % playernum; // Round-robin distribution
+            // Assuming Player has a method to add a territory
+             players[playerIndex]->addTerritory(territory);
+              
+           }
+           std::cout<<"trying to return player 1 ter\n";
+           players[1]->getTerritories();
+            std::cout<<"\ndid I return player 1 ter\n";
+            // b) Randomize order of play
+            // c) Assign initial armies
+            // d) Deal initial cards
+            // e) Switch to play phase
+            startupPhaselogic = true;
+            break; // Assuming the loop should end when the game starts
+
+        } else {
+            // Handle invalid commands or commands in the wrong order
+            std::cout<<"Invalid command or command received in the wrong state.";
+            startupPhaselogic = true;
+        }
+    }
+
+
+
 }
