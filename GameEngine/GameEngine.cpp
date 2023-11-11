@@ -1,6 +1,8 @@
 #include "GameEngine.h"
 #include <iostream>
 #include <memory>
+#include <algorithm>
+#include <random>
 #include <string>
 #include "Command.h"
 #include "Player.h"
@@ -195,7 +197,7 @@ void GameEngine::startupPhase() {
             // delete previous map if any
 
             // load the new map
-            string map_path = "maps/world.map";
+            string map_path = "../maps/world.map";
             //std::shared_ptr<Map> map = MapLoader::loadMap(map_path);
             const auto map_shared_ptr = MapLoader::loadMap(map_path);
             this->map = map_shared_ptr.get();
@@ -264,12 +266,15 @@ void GameEngine::startupPhase() {
         } else if (commandAction == "gamestart" && playersAdded) {
             // Logic to start the game
             // a) Distribute territories
+            std::cout<<"\nEntering game start\n";
             const auto territories = Map::getAllTerritories(*map);
+            std::cout<<"\nafter getAllTER\n";
 
             auto size = static_cast<double>(territories.size());
             cout << size << " total territories" << endl;
             for (int i = 0; i < size; i++)
            {   
+            std::cout<<"\nEntering forLOOP ````game start\n";
             auto *territory = &*territories[i];
             int playerIndex = i % playernum; // Round-robin distribution
             // Assuming Player has a method to add a territory
@@ -280,6 +285,17 @@ void GameEngine::startupPhase() {
            players[1]->getTerritories();
             std::cout<<"\ndid I return player 1 ter\n";
             // b) Randomize order of play
+            std::cout << "\nRandomizing player order\n";
+            std::random_device rd;  // Obtain a random number from hardware
+            std::mt19937 g(rd());   // Seed the generator
+            std::shuffle(players.begin(), players.end(), g);  // Shuffle the players vector
+
+            //PRINT
+            std::cout << "Order of play:" << std::endl;
+            for (const auto& player : players) {
+            // Assuming each player has a method to get their name or ID, such as getName() or getID()
+            std::cout << player->getName() << std::endl;  // Replace getName() with the appropriate method
+}
             // c) Assign initial armies
             // d) Deal initial cards
             // e) Switch to play phase
