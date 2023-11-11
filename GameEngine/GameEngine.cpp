@@ -1,10 +1,6 @@
-#include <iostream>
-#include <memory>
-#include <algorithm>
-#include <random>
-#include <string>
-#include "Command.h"
-#include "Player.h"
+#include "GameEngine.h"
+#include "../CommandProcessor/Command.h"
+#include "../Player/Player.h"
 
 using std::make_shared;
 using std::ostream;
@@ -14,30 +10,22 @@ using std::string;
 /**
  * GameEngine Class Constructor
  */
-GameEngine::GameEngine()
-{
-  initGame();
-}
+GameEngine::GameEngine() { initGame(); }
 
 /** Copy Constructor */
-GameEngine::GameEngine(const GameEngine &other)
-{
+GameEngine::GameEngine(const GameEngine &other) {
   this->currState = other.currState;
 }
 
-GameEngine::~GameEngine()
-{
-}
+GameEngine::~GameEngine() {}
 
-GameEngine &GameEngine::operator=(const GameEngine &other)
-{
+GameEngine &GameEngine::operator=(const GameEngine &other) {
   this->currState = other.currState;
   return *this;
 }
 
 /** Ostream << operator */
-ostream &operator<<(ostream &os, const GameEngine &gameEngine)
-{
+ostream &operator<<(ostream &os, const GameEngine &gameEngine) {
   os << "Current State: " << *gameEngine.currState->phase;
   return os;
 };
@@ -48,8 +36,7 @@ string GameEngine::getPhase() { return *currState->phase; };
  * Initializes the game by creating the states and commands
  * and assigning them to each other.
  */
-void GameEngine::initGame()
-{
+void GameEngine::initGame() {
   /*
    *  Create 'Startup' section of the game
    */
@@ -121,16 +108,13 @@ void GameEngine::initGame()
  * Returns a string of the current available commands
  * in the currState for the console to display
  */
-string GameEngine::getCurrCommandsList()
-{
+string GameEngine::getCurrCommandsList() {
   string commandList = "  ";
   int index = 1;
 
   // Iterate through the commands in the currState
-  for (const auto &command : currState->commands)
-  {
-    if (!command->action->empty())
-    {
+  for (const auto &command : currState->commands) {
+    if (!command->action->empty()) {
       commandList += std::to_string(index) + "." + *command->action + " ";
     }
     index++;
@@ -142,39 +126,33 @@ string GameEngine::getCurrCommandsList()
 /*
  * Executes the command and returns the phase of the next state
  */
-string GameEngine::executeCommand(string input)
-{
+string GameEngine::executeCommand(string input) {
   bool commandExecuted = false;
 
-  for (int i = 0; i < currState->commands.size(); i++)
-  {
+  for (int i = 0; i < currState->commands.size(); i++) {
     if (input == *currState->commands[i]->action ||
         (input == std::to_string(i + 1) &&
-         !currState->commands[i]->action->empty()))
-    {
+         !currState->commands[i]->action->empty())) {
       currState = currState->commands[i]->nextState;
       commandExecuted = true;
       break; // Exit loop
     }
   }
 
-  if (!commandExecuted)
-  {
+  if (!commandExecuted) {
     std::cout << "Invalid command. Try again." << std::endl;
   }
 
   return *currState->phase;
 }
 
-std::string GameEngine::stringToLog() const
-{
+std::string GameEngine::stringToLog() const {
   // Returns the current state of the game engine.
   return "GameEngine stringToLog: Phase " + *currState->phase;
 }
 
 // void GameEngine::startupPhase(CommandProcessor* cmdProcessor)
-void GameEngine::startupPhase()
-{
+void GameEngine::startupPhase() {
   bool startupPhaselogic = false;
   bool mapLoaded = false;
   bool mapValidated = false;
@@ -184,21 +162,18 @@ void GameEngine::startupPhase()
   string commandType;
   std::cout << "entered\n";
 
-  while (!startupPhaselogic)
-  {
+  while (!startupPhaselogic) {
     std::cout << "entered while loop\n";
     std::cout << "\nEnter next command: " << std::endl;
     std::cin >> commandType;
 
     string commandAction = commandType;
 
-    std::cout << "entered command type: \n"
-              << commandAction << "\n";
+    std::cout << "entered command type: \n" << commandAction << "\n";
 
     std::cout << "maploaded outside" << mapLoaded << "\n";
 
-    if (commandAction == "loadmap" && !mapLoaded)
-    {
+    if (commandAction == "loadmap" && !mapLoaded) {
       // Logic to load the map
       std::cout << "\n<<Loading the map...\n " << std::endl;
       // delete previous map if any
@@ -224,8 +199,7 @@ void GameEngine::startupPhase()
       // }
     }
 
-    else if (commandAction == "validatemap" && mapLoaded)
-    {
+    else if (commandAction == "validatemap" && mapLoaded) {
 
       //&& this->map->getValidity() == MapValidity::VALID
       // Logic to validate the map
@@ -237,25 +211,22 @@ void GameEngine::startupPhase()
       std::cout << "mapvalidate  true\n";
 
       Map::validate(map.get());
-    }
-    else if (commandAction == "addplayer" && mapValidated && !playersAdded)
-    {
+    } else if (commandAction == "addplayer" && mapValidated && !playersAdded) {
 
       std::cout << "choose number of players" << std::endl;
       std::cin >> playernum;
 
       // Logic to add players
-      if (playernum <= 6 && playernum >= 2)
-      {
-        for (int i = 1; i <= playernum; i++)
-        {
+      if (playernum <= 6 && playernum >= 2) {
+        for (int i = 1; i <= playernum; i++) {
 
           // set player name and ID
           std::string playerName = "player" + std::to_string(i);
           // Player p = Player(i, playerName);
           players.push_back(new Player(i, playerName));
 
-          std::cout << "adding playerID: " << i << " & name: player" << i << std::endl;
+          std::cout << "adding playerID: " << i << " & name: player" << i
+                    << std::endl;
         }
         // for(auto&& player: players){
         //   std::cout<<*player<<std::endl;
@@ -265,14 +236,11 @@ void GameEngine::startupPhase()
 
         std::cout << "Hello";
         playersAdded = true;
+      } else {
+        std::cout << "wrong number of players. choose between 2 and 6"
+                  << std::endl;
       }
-      else
-      {
-        std::cout << "wrong number of players. choose between 2 and 6" << std::endl;
-      }
-    }
-    else if (commandAction == "gamestart" && playersAdded)
-    {
+    } else if (commandAction == "gamestart" && playersAdded) {
       // Logic to start the game
       // a) Distribute territories
       std::cout << "\nEntering game start\n";
@@ -281,68 +249,65 @@ void GameEngine::startupPhase()
 
       auto size = static_cast<double>(territories.size());
       cout << size << " total territories" << endl;
-      for (int i = 0; i < size; i++)
-      {
+      for (int i = 0; i < size; i++) {
         std::cout << "\nEntering forLOOP ````game start\n";
         Territory *territory = &*territories[i];
         int playerIndex = i % playernum; // Round-robin distribution
         players[playerIndex]->addTerritory(territory);
       }
       std::cout << "trying to return player 1 ter\n";
-      for(int j = 0; j<playernum; j++){
-            std::cout<<"Printing player: "<<j+1<<" territories:\n";
-            for (Territory *t : players[j]->getTerritories()) {
-            cout << *t << endl;
-            }
+      for (int j = 0; j < playernum; j++) {
+        std::cout << "Printing player: " << j + 1 << " territories:\n";
+        for (Territory *t : players[j]->getTerritories()) {
+          cout << *t << endl;
+        }
       }
-     
-      //players[1]->getTerritories();
-      // b) Randomize order of play
+
+      // players[1]->getTerritories();
+      //  b) Randomize order of play
       std::cout << "\nRandomizing player order\n";
-      std::random_device rd;                           // Obtain a random number from hardware
-      std::mt19937 g(rd());                            // Seed the generator
-      std::shuffle(players.begin(), players.end(), g); // Shuffle the players vector
+      std::random_device rd; // Obtain a random number from hardware
+      std::mt19937 g(rd());  // Seed the generator
+      std::shuffle(players.begin(), players.end(),
+                   g); // Shuffle the players vector
 
       // PRINT
       std::cout << "Order of play:" << std::endl;
-      for (const auto &player : players)
-      {
+      for (const auto &player : players) {
         std::cout << player->getName() << std::endl;
       }
       // c) Assign initial armies
       std::cout << "Assigning 50 initial armies to each player...\n";
-         //for (auto& player : players) {
-         // player->setTerritoryUnits(*t, 50);
-        //player->addArmies(50); // Assuming function exists
-    // }
+      // for (auto& player : players) {
+      //  player->setTerritoryUnits(*t, 50);
+      // player->addArmies(50); // Assuming function exists
+      // }
 
       // d) Deal initial cards
       std::cout << "Dealing initial cards to each player...\n";
-        Deck deck;
-        Hand *hand; 
-        for (auto& player : players) {
+      Deck deck;
+      Hand *hand;
+      for (auto &player : players) {
 
         // Each player draws two cards
         deck.draw(*hand); // First card
         deck.draw(*hand); // Second card
 
         player->getHand();
-        std::cout<<"after getHAND";
-    }
+        std::cout << "after getHAND";
+      }
       // e) Switch to play phase
       cout << "\ne) switching the game to the play phase: " << endl;
 
-
-                command->saveEffect("a)distributing all the territories to the players\n"
-                                    "b) determining order of play of randomly\n"
-                                    "c) giving 50 initial army units to the players\n"
-                                    "d) players draw 2 initial cards from the deck using the deck's draw() method\n"
-                                    "e) switch the game to the play phase");
+      command->saveEffect("a)distributing all the territories to the players\n"
+                          "b) determining order of play of randomly\n"
+                          "c) giving 50 initial army units to the players\n"
+                          "d) players draw 2 initial cards from the deck using "
+                          "the deck's draw() method\n"
+                          "e) switch the game to the play phase");
       startupPhaselogic = true;
       break; // Assuming the loop should end when the game starts
-    }
-    else
-    {
+    } else {
       // Handle invalid commands or commands in the wrong order
       std::cout << "Invalid command or command received in the wrong state.";
       startupPhaselogic = true;

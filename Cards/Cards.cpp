@@ -1,5 +1,4 @@
 #include "Cards.h"
-#include <memory>
 
 // Created by Maxime Landry (maxime334) on 23-10-14
 
