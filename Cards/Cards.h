@@ -16,8 +16,7 @@
   airlift,
   diplomacy.
 */
-enum class CardType : char
-{
+enum class CardType : char {
   bomb,
   reinforcement,
   blockade,
@@ -25,13 +24,12 @@ enum class CardType : char
   diplomacy
 };
 
-namespace cd
-{
-  /*
-  Maps class enum value to a string value.
-  Used internally inside the stream insertion operator overload.
-  */
-  const std::string map(const CardType);
+namespace cd {
+/*
+Maps class enum value to a string value.
+Used internally inside the stream insertion operator overload.
+*/
+const std::string map(const CardType);
 } // namespace cd
 
 void test_cards(int = 15);
@@ -65,8 +63,7 @@ using card_vector = std::vector<card_ptr>;
     To declare a type for the card, use Type::type where type is to be
    chosen.
 */
-class Card
-{
+class Card {
 public:
   // Type of the card. 5 types available.
   // Type::type to be used. Check enum class for further details.
@@ -103,8 +100,7 @@ public:
   Base class when holding cards is necessary.
   Container of cards.
 */
-class Buffer
-{
+class Buffer {
 public:
   card_vector m_buffer;
 
@@ -132,6 +128,11 @@ public:
   void insert(const CardType) noexcept;
 
   /*
+    Inserts a specified number of random cards inside the card's container.
+  */
+  void random_insert(const int &) noexcept;
+
+  /*
     Returns a vector of all the cards, as types, contained inside the hand.
     The vector can be implicitely converted to a vector of cards inside a
     for-each loop.
@@ -157,8 +158,7 @@ public:
 /*
   Finite collection of Warzone cards.
 */
-class Hand : public Buffer
-{
+class Hand : public Buffer {
 public:
   Hand();
   Hand(const Hand &);
@@ -179,8 +179,7 @@ public:
 /*
   Contains finite collection of Warzone cards.
 */
-class Deck : public Buffer
-{
+class Deck : public Buffer {
 public:
   Deck();
   Deck(const Deck &);
