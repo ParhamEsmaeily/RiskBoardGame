@@ -1,4 +1,3 @@
-#include "GameEngine.h"
 #include <iostream>
 #include <memory>
 #include <algorithm>
@@ -30,7 +29,6 @@ GameEngine::~GameEngine()
 {
 }
 
-/** Assignment Constructor */
 GameEngine &GameEngine::operator=(const GameEngine &other)
 {
   this->currState = other.currState;

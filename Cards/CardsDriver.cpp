@@ -9,7 +9,7 @@
 void test_cards(int no_cards) {
   Deck deck;
   for (int i = 0; i < no_cards; i++) {
-    deck.insert(Type(i % 5)); // Kind of random insertion of cards.
+    deck.insert(CardType(i % 5)); // Kind of random insertion of cards.
   }
 
   Hand hand;
@@ -18,6 +18,6 @@ void test_cards(int no_cards) {
   }
 
   for (int i = 0; i < no_cards; i++) {
-    hand.play(Type(i % 5), deck);
+    hand.play(CardType(i % 5), deck);
   }
 }
