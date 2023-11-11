@@ -206,7 +206,7 @@ void GameEngine::startupPhase()
       // delete previous map if any
 
       // load the new map
-      string map_path = "maps/world.map";
+      string map_path = "../maps/world.map";
       // std::shared_ptr<Map> map = MapLoader::loadMap(map_path);
       this->map = MapLoader::loadMap(map_path);
 
@@ -286,14 +286,19 @@ void GameEngine::startupPhase()
       for (int i = 0; i < size; i++)
       {
         std::cout << "\nEntering forLOOP ````game start\n";
-        auto *territory = &*territories[i];
+        Territory *territory = &*territories[i];
         int playerIndex = i % playernum; // Round-robin distribution
-                                         // Assuming Player has a method to add a territory
         players[playerIndex]->addTerritory(territory);
       }
       std::cout << "trying to return player 1 ter\n";
-      players[1]->getTerritories();
-      std::cout << "\ndid I return player 1 ter\n";
+      for(int j = 0; j<playernum; j++){
+            std::cout<<"Printing player: "<<j+1<<" territories:\n";
+            for (Territory *t : players[j]->getTerritories()) {
+            cout << *t << endl;
+            }
+      }
+     
+      //players[1]->getTerritories();
       // b) Randomize order of play
       std::cout << "\nRandomizing player order\n";
       std::random_device rd;                           // Obtain a random number from hardware
@@ -304,12 +309,37 @@ void GameEngine::startupPhase()
       std::cout << "Order of play:" << std::endl;
       for (const auto &player : players)
       {
-        // Assuming each player has a method to get their name or ID, such as getName() or getID()
-        std::cout << player->getName() << std::endl; // Replace getName() with the appropriate method
+        std::cout << player->getName() << std::endl;
       }
       // c) Assign initial armies
+      std::cout << "Assigning 50 initial armies to each player...\n";
+         //for (auto& player : players) {
+         // player->setTerritoryUnits(*t, 50);
+        //player->addArmies(50); // Assuming function exists
+    // }
+
       // d) Deal initial cards
+      std::cout << "Dealing initial cards to each player...\n";
+        Deck deck;
+        Hand *hand; 
+        for (auto& player : players) {
+
+        // Each player draws two cards
+        deck.draw(*hand); // First card
+        deck.draw(*hand); // Second card
+
+        player->getHand();
+        std::cout<<"after getHAND";
+    }
       // e) Switch to play phase
+      cout << "\ne) switching the game to the play phase: " << endl;
+
+
+                command->saveEffect("a)distributing all the territories to the players\n"
+                                    "b) determining order of play of randomly\n"
+                                    "c) giving 50 initial army units to the players\n"
+                                    "d) players draw 2 initial cards from the deck using the deck's draw() method\n"
+                                    "e) switch the game to the play phase");
       startupPhaselogic = true;
       break; // Assuming the loop should end when the game starts
     }

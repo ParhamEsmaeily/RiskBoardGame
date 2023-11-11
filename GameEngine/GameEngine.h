@@ -8,6 +8,7 @@
 #include "Command.h"
 #include "Map.h"
 #include "Player.h"
+#include "Cards.h"
 
 using std::ostream;
 using std::shared_ptr;
@@ -35,6 +36,7 @@ public:
   vector<Player *> players;
   std::string stringToLog() const override;
   std::shared_ptr<Map> map;
+  Deck* deck;
 
   CommandProcessor *commandProcessor;
   GameEngine();
