@@ -162,32 +162,36 @@ void GameEngine::startupPhase() {
   int playernum;
   Command currentCommand;
   string commandType;
-  std::cout << "entered\n";
 
   while (!startupPhaselogic) {
-    std::cout << "entered while loop\n";
     std::cout << "\nEnter next command: " << std::endl;
     std::cin >> commandType;
 
     string commandAction = commandType;
 
-    std::cout << "entered command type: \n" << commandAction << "\n";
 
-    std::cout << "maploaded outside" << mapLoaded << "\n";
 
     if (commandAction == "loadmap" && !mapLoaded) {
+      string choice;
       // Logic to load the map
       std::cout << "\n<<Loading the map...\n " << std::endl;
+
+      std::cout << "\n<<two map choices:\n world.map & test.map" << std::endl;
+
+      std::cout << "\n<<Choose your choice make sure to have correct syntax\n " << std::endl;
+
+      std::cin>>choice;
       // delete previous map if any
 
       // load the new map
-      string map_path = "../maps/world.map";
+      string map_path = "../maps/"+choice;
       // std::shared_ptr<Map> map = MapLoader::loadMap(map_path);
       this->map = MapLoader::loadMap(map_path);
-
-      std::cout << "entered6\n";
+      
       mapLoaded = true;
-      std::cout << mapLoaded << "\n";
+      
+      
+      std::cout << "\n<<You may \"validatemap\"\n if loaded correctly" << std::endl;
 
       // if (this->map = nullptr) {//if null pointer
       //     string effect = "Could not load the map ";
@@ -195,8 +199,8 @@ void GameEngine::startupPhase() {
       //     //go_to_next_state = false;
       //     std::cout<<"entered4\n";
       // } else {
-      //     string effect = "Loaded map";
-      //     command->saveEffect(effect);
+      //      string effect = "Loaded map";
+      //      command->saveEffect(effect);
       //     std::cout<<"entered5\n";
       // }
     }
@@ -207,15 +211,16 @@ void GameEngine::startupPhase() {
       // Logic to validate the map
       // string effect = "Validated Map";
       //     command->saveEffect(effect);
+      
 
-      std::cout << "mapvalidate  before\n";
       mapValidated = true;
-      std::cout << "mapvalidate  true\n";
+      
 
       Map::validate(map.get());
+      std::cout << "\nMap has been Validated, now you may proceed to sue \"addplayer\"\n" << std::endl;
     } else if (commandAction == "addplayer" && mapValidated && !playersAdded) {
 
-      std::cout << "choose number of players" << std::endl;
+      std::cout << "\nchoose number of players" << std::endl;
       std::cin >> playernum;
 
       // Logic to add players
@@ -236,28 +241,26 @@ void GameEngine::startupPhase() {
         // string effect = "Validated Map";
         //   command->saveEffect(effect);
 
-        std::cout << "Hello";
+
         playersAdded = true;
+        std::cout << "\n<<Players have been added to game\n\n You may \"gamestart\"\n " << std::endl;
       } else {
         std::cout << "wrong number of players. choose between 2 and 6"
                   << std::endl;
       }
+
     } else if (commandAction == "gamestart" && playersAdded) {
       // Logic to start the game
       // a) Distribute territories
-      std::cout << "\nEntering game start\n";
       const auto territories = Map::getAllTerritories(*map);
-      std::cout << "\nafter getAllTER\n";
 
       auto size = static_cast<double>(territories.size());
       cout << size << " total territories" << endl;
       for (int i = 0; i < size; i++) {
-        std::cout << "\nEntering forLOOP ````game start\n";
         Territory *territory = &*territories[i];
         int playerIndex = i % playernum; // Round-robin distribution
         players[playerIndex]->addTerritory(territory);
       }
-      std::cout << "trying to return player 1 ter\n";
       for (int j = 0; j < playernum; j++) {
         std::cout << "Printing player: " << j + 1 << " territories:\n";
         for (Territory *t : players[j]->getTerritories()) {
@@ -267,7 +270,7 @@ void GameEngine::startupPhase() {
 
       // players[1]->getTerritories();
       //  b) Randomize order of play
-      std::cout << "\nRandomizing player order\n";
+      std::cout << "\nRandomizing player order\n==========================================================\n";
       std::random_device rd; // Obtain a random number from hardware
       std::mt19937 g(rd());  // Seed the generator
       std::shuffle(players.begin(), players.end(),
@@ -279,24 +282,40 @@ void GameEngine::startupPhase() {
         std::cout << player->getName() << std::endl;
       }
       // c) Assign initial armies
-      std::cout << "Assigning 50 initial armies to each player...\n";
-      // for (auto& player : players) {
-      //  player->setTerritoryUnits(*t, 50);
-      // player->addArmies(50); // Assuming function exists
-      // }
+      std::cout << "\n==========================================================\nAssigning 50 initial armies to each player...\n";
+      for (auto& player : players) {
+       for (int k = 0; k<50; k++){
+        player->getHand()->insert(Card(CardType::reinforcement));
+       }
+      }
 
       // d) Deal initial cards
-      std::cout << "Dealing initial cards to each player...\n";
+      std::cout << "==========================================================\nDealing initial cards to each player...\n";
       Deck deck;
-      Hand *hand;
+      deck.random_insert(100);
       for (auto &player : players) {
+        std::cout << "\nplayer ";
+        std::cout<< player->getPlayerId()<<std::endl;
+        //std::cout << "\nhand";
+        //std::cout << player->getHand()<< std::endl; 
+        
+
+        
 
         // Each player draws two cards
-        deck.draw(*hand); // First card
-        deck.draw(*hand); // Second card
+        deck.draw(*player->getHand()); // First card
+        deck.draw(*player->getHand()); // Second card
 
-        player->getHand();
-        std::cout << "after getHAND";
+       // std::cout <<  player->getHand()->show_cards().size() << std::endl;
+
+      
+      std::cout << "\nhand card 1 that should be reinforcement: \n";
+      std::cout <<  player->getHand()->show_cards()[1] << std::endl;
+      std::cout << "\ndraw card  #1: \n";
+       std::cout <<  player->getHand()->show_cards()[50] << std::endl; //because we add 50 initial reinforcement cards
+       std::cout << "\ndraw card  #2: \n";
+       std::cout <<  player->getHand()->show_cards()[51] << std::endl;
+        
       }
       // e) Switch to play phase
       cout << "\ne) switching the game to the play phase: " << endl;

@@ -24,6 +24,16 @@ void testGameStates() {
   gameEngine = nullptr;
 }
 
+// void GameEngine::testStartupPhase(){
+//   this->startupPhase();
+
+// }
+void testStartupPhase(){
+  auto *gameEngine = new GameEngine();
+  gameEngine->startupPhase();
+  delete gameEngine;
+  gameEngine = nullptr;
+}
 void testMainGameLoop() {
   GameEngine gameEngine;
   vector<Player *> list_players;

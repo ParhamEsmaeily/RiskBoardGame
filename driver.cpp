@@ -75,8 +75,9 @@ int main(int argc, char const *argv[])
 
             break;
         }
-        case 7:{ GameEngine engine;
-            engine.startupPhase();
+        case 7:{ 
+        testStartupPhase();
+            //engine.startupPhase();
         break;
         }
         case 8:{

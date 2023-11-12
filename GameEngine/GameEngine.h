@@ -20,6 +20,7 @@ using std::vector;
 
 void testGameStates();
 void testMainGameLoop();
+void testStartupPhase();
 
 // class State; // Forward declaration
 class CommandProcessor;
@@ -36,6 +37,7 @@ public:
   string getCurrCommandsList();
   string executeCommand(string input);
   string getPhase();
+  
 
   void startupPhase();
   Command *command;

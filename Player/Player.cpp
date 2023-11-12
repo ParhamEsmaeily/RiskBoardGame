@@ -21,7 +21,7 @@ Player::Player(int playerID, string name)
     // int index2 = dist6(rng);
 
     // Inserts random cards inside both deck and the hand.
-    hand->insert(CardType(index));
+    //hand->insert(CardType(index));
     // deck.insert(Type(index2));
   }
 }
