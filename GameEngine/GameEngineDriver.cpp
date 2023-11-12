@@ -28,6 +28,9 @@ void testMainGameLoop() {
   GameEngine gameEngine;
   vector<Player *> list_players;
 
+  // fixes incompatibility with cin and getline
+  cin.ignore(256, '\n');
+
   // Test: load map
   const shared_ptr<Map> gameMap = MapLoader::loadMap("../maps/world.map");
   const auto territories = Map::getAllTerritories(*gameMap);
@@ -75,7 +78,7 @@ void testMainGameLoop() {
   // Test: move current state to reinforcement phase
   gameEngine.executeCommand("loadmap");
   gameEngine.executeCommand("validate");
-  gameEngine.executeCommand("addlist_players");
+  gameEngine.executeCommand("addplayers");
   gameEngine.executeCommand("assigncountries");
 
   gameEngine.mainGameLoop(list_players, *gameMap);
@@ -107,7 +110,7 @@ void testMainGameLoop() {
   // Test: move current state to reinforcement phase
   gameEngine2.executeCommand("loadmap");
   gameEngine2.executeCommand("validate");
-  gameEngine2.executeCommand("addlist_players");
+  gameEngine2.executeCommand("addplayers");
   gameEngine2.executeCommand("assigncountries");
 
   gameEngine2.mainGameLoop(list_players2, *gameMap);

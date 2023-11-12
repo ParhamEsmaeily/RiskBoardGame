@@ -28,6 +28,9 @@ class Map;
 class GameEngine : private ILoggable, private Subject {
   shared_ptr<State> currState;
   void initGame();
+  void reinforcementPhase(vector<Player *> players, const Map &map);
+  void issueOrdersPhase(vector<Player *> players, const Map &map);
+  void executeOrdersPhase(vector<Player *> players);
 
 public:
   string getCurrCommandsList();

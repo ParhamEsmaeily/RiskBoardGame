@@ -1,6 +1,8 @@
+#include <map>
 #include "GameEngine.h"
 #include "../CommandProcessor/Command.h"
 #include "../Player/Player.h"
+#include "Player.h"
 
 using std::make_shared;
 using std::ostream;
@@ -313,4 +315,198 @@ void GameEngine::startupPhase() {
       startupPhaselogic = true;
     }
   }
+}
+
+
+/*
+ * Part 3: Main Game Loop
+ */
+
+void GameEngine::reinforcementPhase(vector<Player *> players, const Map &gameMap)
+{
+    cout << "Reinforcement Phase Starting" << endl;
+
+    const auto continents = Map::getAllContinents(gameMap);
+
+    // for each player, give reinforcements based on territories owned
+    for (auto &&player : players)
+    {
+        int continent_bonus = 0;
+
+        // 1 army for every 3 territories owned rounded down
+        int territory_reinforcement_count = static_cast<int>(player->getTerritories().size() / 3);
+
+        // map of number of territories owned per continent: <continent name, number of territories owned>
+        ::map<string, int> num_terr_per_continent;
+
+        // count number of territories owned per continent for this player
+        for (auto &&territory : player->getTerritories())
+        {
+            string territoryContinent = territory->getContinent()->getName();
+            bool missing_from_map = num_terr_per_continent.find(territoryContinent) == num_terr_per_continent.end();
+
+            if (missing_from_map)
+            {
+                num_terr_per_continent[territoryContinent] = 1;
+            }
+            else
+            {
+                num_terr_per_continent[territoryContinent]++;
+            }
+        }
+
+        // check if player owns all territories in a continent by matching the number of territories owned per continent
+        // with the total number of territories in that continent
+        for (auto &&continent : continents)
+        {
+            if (num_terr_per_continent.find(continent->getName()) != num_terr_per_continent.end())
+            {
+                if (num_terr_per_continent[continent->getName()] == continent->getTerritoryCount())
+                {
+                    std::cout << "Player " << player->getName() << " owns all territories in " << continent->getName()
+                              << std::endl;
+                    continent_bonus += continent->getBonus();
+                }
+            }
+        }
+
+        int reinforcements = territory_reinforcement_count + continent_bonus;
+
+        // minimum of 3 reinforcements
+        if (reinforcements < 3)
+        {
+            reinforcements = 3;
+        }
+
+        cout << player->getName() << " gets " << reinforcements << " reinforcements: "
+             << territory_reinforcement_count << " from territories and "
+             << continent_bonus << " from continent bonuses." << endl;
+
+        // give player reinforcements
+        for (int i = 0; i < reinforcements; i++)
+        {
+            player->getHand()->insert(Card(CardType::reinforcement));
+        }
+    }
+    cout << "Reinforcement Phase End" << endl;
+}
+
+void GameEngine::issueOrdersPhase(vector<Player *> players, const Map &gameMap)
+{
+    cout << "Issue Orders Phase Starting" << endl;
+
+    // for each player, issue orders
+    for (auto &&player : players)
+    {
+        cout << "Player " << player->getName() << " issuing orders" << endl;
+        player->issueOrder(gameMap);
+    }
+
+    cout << "Issue Orders Phase End" << endl;
+}
+
+void GameEngine::executeOrdersPhase(vector<Player *> players)
+{
+    cout << "Execute Orders Phase Starting" << endl;
+
+    // while all players still have orders left
+    size_t players_with_deploys_left = players.size();
+    while (true)
+    {
+        bool all_players_have_no_orders = true;
+
+        // for each player, check if they have orders left
+        for (auto &&player : players)
+        {
+            if (!player->getPlayerOrderList()->list.empty())
+            {
+                all_players_have_no_orders = false;
+                break;
+            }
+        }
+        // if all players have no orders left, break out of loop
+        if (all_players_have_no_orders)
+        {
+            break;
+        }
+
+        // for each player, execute orders
+        for (auto &&player : players)
+        {
+            // execute deploy orders first, then when all players have no deploy orders left, execute the rest
+            if (!player->getPlayerOrderList()->list.empty() &&
+                (player->getPlayerOrderList()->list[0]->name == "Deploy" || players_with_deploys_left <= 0))
+            {
+                cout << "Player " << player->getName() << " executing orders" << endl;
+
+                player->getPlayerOrderList()->list[0]->execute();
+                player->getPlayerOrderList()->remove(0);
+            }
+            else if (players_with_deploys_left > 0)
+            {
+                players_with_deploys_left--;
+            }
+        }
+    }
+
+    cout << "Execute Orders Phase End" << endl;
+}
+
+void GameEngine::mainGameLoop(vector<Player *> players, const Map &gameMap)
+{
+    // Check if gamestart was called
+    if (getPhase() != "assign reinforcements")
+    {
+        cout << "Error: Game start has not been called" << endl;
+        return;
+    }
+
+    while (getPhase() != "end")
+    {
+        // check if a player has no territories (delete function because players don't start with 0 territories)
+        for (auto &&player : players)
+        {
+            if (player->getTerritories().empty())
+            {
+                cout << player->getName() << " has no territories left. Player will be removed." << endl;
+                // remove player from list of players
+                players.erase(std::remove(players.begin(), players.end(), player), players.end());
+                break;
+            }
+        }
+
+        reinforcementPhase(players, gameMap);
+        executeCommand("issueorder");
+
+        issueOrdersPhase(players, gameMap);
+        executeCommand("endissueorders");
+
+        executeOrdersPhase(players);
+
+        // check if a player has no territories
+        for (auto &&player : players)
+        {
+            if (player->getTerritories().empty())
+            {
+                cout << player->getName() << " has no territories left. Player will be removed." << endl;
+                // remove player from list of players
+                players.erase(std::remove(players.begin(), players.end(), player), players.end());
+                break;
+            }
+        }
+
+        // check if there is only one player left
+        if (players.size() == 1)
+        {
+            cout << players[0]->getName() << " has won the game!" << endl;
+            // must be in execute orders state to win
+            executeCommand("win");
+            return;
+        }
+
+        executeCommand("endexecorders");
+
+        // Stops after 1 loop (to delete)
+        break;
+    }
 }
