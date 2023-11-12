@@ -1,5 +1,4 @@
 #include "Cards.h"
-#include <iostream>
 
 /*
   Test the cards methods.

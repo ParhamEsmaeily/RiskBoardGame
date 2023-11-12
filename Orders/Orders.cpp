@@ -1,8 +1,4 @@
 #include "Orders.h"
-#include <iostream>
-#include <memory>
-#include <string>
-#include <vector>
 using namespace std;
 
 /**Prameterized constructor*/

@@ -28,7 +28,7 @@ int main(int argc, char const *argv[])
     // otherwise, if the '-test' flag is provided, run the tests and exit
     while (true)
     {
-        std::cout << "Choose your poison \n1: Test Maps\n2: Test Players\n3: Test Orders\n4: Test Cards\n5: Test Game Engine\n6: Test Command Processor\n7: Test startupPhase\nElse: exit ";
+        std::cout << "Choose your poison \n1: Test Maps\n2: Test Players\n3: Test Orders\n4: Test Cards\n5: Test Game Engine\n6: Test Command Processor\n7: Test startupPhase\n8: Test mainGameLoop \nElse: exit\n";
         std::cin >> choice;
         std::cout << std::endl;
 
@@ -75,11 +75,15 @@ int main(int argc, char const *argv[])
 
             break;
         }
-        case 7:{ GameEngine engine;
-            engine.startupPhase();
+        case 7:{ 
+        testStartupPhase();
+            //engine.startupPhase();
         break;
         }
-           
+        case 8:{
+            testMainGameLoop();
+            break;
+        }
         default:
             std::cout << "Byyyye ;)" << std::endl;
             return 0;
