@@ -1,8 +1,4 @@
 #include "./LoggingObserver.h"
-#include <fstream>
-#include <iostream> // To be removed.
-#include <memory>   // To be removed.
-#include <vector>   // To be removed.
 
 // Created by Maxime Landry (maxime334).
 
