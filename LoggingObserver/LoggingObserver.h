@@ -11,8 +11,19 @@
 class Observer;
 class Subject;
 class ILoggable;
-class LogObserver;
-// Forward declarations.
+class LogObserver; // Forward.
+
+namespace obs {
+/*
+Holds path to the log file. Can change this directly to change the log file's
+location.
+Weirdly depends on where the executable is located rather than the location of
+the class itself.
+
+If executable inside build directory: ../ is needed.
+*/
+const std::string path = "gamelog.txt";
+} // namespace obs
 
 void test_LoggingObserver();
 
