@@ -80,15 +80,15 @@ Player &Player::operator=(const Player &p)
     return *this;
 }
 
-//check equality between player objects
-bool Player::operator==(const Player& other)
+// check equality between player objects
+bool Player::operator==(const Player &other)
 {
     if (this->playerId == other.playerId)
         return true;
     return false;
 }
 
-bool Player::operator!=(const Player& other) { return !(*this == other); }
+bool Player::operator!=(const Player &other) { return !(*this == other); }
 
 vector<Territory *> Player::toDefend() { return this->territories; }
 
@@ -176,7 +176,7 @@ void Player::issueOrder(const Map &gameMap)
                 if (t->getName() == terr_name)
                 {
                     // TODO: add the deploy order to the order list
-                    this->order_list->add(Deploy(this, t, 1));
+                    this->order_list->add(Deploy(this, &gameMap, t, 1));
                     orderAdded = true;
                     break;
                 }
@@ -245,14 +245,29 @@ void Player::issueOrder(const Map &gameMap)
                     cout << "Invalid number of armies." << endl;
                     continue;
                 }
-                //Parse strings to territory objects
+
+                // Parse strings to territory objects
+                Territory *source = nullptr;
+                Territory *dest = nullptr;
+
+                for (Territory *t : this->toAttack(gameMap))
+                {
+                    if (t->getName() == terr_1)
+                    {
+                        source = t;
+                    }
+                    else if (t->getName() == terr_2)
+                    {
+                        dest = t;
+                    }
+                }
 
                 // TODO: add params to Advance constructor
-                this->order_list->add(Advance(this, ));
+                this->order_list->add(Advance(this, &gameMap, this, source, dest, std::stoi(str_num_armies)));
             }
             else if (input == "bomb" && cards_count[CardType::bomb] > 0)
             {
-                this->order_list->add(Bomb());
+                this->order_list->add(Bomb(this, &gameMap, ));
                 cards_count[CardType::bomb]--;
             }
             else if (input == "blockade" && cards_count[CardType::blockade] > 0)
@@ -283,13 +298,13 @@ void Player::issueOrder(const Map &gameMap)
 //      order_list->add(new Deploy);
 //  }
 
-void Player::addTerritory(const Territory* t)
+void Player::addTerritory(const Territory *t)
 {
-    territories.push_back(const_cast<Territory*>(t));
+    territories.push_back(const_cast<Territory *>(t));
     units_map[t->getName()] = 0;
 }
 
-void Player::removeTerritory(const Territory* t)
+void Player::removeTerritory(const Territory *t)
 {
     for (int i = 0; i < territories.size(); i++)
     {
@@ -302,9 +317,9 @@ void Player::removeTerritory(const Territory* t)
     units_map.erase(t->getName());
 }
 
-void Player::addAlly(const Player* p)
+void Player::addAlly(const Player *p)
 {
-    this->allies.push_back(const_cast<Player*>(p));
+    this->allies.push_back(const_cast<Player *>(p));
 }
 
 void Player::resetTurnValues()
@@ -313,7 +328,7 @@ void Player::resetTurnValues()
     this->allies.clear();
 }
 
-bool Player::isAllied(Player* p)
+bool Player::isAllied(Player *p)
 {
     for (int i = 0; i < this->allies.size(); i++)
     {
@@ -323,7 +338,7 @@ bool Player::isAllied(Player* p)
     return false;
 }
 
-bool Player::owns(const Territory* t) const
+bool Player::owns(const Territory *t) const
 {
     for (int i = 0; i < territories.size(); i++)
     {
@@ -343,16 +358,15 @@ OrdersList *Player ::getPlayerOrderList() { return order_list; }
 
 vector<Territory *> Player::getTerritories() { return territories; }
 
-int Player::getTerritoryUnits(const Territory* t) const
+int Player::getTerritoryUnits(const Territory *t) const
 {
     std::string str = t->getName();
     return units_map.at(str);
 }
 
-bool Player::conqueredThisTurn(){return conquered_this_turn;}
+bool Player::conqueredThisTurn() { return conquered_this_turn; }
 
-bool Player::isNeutral(){return this->is_neutral;}
-
+bool Player::isNeutral() { return this->is_neutral; }
 
 // setters
 void Player::setPlayerOrderList(OrdersList *orders)
@@ -367,7 +381,7 @@ ostream &operator<<(ostream &os, Player &p)
     return os << "Name: " << p.getName() << " ID: " << p.getPlayerId();
 }
 
-void Player::setTerritoryUnits(const Territory* t, int units)
+void Player::setTerritoryUnits(const Territory *t, int units)
 {
     units_map[t->getName()] = units;
 }
