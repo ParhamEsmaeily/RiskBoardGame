@@ -29,7 +29,7 @@ public:
   Order(Player *player, const Map *map, std::string name, std::string description);
   ~Order();
   virtual bool validate();
-  virtual void execute();
+  virtual void execute() = 0;
   friend std::ostream &operator<<(std::ostream &os, const Order &order);
   Order &operator=(const Order &other);
   bool operator==(const Order &other);

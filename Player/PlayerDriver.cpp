@@ -49,9 +49,9 @@ void testPlayers()
   //========================ORDER LIST+++++++++++
   // doesn't work yet
   //  cout << "Player's orders list:" << endl;
-  Order test_order = Advance(p1, map.get(), p2, territories[0].get(), territories[1].get(), 5);
+  Advance test_order = Advance(p1, map.get(), p2, territories[0].get(), territories[1].get(), 5);
 
-  //   p1->issueOrder(test_order);
+  p1->issueOrder(*map);
 
   cout << *(p1->getPlayerOrderList()) << endl;
 

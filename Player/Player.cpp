@@ -267,7 +267,7 @@ void Player::issueOrder(const Map &gameMap)
             }
             else if (input == "bomb" && cards_count[CardType::bomb] > 0)
             {
-                this->order_list->add(Bomb(this, &gameMap, ));
+                this->order_list->add(Bomb());
                 cards_count[CardType::bomb]--;
             }
             else if (input == "blockade" && cards_count[CardType::blockade] > 0)

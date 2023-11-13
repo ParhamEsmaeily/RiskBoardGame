@@ -139,6 +139,16 @@ void Order::execute()
         std::cout << "Cannot validate." << endl;
 }
 
+bool Order::operator==(const Order &other)
+{
+    return (this->name == other.name && this->description == other.description);
+}
+
+bool Order::operator!=(const Order &other)
+{
+    return !(*this == other);
+}
+
 Advance::Advance(Player *player, const Map *map, Player *target, const Territory *source, const Territory *dest, int units) : Order(player, map, "Advance", "An advance order tells a certain number of army units to move from a source territory to a target adjacent territory.")
 {
     this->target_player = target;
@@ -265,7 +275,7 @@ Airlift::~Airlift()
 
 ostream &operator<<(ostream &os, Airlift &order)
 {
-    Order *base = &order;
+    Airlift *base = &order;
     os << base;
     os << order.units_deployed << " units airlifted from " << order.source_terr << "to " << order.dest_terr << endl;
     return os;
@@ -273,8 +283,8 @@ ostream &operator<<(ostream &os, Airlift &order)
 
 bool Airlift::operator==(const Airlift &other)
 {
-    Order base = *this;
-    Order baseo = other;
+    Airlift base = *this;
+    Airlift baseo = other;
     if (base == baseo && this->source_terr == other.source_terr && this->dest_terr == other.dest_terr && this->units_deployed == other.units_deployed && this->card == other.card)
         return true;
     return false;
@@ -346,7 +356,7 @@ Bomb::~Bomb()
 
 ostream &operator<<(ostream &os, Bomb &order)
 {
-    Order *base = &order;
+    Bomb *base = &order;
     os << base;
     os << "Player bombs " << order.dest_terr << endl;
     return os;
@@ -354,8 +364,8 @@ ostream &operator<<(ostream &os, Bomb &order)
 
 bool Bomb::operator==(const Bomb &other)
 {
-    Order base = *this;
-    Order baseo = other;
+    Bomb base = *this;
+    Bomb baseo = other;
     if (base == baseo && this->dest_terr == other.dest_terr && this->card == other.card && this->target_player == other.target_player)
         return true;
     return false;
@@ -420,7 +430,7 @@ Blockade::~Blockade()
 
 ostream &operator<<(ostream &os, Blockade &order)
 {
-    Order *base = &order;
+    Blockade *base = &order;
     os << base;
     os << "Blockade created in " << order.dest_terr << endl;
     return os;
@@ -428,8 +438,8 @@ ostream &operator<<(ostream &os, Blockade &order)
 
 bool Blockade::operator==(const Blockade &other)
 {
-    Order base = *this;
-    Order baseo = other;
+    Blockade base = *this;
+    Blockade baseo = other;
     if (base == baseo && this->dest_terr == other.dest_terr && this->card == other.card)
         return true;
     return false;
@@ -561,7 +571,7 @@ Negotiate::~Negotiate()
 
 ostream &operator<<(ostream &os, Negotiate &order)
 {
-    Order *base = &order;
+    Negotiate *base = &order;
     os << base;
     os << "Negotiations between " << order.issuer << "and " << order.target_player << " result in a ceasefire for the remainder of the turn." << endl;
     return os;
@@ -569,8 +579,8 @@ ostream &operator<<(ostream &os, Negotiate &order)
 
 bool Negotiate::operator==(const Negotiate &other)
 {
-    Order base = *this;
-    Order baseo = other;
+    Negotiate base = *this;
+    Negotiate baseo = other;
     if (base == baseo && this->target_player == other.target_player && this->card == other.card)
         return true;
     return false;
