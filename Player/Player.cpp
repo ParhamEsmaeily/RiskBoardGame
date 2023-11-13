@@ -1,10 +1,9 @@
 #include <set>
 #include <map>
-
 #include "Cards.h"
 #include "Orders.h"
-
 #include "Player.h"
+#include "../Map/Map.h"
 
 using namespace std;
 
@@ -37,6 +36,11 @@ Player::Player(int playerID, string name, vector<Territory *> &territories,
                Hand *hand, OrdersList *orders)
     : playerId(playerID), name(name), territories(territories), hand(hand),
       order_list(orders) {}
+
+Player::Player(bool isNeutral) : Player()
+{
+    this->is_neutral = true;
+}
 
 // create copy player obj
 Player::Player(const Player &p)
@@ -268,9 +272,54 @@ void Player::issueOrder(const Map &gameMap)
 //      order_list->add(new Deploy);
 //  }
 
-void Player::addTerritory(Territory *t)
+void Player::addTerritory(const Territory* t)
 {
-    territories.push_back(t); // to add t to player
+    territories.push_back(const_cast<Territory*>(t));
+    units_map[t->getName()] = 0;
+}
+
+void Player::removeTerritory(const Territory* t)
+{
+    for (int i = 0; i < territories.size(); i++)
+    {
+        if (territories[i]->getName() == t->getName())
+        {
+            territories.erase(territories.begin() + i);
+            break;
+        }
+    }
+    units_map.erase(t->getName());
+}
+
+void Player::addAlly(const Player* p)
+{
+    this->allies.push_back(const_cast<Player*>(p));
+}
+
+void Player::resetTurnValues()
+{
+    this->conquered_this_turn = false;
+    this->allies.clear();
+}
+
+bool Player::isAllied(Player* p)
+{
+    for (int i = 0; i < this->allies.size(); i++)
+    {
+        if (*p == *(allies[i]))
+            return true;
+    }
+    return false;
+}
+
+bool Player::owns(const Territory* t) const
+{
+    for (int i = 0; i < territories.size(); i++)
+    {
+        if (territories[i]->getName() == t->getName())
+            return true;
+    }
+    return false;
 }
 
 // getters
@@ -283,6 +332,17 @@ OrdersList *Player ::getPlayerOrderList() { return order_list; }
 
 vector<Territory *> Player::getTerritories() { return territories; }
 
+int Player::getTerritoryUnits(const Territory* t) const
+{
+    std::string str = t->getName();
+    return units_map.at(str);
+}
+
+bool Player::conqueredThisTurn(){return conquered_this_turn;}
+
+bool Player::isNeutral(){return this->is_neutral;}
+
+
 // setters
 void Player::setPlayerOrderList(OrdersList *orders)
 {
@@ -294,4 +354,14 @@ void Player::setTerritories(vector<Territory *> t) { this->territories = t; }
 ostream &operator<<(ostream &os, Player &p)
 {
     return os << "Name: " << p.getName() << " ID: " << p.getPlayerId();
+}
+
+void Player::setTerritoryUnits(const Territory* t, int units)
+{
+    units_map[t->getName()] = units;
+}
+
+void Player::setConqueredThisTurn(bool b)
+{
+    this->conquered_this_turn = b;
 }
