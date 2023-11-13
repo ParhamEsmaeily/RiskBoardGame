@@ -1,8 +1,11 @@
-﻿#include "Orders.h"
-#include <iostream>
+﻿#include <iostream>
+#include <vector>
 #include <memory>
 #include <string>
-#include <vector>
+#include "Orders.h"
+#include "../Player/Player.h"
+#include "../Map/Map.h"
+#include "../Cards/Cards.h"
 using namespace std;
 
 /**Prameterized constructor*/
