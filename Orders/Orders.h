@@ -24,6 +24,7 @@ public:
     Player* issuer;
     Order() = delete;
     Order(const Order& other);
+    Order(std::string name, std::string description);
     Order(Player* player, string name, string description);
     ~Order();
     virtual bool validate();

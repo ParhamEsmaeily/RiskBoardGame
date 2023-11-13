@@ -54,6 +54,11 @@ public:
   // assignment operator
   Player &operator=(const Player &p);
 
+  //Check equality between Player objects
+  bool operator==(const Player& other);
+
+  bool operator!=(const Player& other);
+
   // get
   int getPlayerId();
   OrdersList *getPlayerOrderList();
@@ -68,7 +73,7 @@ public:
   vector<Territory *> toAttack(const Map &gameMap); // return a list of territories to be Attacked
   vector<Territory *> toDefend();                   // return a list of territories to be defended
   void issueOrder(const Map &gameMap);              // uses the console to add orders to the player's list of orders
-  void addTerritory(Territory *territory);          // add territories to player
+  void addTerritory(const Territory *territory);          // add territories to player
   void removeTerritory(const Territory* t);  //removes territory and corresponding units from player
   bool owns(const Territory* t) const;
   void addAlly(const Player* p);

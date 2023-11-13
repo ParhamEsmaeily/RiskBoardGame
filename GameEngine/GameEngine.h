@@ -51,6 +51,4 @@ public:
   friend ostream &operator<<(ostream &os, const GameEngine &gameEngine);
 
   void mainGameLoop(vector<Player *> players, const Map &map);
-
-  std::string stringToLog() const override;
 };

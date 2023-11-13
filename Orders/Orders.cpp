@@ -272,7 +272,7 @@ Airlift& Airlift::operator=(const Airlift& other)
 
 bool Airlift::validate()
 {
-    if (this->issuer->owns(this->source_terr) && this->issuer->owns(this->source_terr) && this->units_deployed <= this->issuer->getTerritoryUnits(this->source_terr) && this->card->type == 3)
+    if (this->issuer->owns(this->source_terr) && this->issuer->owns(this->source_terr) && this->units_deployed <= this->issuer->getTerritoryUnits(this->source_terr) && this->card->type() == "airlift")
         return true;
     cout << this->name << " order invalid.";
     return false;
@@ -294,7 +294,7 @@ std::string Airlift::stringToLog() const {
     return "Airlift stringToLog: Airlift Executing:";
 }
 
-omb::Bomb(Player* player, Player* target, Card* card, const Territory* dest) :
+Bomb::Bomb(Player* player, Player* target, Card* card, const Territory* dest) :
     Order(player, "Bomb", "A bomb order targets a territory owned by another player than the one issuing the order. Its result is to remove half of the army units from this territory.The bomb order can only be created by playing the bomb card.")
 {
     this->card = card;
@@ -351,7 +351,7 @@ Bomb& Bomb::operator=(const Bomb& other)
 }
 bool Bomb::validate()
 {
-    if (this->target_player->owns(this->dest_terr) && this->card->type == 0 && !this->issuer->isAllied(this->target_player))
+    if (this->target_player->owns(this->dest_terr) && this->card->type() == "bomb" && !this->issuer->isAllied(this->target_player))
         return true;
     cout << this->name << " order invalid.";
     return false;
@@ -427,7 +427,7 @@ Blockade& Blockade::operator=(const Blockade& other)
 
 bool Blockade::validate()
 {
-    if (this->neutral_player->isNeutral() && this->card->type == 2 && this->issuer->owns(this->dest_terr))
+    if (this->neutral_player->isNeutral() && this->card->type() == "blockade" && this->issuer->owns(this->dest_terr))
         return true;
     cout << this->name << " order invalid.";
     return false;
@@ -571,7 +571,7 @@ Negotiate& Negotiate::operator=(const Negotiate& other)
 
 bool Negotiate::validate()
 {
-    if (this->card->type == 4)
+    if (this->card->type() == "negotiate")
         return true;
     cout << this->name << " order invalid.";
     return false;

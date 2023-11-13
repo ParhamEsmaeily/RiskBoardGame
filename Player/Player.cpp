@@ -80,6 +80,16 @@ Player &Player::operator=(const Player &p)
     return *this;
 }
 
+//check equality between player objects
+bool Player::operator==(const Player& other)
+{
+    if (this->playerId == other.playerId)
+        return true;
+    return false;
+}
+
+bool Player::operator!=(const Player& other) { return !(*this == other); }
+
 vector<Territory *> Player::toDefend() { return this->territories; }
 
 vector<Territory *> Player::toAttack(const Map &gameMap)
@@ -166,7 +176,7 @@ void Player::issueOrder(const Map &gameMap)
                 if (t->getName() == terr_name)
                 {
                     // TODO: add the deploy order to the order list
-                    this->order_list->add(Deploy());
+                    this->order_list->add(Deploy(this, t, 1));
                     orderAdded = true;
                     break;
                 }
@@ -235,9 +245,10 @@ void Player::issueOrder(const Map &gameMap)
                     cout << "Invalid number of armies." << endl;
                     continue;
                 }
+                //Parse strings to territory objects
 
                 // TODO: add params to Advance constructor
-                this->order_list->add(Advance());
+                this->order_list->add(Advance(this, ));
             }
             else if (input == "bomb" && cards_count[CardType::bomb] > 0)
             {
