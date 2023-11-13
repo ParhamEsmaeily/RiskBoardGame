@@ -37,6 +37,7 @@ public:
   string getCurrCommandsList();
   string executeCommand(string input);
   string getPhase();
+  void phase(std::string) noexcept;
   
 
   void startupPhase();

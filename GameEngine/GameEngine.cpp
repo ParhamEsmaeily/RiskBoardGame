@@ -153,6 +153,10 @@ std::string GameEngine::stringToLog() const {
   return "GameEngine stringToLog: Phase " + *currState->phase;
 }
 
+void GameEngine::phase(std::string phase) noexcept{
+  *currState->phase = std::move(phase);
+  Notify(this);
+}
 // void GameEngine::startupPhase(CommandProcessor* cmdProcessor)
 void GameEngine::startupPhase() {
   bool startupPhaselogic = false;
@@ -186,6 +190,7 @@ void GameEngine::startupPhase() {
       // load the new map
       string map_path = "../maps/"+choice;
       // std::shared_ptr<Map> map = MapLoader::loadMap(map_path);
+      //executeCommand("loadmap");
       this->map = MapLoader::loadMap(map_path);
       
       mapLoaded = true;
@@ -319,13 +324,19 @@ void GameEngine::startupPhase() {
       }
       // e) Switch to play phase
       cout << "\ne) switching the game to the play phase: " << endl;
+      this->phase("play");
+      
+      std::cout<<"\nGameState is: ";
+      std::cout<<this->getPhase();
 
-      command->saveEffect("a)distributing all the territories to the players\n"
+      command->saveEffect("\na)distributing all the territories to the players\n"
                           "b) determining order of play of randomly\n"
                           "c) giving 50 initial army units to the players\n"
                           "d) players draw 2 initial cards from the deck using "
                           "the deck's draw() method\n"
                           "e) switch the game to the play phase");
+
+      
       startupPhaselogic = true;
       break; // Assuming the loop should end when the game starts
     } else {
