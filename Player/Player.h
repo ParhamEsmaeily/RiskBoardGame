@@ -7,7 +7,6 @@
 #include "Map.h"
 #include "Orders.h"
 
-
 using namespace std;
 
 void testPlayers();
@@ -22,7 +21,7 @@ private:
   string name;
   Hand *hand;
   vector<Territory *> territories; // List of owned territories
-  std::vector<Player*> allies; //list of allies for the turn
+  std::vector<Player *> allies;    // list of allies for the turn
   OrdersList *order_list;
   std::unordered_map<string, int> units_map;
   int playerId;
@@ -38,7 +37,7 @@ public:
   // param constructor for ID and name
   Player(int playerID, string name);
 
-  //Constructor for Neutral Player
+  // Constructor for Neutral Player
   Player(bool isNeutral);
 
   // constructor for full player object
@@ -54,10 +53,10 @@ public:
   // assignment operator
   Player &operator=(const Player &p);
 
-  //Check equality between Player objects
-  bool operator==(const Player& other);
+  // Check equality between Player objects
+  bool operator==(const Player &other);
 
-  bool operator!=(const Player& other);
+  bool operator!=(const Player &other);
 
   // get
   int getPlayerId();
@@ -65,24 +64,24 @@ public:
   Hand *getHand();
   string getName();
   vector<Territory *> getTerritories();
-  int getTerritoryUnits(const Territory* t) const;
+  int getTerritoryUnits(const Territory *t) const;
   bool isNeutral();
   bool conqueredThisTurn();
 
   // methods
-  vector<Territory *> toAttack(const Map &gameMap); // return a list of territories to be Attacked
-  vector<Territory *> toDefend();                   // return a list of territories to be defended
-  void issueOrder(const Map &gameMap);              // uses the console to add orders to the player's list of orders
-  void addTerritory(const Territory *territory);          // add territories to player
-  void removeTerritory(const Territory* t);  //removes territory and corresponding units from player
-  bool owns(const Territory* t) const;
-  void addAlly(const Player* p);
-  bool isAllied(Player* p);
+  vector<Territory *> toAttack(const Map &gameMap);                 // return a list of territories to be Attacked
+  vector<Territory *> toDefend();                                   // return a list of territories to be defended
+  void issueOrder(const Map &gameMap, std::vector<Player> players); // uses the console to add orders to the player's list of orders
+  void addTerritory(const Territory *territory);                    // add territories to player
+  void removeTerritory(const Territory *t);                         // removes territory and corresponding units from player
+  bool owns(const Territory *t) const;
+  void addAlly(const Player *p);
+  bool isAllied(Player *p);
 
   // sets
   void setPlayerOrderList(OrdersList *orders);
   void setTerritories(vector<Territory *> t);
-  void setTerritoryUnits(const Territory* t, int units);
+  void setTerritoryUnits(const Territory *t, int units);
   void setConqueredThisTurn(bool b);
   void resetTurnValues();
 };

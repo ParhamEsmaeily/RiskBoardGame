@@ -119,7 +119,7 @@ vector<Territory *> Player::toAttack(const Map &gameMap)
     return attack_territories;
 }
 
-void Player::issueOrder(const Map &gameMap)
+void Player::issueOrder(const Map &gameMap, std::vector<Player> players)
 {
     // print all territories to defend
     cout << getName() << "'s territories to defend:" << endl;
@@ -262,12 +262,24 @@ void Player::issueOrder(const Map &gameMap)
                     }
                 }
 
+                // find the target player
+                Player *target_player = nullptr;
+
+                for (size_t i = 0; i < players.size(); i++)
+                {
+                    if (players[i].owns(dest))
+                    {
+                        target_player = &players[i];
+                        break;
+                    }
+                }
+
                 // TODO: add params to Advance constructor
-                this->order_list->add(Advance(this, &gameMap, this, source, dest, std::stoi(str_num_armies)));
+                this->order_list->add(Advance(this, &gameMap, target_player, source, dest, std::stoi(str_num_armies)));
             }
             else if (input == "bomb" && cards_count[CardType::bomb] > 0)
             {
-                this->order_list->add(Bomb());
+                this->order_list->add(Bomb(this, &gameMap));
                 cards_count[CardType::bomb]--;
             }
             else if (input == "blockade" && cards_count[CardType::blockade] > 0)

@@ -6,7 +6,6 @@
 #include <vector>
 #include "Command.h"
 #include "Map.h"
-#include "Player.h"
 #include "Cards.h"
 
 #include "Player.h"
@@ -39,10 +38,10 @@ public:
   vector<Player *> players;
   std::string stringToLog() const override;
   std::shared_ptr<Map> map;
-  Deck* deck;
+  Deck *deck;
 
   CommandProcessor *commandProcessor;
-  
+
   GameEngine();
   GameEngine(GameEngine const &other);
   ~GameEngine();
