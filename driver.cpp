@@ -1,11 +1,11 @@
 #include <iostream>
 
-#include "CommandProcessor/CommandProcessor.h"
-#include "Cards/Cards.h"
-#include "Orders/Orders.h"
-#include "GameEngine/GameEngine.h"
-#include "Map/Map.h"
-#include "Player/Player.h"
+#include "CommandProcessor.h"
+#include "Cards.h"
+#include "Orders.h"
+#include "GameEngine.h"
+#include "Map.h"
+#include "Player.h"
 #include "Command.h"
 
 int main(int argc, char const *argv[])
@@ -75,12 +75,14 @@ int main(int argc, char const *argv[])
 
             break;
         }
-        case 7:{ 
-        testStartupPhase();
-            //engine.startupPhase();
-        break;
+        case 7:
+        {
+            testStartupPhase();
+            // engine.startupPhase();
+            break;
         }
-        case 8:{
+        case 8:
+        {
             testMainGameLoop();
             break;
         }

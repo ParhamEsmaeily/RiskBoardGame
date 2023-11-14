@@ -1,13 +1,14 @@
 #pragma once
-#include "../LoggingObserver/LoggingObserver.h"
 #include <iostream>
 #include <vector>
 #include <memory>
 #include <string>
 #include <cstdlib>
-#include "../Player/Player.h"
-#include "../Map/Map.h"
-#include "../Cards/Cards.h"
+
+#include "LoggingObserver.h"
+#include "Player.h"
+#include "Map.h"
+#include "Cards.h"
 
 using namespace std;
 

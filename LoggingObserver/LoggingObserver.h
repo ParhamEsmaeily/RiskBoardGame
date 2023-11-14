@@ -1,4 +1,5 @@
 #pragma once
+
 #include <fstream>
 #include <list>
 #include <memory>
@@ -19,7 +20,8 @@ void test_LoggingObserver();
 /*
     Must be inherited by all classes that can be subject of logging mechanism.
 */
-class ILoggable {
+class ILoggable
+{
 public:
   ILoggable() = default;
   ~ILoggable() = default;
@@ -35,7 +37,8 @@ public:
   Interface.
   Providing implementation of the notification mechanism.
 */
-class Subject {
+class Subject
+{
 public:
   // List of shared_ptrs.
   std::list<Observer *> *m_list;
@@ -74,7 +77,8 @@ public:
   Interface.
   Observer can only be attached to one Observable at most at a time.
 */
-class Observer {
+class Observer
+{
 protected:
   Subject *m_subject;
 
@@ -99,7 +103,8 @@ public:
   void clear() noexcept;
 };
 
-class LogObserver : public Observer {
+class LogObserver : public Observer
+{
 public:
   explicit LogObserver();
   /*

@@ -27,10 +27,6 @@ void testGameStates()
     gameEngine = nullptr;
 }
 
-// void GameEngine::testStartupPhase(){
-//   this->startupPhase();
-
-// }
 void testStartupPhase()
 {
     auto *gameEngine = new GameEngine();

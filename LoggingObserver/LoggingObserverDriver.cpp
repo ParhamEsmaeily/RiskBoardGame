@@ -1,5 +1,6 @@
-#include "../GameEngine/GameEngine.h"
-#include "../Orders/Orders.h"
+#include "GameEngine.h"
+#include "Orders.h"
+
 #include "LoggingObserver.h"
 
 // To be implemented.

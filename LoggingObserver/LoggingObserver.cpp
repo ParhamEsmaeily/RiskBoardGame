@@ -1,4 +1,4 @@
-#include "./LoggingObserver.h"
+#include "LoggingObserver.h"
 
 // Created by Maxime Landry (maxime334).
 
@@ -18,19 +18,23 @@ const std::string path = "gamelog.txt";
 
 // --- Subject ---
 
-Subject::Subject() : m_list{new std::list<Observer *>()} {
+Subject::Subject() : m_list{new std::list<Observer *>()}
+{
   new LogObserver(*this);
   // Memory leak.
 }
 
-Subject::Subject(const Subject &subject) : m_list{subject.m_list} {
+Subject::Subject(const Subject &subject) : m_list{subject.m_list}
+{
   // Ptr is copied. Both are pointing to the same list.
 }
 
-Subject::~Subject() {
+Subject::~Subject()
+{
   // Set up each observer's subject as nullptr.
   // Removes the subject relationship.
-  for (auto &i : *m_list) {
+  for (auto &i : *m_list)
+  {
     i->clear();
   }
 
@@ -40,20 +44,24 @@ Subject::~Subject() {
   delete m_list;
 }
 
-void Subject::Attach(Observer *observer) noexcept {
+void Subject::Attach(Observer *observer) noexcept
+{
   // Observer o's ptr is pushed by value inside the list.
   // o and the pushed value still point to the same element.
   m_list->push_back(observer);
 }
 
-void Subject::Detach(Observer *observer) noexcept {
+void Subject::Detach(Observer *observer) noexcept
+{
   // Removes element satisfying specific value.
   // O(n) operation, as each ptr of the list is checked to see if equal to o.
   m_list->remove(observer);
 }
 
-void Subject::Notify(ILoggable *ilog) const noexcept {
-  for (Observer *o : *m_list) {
+void Subject::Notify(ILoggable *ilog) const noexcept
+{
+  for (Observer *o : *m_list)
+  {
     o->Update(*ilog);
   }
 }
@@ -62,12 +70,14 @@ void Subject::Notify(ILoggable *ilog) const noexcept {
 
 Observer::Observer() : m_subject(nullptr) {}
 
-Observer::Observer(Subject &s) {
+Observer::Observer(Subject &s)
+{
   m_subject = &s;
   s.Attach(this);
 }
 
-Observer::~Observer() {
+Observer::~Observer()
+{
   if (m_subject != nullptr)
     m_subject->Detach(this);
 }
@@ -80,7 +90,8 @@ LogObserver::LogObserver() : Observer() {}
 
 LogObserver::LogObserver(Subject &s) : Observer(s) {}
 
-void LogObserver::Update(ILoggable &ilog) const {
+void LogObserver::Update(ILoggable &ilog) const
+{
   std::ofstream ofs;
   ofs.open(path);
   ofs << ilog.stringToLog() << std::endl;
