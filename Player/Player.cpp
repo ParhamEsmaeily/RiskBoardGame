@@ -274,27 +274,26 @@ void Player::issueOrder(const Map &gameMap, std::vector<Player> players)
                     }
                 }
 
-                // TODO: add params to Advance constructor
                 this->order_list->add(Advance(this, &gameMap, target_player, source, dest, std::stoi(str_num_armies)));
             }
             else if (input == "bomb" && cards_count[CardType::bomb] > 0)
             {
-                this->order_list->add(Bomb(this, &gameMap));
+                this->order_list->add(Bomb(this, &gameMap, nullptr, nullptr, nullptr));
                 cards_count[CardType::bomb]--;
             }
             else if (input == "blockade" && cards_count[CardType::blockade] > 0)
             {
-                this->order_list->add(Blockade());
+                this->order_list->add(Blockade(this, &gameMap, nullptr, nullptr, nullptr));
                 cards_count[CardType::blockade]--;
             }
             else if (input == "airlift" && cards_count[CardType::airlift] > 0)
             {
-                this->order_list->add(Airlift());
+                this->order_list->add(Airlift(this, &gameMap, nullptr, nullptr, nullptr, 0));
                 cards_count[CardType::airlift]--;
             }
             else if (input == "negotiate" && cards_count[CardType::diplomacy] > 0)
             {
-                this->order_list->add(Negotiate());
+                this->order_list->add(Negotiate(this, &gameMap, nullptr, nullptr));
                 cards_count[CardType::diplomacy]--;
             }
             else
