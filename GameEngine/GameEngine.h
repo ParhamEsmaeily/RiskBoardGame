@@ -1,17 +1,16 @@
 #pragma once
 
-#include "../Cards/Cards.h"
-#include "../CommandProcessor/Command.h"
-#include "../Map/Map.h"
-#include "../Player/Player.h"
 #include <algorithm>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "../LoggingObserver/LoggingObserver.h"
-#include "../Player/Player.h"
+#include "Cards.h"
+#include "Map.h"
+#include "Command.h"
+#include "LoggingObserver.h"
+#include "Player.h"
 
 using std::ostream;
 using std::shared_ptr;
@@ -26,7 +25,8 @@ void testStartupPhase();
 class CommandProcessor;
 class Map;
 
-class GameEngine : private ILoggable, private Subject {
+class GameEngine : private ILoggable, private Subject
+{
   shared_ptr<State> currState;
   void initGame();
   void reinforcementPhase(vector<Player *> players, const Map &map);
@@ -38,7 +38,6 @@ public:
   string executeCommand(string input);
   string getPhase();
   void phase(std::string) noexcept;
-  
 
   void startupPhase();
   Command *command;
