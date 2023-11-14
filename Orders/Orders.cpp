@@ -3,9 +3,9 @@
 #include <memory>
 #include <string>
 #include "Orders.h"
-#include "../Player/Player.h"
-#include "../Map/Map.h"
-#include "../Cards/Cards.h"
+#include "Player.h"
+#include "Map.h"
+#include "Cards.h"
 using namespace std;
 
 /**Prameterized constructor*/
@@ -77,7 +77,7 @@ bool OrdersList::remove(int index)
  */
 void OrdersList::add(const Order &o)
 {
-    this->list.emplace_back(make_shared<Order>(o));
+    this->list.push_back(std::make_shared<Order>(o));
     // Calls in the log file that the order has been added to the list.
     Notify(this);
 }
@@ -137,6 +137,17 @@ void Order::execute()
         std::cout << "No real implementation yet! Executed." << endl;
     else
         std::cout << "Cannot validate." << endl;
+}
+
+Order &Order::operator=(const Order &other)
+{
+    if (*this != other)
+    {
+        this->name = other.name;
+        this->description = other.description;
+    }
+
+    return *this;
 }
 
 bool Order::operator==(const Order &other)
@@ -518,6 +529,11 @@ bool Deploy::operator==(const Deploy &other)
     if (base == baseo && this->units_deployed == other.units_deployed && this->dest_terr == other.dest_terr)
         return true;
     return false;
+}
+
+bool Deploy::operator!=(const Deploy &other)
+{
+    return !(*this == other);
 }
 
 Deploy &Deploy::operator=(const Deploy &other)

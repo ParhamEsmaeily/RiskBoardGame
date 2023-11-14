@@ -3,13 +3,14 @@
 #include "LoggingObserver.h"
 
 // To be implemented.
-void test_LoggingObserver() {
+void test_LoggingObserver()
+{
   int y;
   int x;
 
-  Order o("name", "desc");
+  // Order o("name", "desc");
 
   OrdersList list;
 
-  list.add(o);
+  // list.add(o);
 }
