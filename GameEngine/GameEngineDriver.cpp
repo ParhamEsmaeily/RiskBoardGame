@@ -44,7 +44,7 @@ void testMainGameLoop()
     cin.ignore(256, '\n');
 
     // Test: load map
-    const shared_ptr<Map> gameMap = MapLoader::loadMap("maps/world.map");
+    const shared_ptr<Map> gameMap = MapLoader::loadMap("../maps/world.map");
     const auto territories = Map::getAllTerritories(*gameMap);
 
     // Test: add list_players and add territories to them
@@ -82,6 +82,13 @@ void testMainGameLoop()
             p4->addTerritory(territory);
         }
     }
+
+    // Test: have each player draw 3 cards
+    for (auto && player : list_players)
+    {
+        player->getHand()->random_insert(3);
+    }
+
 
     // Test: print number of territories for each player
     cout << "p1: " << p1->getTerritories().size() << " territories owned."
