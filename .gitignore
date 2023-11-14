@@ -4,3 +4,6 @@
 
 # builds
 build/
+
+# program output
+gamelog.txt

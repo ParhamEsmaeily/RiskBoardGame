@@ -31,7 +31,7 @@ void Command::saveEffect(const std::string &effect) {
 };
 
 std::string Command::stringToLog() const {
-  return "Command stringToLog: " + *effect;
+  return "Command stringToLog: Saved effect " + *effect;
 }
 
 /** Ostream << operator */

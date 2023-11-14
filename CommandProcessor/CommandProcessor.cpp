@@ -110,6 +110,13 @@ bool CommandProcessor::readCommand(Command *_newCommand) {
 void CommandProcessor::saveCommand(Command *_newCommand) {
   // creates a copy of the command and stores it in the command list
   commands.emplace_back(*_newCommand);
+  Notify(this);
+}
+
+std::string CommandProcessor::stringToLog() const noexcept {
+  // Returns action of the last added command.
+  return "CommandProcessor stringToLog: Saved action " +
+         *commands.back().action;
 }
 
 FileCommandProcessorAdapter::FileCommandProcessorAdapter(

@@ -101,7 +101,7 @@ public:
   Container of cards.
 */
 class Buffer {
-public:
+protected:
   card_vector m_buffer;
 
   /*

@@ -181,7 +181,7 @@ Advance::Advance(const Advance &other) : Order(other)
 
 Advance::~Advance()
 {
-    Order::~Order();
+    // redundant destructor, all pointers are non-owned
 }
 
 ostream &operator<<(ostream &os, Advance &order)
@@ -284,7 +284,7 @@ Airlift::Airlift(const Airlift &other) : Order(other)
 
 Airlift::~Airlift()
 {
-    Order::~Order();
+    // redundant destructor, all pointers are non-owned
 }
 
 ostream &operator<<(ostream &os, Airlift &order)
@@ -363,9 +363,7 @@ Bomb::Bomb(const Bomb &other) : Order(other)
 
 Bomb::~Bomb()
 {
-    Order::~Order();
     delete this->card;
-    delete this->dest_terr;
 }
 
 ostream &operator<<(ostream &os, Bomb &order)
@@ -437,9 +435,7 @@ Blockade::Blockade(const Blockade &other) : Order(other)
 
 Blockade::~Blockade()
 {
-    Order::~Order();
     delete this->card;
-    delete this->dest_terr;
 }
 
 ostream &operator<<(ostream &os, Blockade &order)
@@ -514,7 +510,7 @@ Deploy::Deploy(const Deploy &other) : Order(other)
 
 Deploy::~Deploy()
 {
-    Order::~Order();
+    // redundant destructor, all pointers are non-owned
 }
 
 ostream &operator<<(ostream &os, Deploy &order)
@@ -583,9 +579,7 @@ Negotiate::Negotiate(const Negotiate &other) : Order(other)
 
 Negotiate::~Negotiate()
 {
-    Order::~Order();
     delete this->card;
-    delete this->target_player;
 }
 
 ostream &operator<<(ostream &os, Negotiate &order)
