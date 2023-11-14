@@ -1,84 +1,206 @@
 #pragma once
-#include "../LoggingObserver/LoggingObserver.h"
 #include <iostream>
+#include <vector>
 #include <memory>
 #include <string>
-#include <vector>
+#include <cstdlib>
+
+#include "LoggingObserver.h"
+#include "Player.h"
+#include "Map.h"
+#include "Cards.h"
 
 using namespace std;
 
 void testOrdersList();
+class Order;
+class Player;
+class OrdersList;
 
-class Order {
+class Order
+{
 public:
   std::string description;
   std::string name;
+  Player *issuer;
+  const Map *map;
 
-  Order() = default;
-  Order(std::string, std::string);
-  Order(Order const &other);
-  /**Validate and execute will eventually be virtual functions overridden by
-   * every child class, but no pointin doing it now, as we have no real
-   * implementation.*/
-  bool validate();
-  void execute();
-  friend ostream &operator<<(ostream &os, const Order &order);
+  Order() = delete;
+  Order(const Order &other);
+  Order(std::string name, std::string description);
+  Order(Player *player, const Map *map, std::string name, std::string description);
+  ~Order();
+
+  friend std::ostream &operator<<(std::ostream &os, const Order &order);
+
+  Order &operator=(const Order &other);
+  bool operator==(const Order &other);
+  bool operator!=(const Order &other);
+
+  virtual bool validate();
+  virtual void execute();
 };
 
-class OrdersList : protected ILoggable, protected Subject {
+class OrdersList : protected ILoggable, protected Subject
+{
 public:
   vector<std::shared_ptr<Order>> list;
 
   OrdersList() = default;
-  OrdersList(vector<shared_ptr<Order>>); //*
+  OrdersList(vector<shared_ptr<Order>>);
   OrdersList(const OrdersList &other);
+
+  std::shared_ptr<Order> &operator[](const int i);
+
+  friend ostream &operator<<(ostream &os, const OrdersList &olist);
+
   bool move(int index, int destination);
   bool remove(int index);
   void add(const Order &o);
   bool isEmpty() const { return (this->list.size() == 0); };
   int size() const { return this->list.size(); };
-  /*
-      Overriden by all type of orders subclasses.
-      Cannot be pure virtual, as we do not want an abstract class.
-  */
-  virtual std::string stringToLog() const;
 
-  std::shared_ptr<Order> &operator[](const int i);
-  friend ostream &operator<<(ostream &os, const OrdersList &olist);
+  std::string stringToLog() const override;
 };
 
-class Deploy : public Order, private ILoggable, private Subject {
+class Advance : public Order, private ILoggable, private Subject
+{
 public:
-  Deploy();
-  std::string stringToLog() const;
+  const Territory *source_terr;
+  const Territory *dest_terr;
+  Player *target_player;
+  int units_deployed;
+
+  Advance() = delete;
+  Advance(const Advance &other);
+  Advance(Player *player, const Map *map, Player *target_player, const Territory *source, const Territory *dest, int units);
+  ~Advance();
+
+  Advance &operator=(const Advance &other);
+  bool operator==(const Advance &other);
+  bool operator!=(const Advance &other);
+
+  friend ostream &operator<<(ostream &os, const Advance &order);
+
+  bool validate();
+  void execute();
+
+  std::string stringToLog() const override;
 };
 
-class Advance : public Order, private ILoggable, private Subject {
+class Airlift : public Order, private ILoggable, private Subject
+{
 public:
-  Advance();
-  std::string stringToLog() const;
+  const Territory *source_terr;
+  const Territory *dest_terr;
+  Card *card;
+  int units_deployed;
+
+  Airlift() = delete;
+  Airlift(const Airlift &other);
+  Airlift(Player *player, const Map *map, Card *card, const Territory *source, const Territory *dest, int units);
+  ~Airlift();
+
+  Airlift &operator=(const Airlift &other);
+  bool operator==(const Airlift &other);
+  bool operator!=(const Airlift &other);
+
+  friend ostream &operator<<(ostream &os, const Airlift &order);
+
+  bool validate();
+  void execute();
+
+  std::string stringToLog() const override;
 };
 
-class Bomb : public Order, private ILoggable, private Subject {
+class Bomb : public Order, private ILoggable, private Subject
+{
 public:
-  Bomb();
-  std::string stringToLog() const;
+  const Territory *dest_terr;
+  Card *card;
+  Player *target_player;
+
+  Bomb() = delete;
+  Bomb(const Bomb &other);
+  Bomb(Player *player, const Map *map, Player *target, Card *card, const Territory *dest);
+  ~Bomb();
+
+  Bomb &operator=(const Bomb &other);
+  bool operator==(const Bomb &other);
+  bool operator!=(const Bomb &other);
+
+  friend ostream &operator<<(ostream &os, const Bomb &order);
+
+  bool validate();
+  void execute();
+
+  std::string stringToLog() const override;
 };
 
-class Blockade : public Order, private ILoggable, private Subject {
+class Blockade : public Order, private ILoggable, private Subject
+{
 public:
-  Blockade();
-  std::string stringToLog() const;
+  const Territory *dest_terr;
+  Player *neutral_player;
+  Card *card;
+
+  Blockade() = delete;
+  Blockade(const Blockade &other);
+  Blockade(Player *player, const Map *map, Player *neutral, Card *card, const Territory *dest);
+  ~Blockade();
+
+  Blockade &operator=(const Blockade &other);
+  bool operator==(const Blockade &other);
+  bool operator!=(const Blockade &other);
+
+  friend ostream &operator<<(ostream &os, const Blockade &order);
+
+  bool validate();
+  void execute();
+
+  std::string stringToLog() const override;
 };
 
-class Airlift : public Order, private ILoggable, private Subject {
+class Deploy : public Order, private ILoggable, private Subject
+{
 public:
-  Airlift();
-  std::string stringToLog() const;
+  const Territory *dest_terr;
+  int units_deployed;
+  Deploy() = delete;
+  Deploy(const Deploy &other);
+  Deploy(Player *player, const Map *map, const Territory *dest, int units);
+  ~Deploy();
+
+  Deploy &operator=(const Deploy &other);
+  bool operator==(const Deploy &other);
+  bool operator!=(const Deploy &other);
+
+  friend ostream &operator<<(ostream &os, const Deploy &order);
+
+  bool validate();
+  void execute();
+
+  std::string stringToLog() const override;
 };
 
-class Negotiate : public Order, private ILoggable, private Subject {
+class Negotiate : public Order, private ILoggable, private Subject
+{
 public:
-  Negotiate();
-  std::string stringToLog() const;
+  Player *target_player;
+  Card *card;
+
+  Negotiate() = delete;
+  Negotiate(const Negotiate &other);
+  Negotiate(Player *issuer, const Map *map, Player *target, Card *card);
+  ~Negotiate();
+
+  Negotiate &operator=(const Negotiate &other);
+  bool operator==(const Negotiate &other);
+  bool operator!=(const Negotiate &other);
+  friend ostream &operator<<(ostream &os, const Negotiate &order);
+
+  bool validate();
+  void execute();
+
+  std::string stringToLog() const override;
 };

@@ -1,26 +1,32 @@
 #include <iostream>
 
-#include "CommandProcessor/CommandProcessor.h"
-#include "Cards/Cards.h"
-#include "Orders/Orders.h"
-#include "GameEngine/GameEngine.h"
-#include "Map/Map.h"
-#include "Player/Player.h"
+#include "LoggingObserver.h"
+#include "CommandProcessor.h"
+#include "Cards.h"
+#include "Orders.h"
+#include "GameEngine.h"
+#include "Map.h"
+#include "Player.h"
 #include "Command.h"
 
 int main(int argc, char const *argv[])
 {
-    int choice = -1;
-    std::vector<std::string> argsVector = std::vector<std::string>(argv + 1, argv + argc); // create a vector of the command line arguments
+    // Using obs::path, path to the gamelog file.
+    std::ofstream ofs;
+    ofs.open(obs::path); // Clears the gamelog file if text was still inside.
+    ofs << "Gamelog." << std::endl;
 
-    const auto testRunIterator = std::find(argsVector.begin(), argsVector.end(), "-test");
+    int choice = -1;
+    std::vector<std::string> argsVector = std::vector<std::string>(
+        argv + 1, argv + argc); // create a vector of the command line arguments
+
+    const auto testRunIterator =
+        std::find(argsVector.begin(), argsVector.end(), "-test");
 
     // if the '-test' flag is not provided, run the game
     if (testRunIterator == argsVector.end())
     {
         // run actual game
-
-        std::cout << "Running game..." << std::endl;
 
         return 0;
     }
@@ -28,7 +34,7 @@ int main(int argc, char const *argv[])
     // otherwise, if the '-test' flag is provided, run the tests and exit
     while (true)
     {
-        std::cout << "Choose your poison \n1: Test Maps\n2: Test Players\n3: Test Orders\n4: Test Cards\n5: Test Game Engine\n6: Test Command Processor\n7: Test startupPhase\n8: Test mainGameLoop \nElse: exit\n";
+        std::cout << "Choose your poison \n1: Test Maps\n2: Test Players\n3: Test Orders\n4: Test Cards\n5: Test Game Engine\n6: Test Command Processor\n7: Test Startup Phase\n8: Test Main Game Loop \n9: Test Logging Observer\nElse: exit\n";
         std::cin >> choice;
         std::cout << std::endl;
 
@@ -75,15 +81,15 @@ int main(int argc, char const *argv[])
 
             break;
         }
-        case 7:{ 
-        testStartupPhase();
-            //engine.startupPhase();
-        break;
-        }
-        case 8:{
+        case 7:
+            testStartupPhase();
+            break;
+        case 8:
             testMainGameLoop();
             break;
-        }
+        case 9:
+            test_LoggingObserver();
+            break;
         default:
             std::cout << "Byyyye ;)" << std::endl;
             return 0;

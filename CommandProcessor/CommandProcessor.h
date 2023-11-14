@@ -10,7 +10,7 @@ void testCommandProcessor(const std::string &_fileName = "");
 /*
  * Class that processes commands from the console.
  */
-class CommandProcessor {
+class CommandProcessor : private ILoggable, private Subject {
 private:
   std::vector<Command> commands;
 
@@ -45,6 +45,11 @@ public:
    * @return true if the command is valid, false otherwise.
    */
   bool validate(Command &_command, const std::string &_currentState);
+
+  /*
+    Returns action of the last added command to the commands list.
+  */
+  std::string stringToLog() const noexcept override;
 
 private:
   bool readCommand(Command *_newCommand);
