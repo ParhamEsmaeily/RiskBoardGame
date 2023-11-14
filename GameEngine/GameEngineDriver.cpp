@@ -44,7 +44,7 @@ void testMainGameLoop()
     cin.ignore(256, '\n');
 
     // Test: load map
-    const shared_ptr<Map> gameMap = MapLoader::loadMap("../maps/world.map");
+    const shared_ptr<Map> gameMap = MapLoader::loadMap("maps/world.map");
     const auto territories = Map::getAllTerritories(*gameMap);
 
     // Test: add list_players and add territories to them

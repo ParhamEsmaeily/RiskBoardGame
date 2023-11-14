@@ -40,7 +40,6 @@ public:
   void phase(std::string) noexcept;
 
   void startupPhase();
-  Command *command;
   vector<Player *> players;
   std::string stringToLog() const override;
   std::shared_ptr<Map> map;

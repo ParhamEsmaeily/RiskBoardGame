@@ -176,7 +176,7 @@ void GameEngine::startupPhase()
   bool mapValidated = false;
   bool playersAdded = false;
   int playernum;
-  Command currentCommand;
+  Command *currentCommand = new Command();
   string commandType;
 
   while (!startupPhaselogic)
@@ -200,35 +200,16 @@ void GameEngine::startupPhase()
       // delete previous map if any
 
       // load the new map
-      string map_path = "../maps/" + choice;
-      // std::shared_ptr<Map> map = MapLoader::loadMap(map_path);
-      // executeCommand("loadmap");
+      string map_path = "maps/" + choice;
       this->map = MapLoader::loadMap(map_path);
 
       mapLoaded = true;
 
       std::cout << "\n<<You may \"validatemap\"\n if loaded correctly" << std::endl;
-
-      // if (this->map = nullptr) {//if null pointer
-      //     string effect = "Could not load the map ";
-      //     command->saveEffect(effect);
-      //     //go_to_next_state = false;
-      //     std::cout<<"entered4\n";
-      // } else {
-      //      string effect = "Loaded map";
-      //      command->saveEffect(effect);
-      //     std::cout<<"entered5\n";
-      // }
     }
 
     else if (commandAction == "validatemap" && mapLoaded)
     {
-
-      //&& this->map->getValidity() == MapValidity::VALID
-      // Logic to validate the map
-      // string effect = "Validated Map";
-      //     command->saveEffect(effect);
-
       mapValidated = true;
 
       Map::validate(map.get());
@@ -255,11 +236,6 @@ void GameEngine::startupPhase()
           std::cout << "adding playerID: " << i << " & name: player" << i
                     << std::endl;
         }
-        // for(auto&& player: players){
-        //   std::cout<<*player<<std::endl;
-        // }
-        // string effect = "Validated Map";
-        //   command->saveEffect(effect);
 
         playersAdded = true;
         std::cout << "\n<<Players have been added to game\n\n You may \"gamestart\"\n " << std::endl;
@@ -346,14 +322,14 @@ void GameEngine::startupPhase()
       this->phase("play");
 
       std::cout << "\nGameState is: ";
-      std::cout << this->getPhase();
+      std::cout << this->getPhase() << std::endl;
 
-      command->saveEffect("\na)distributing all the territories to the players\n"
-                          "b) determining order of play of randomly\n"
-                          "c) giving 50 initial army units to the players\n"
-                          "d) players draw 2 initial cards from the deck using "
-                          "the deck's draw() method\n"
-                          "e) switch the game to the play phase");
+      currentCommand->saveEffect("\na)distributing all the territories to the players\n"
+                                 "b) determining order of play of randomly\n"
+                                 "c) giving 50 initial army units to the players\n"
+                                 "d) players draw 2 initial cards from the deck using "
+                                 "the deck's draw() method\n"
+                                 "e) switch the game to the play phase");
 
       startupPhaselogic = true;
       break; // Assuming the loop should end when the game starts
@@ -365,6 +341,9 @@ void GameEngine::startupPhase()
       startupPhaselogic = true;
     }
   }
+
+  delete currentCommand;
+  currentCommand = nullptr;
 }
 
 /*
