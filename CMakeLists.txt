@@ -7,34 +7,34 @@ set(CMAKE_CXX_STANDARD 17)
 
 # Add source file to the root project
 set(SOURCES
-    Cards/Cards.cpp
-    Cards/CardsDriver.cpp
-    CommandProcessor/Command.cpp
-    CommandProcessor/CommandProcessor.cpp
-    CommandProcessor/CommandProcessorDriver.cpp
-    CommandProcessor/FileLineReader.cpp
-    GameEngine/GameEngine.cpp
-    GameEngine/GameEngineDriver.cpp
-    Map/Map.cpp
-    Map/MapDriver.cpp
-    Orders/Orders.cpp
-    Orders/OrdersDriver.cpp
-    Player/Player.cpp
-    Player/PlayerDriver.cpp
-    LoggingObserver/LoggingObserver.cpp
-    LoggingObserver/LoggingObserverDriver.cpp
-    driver.cpp
+    src/Cards/Cards.cpp
+    src/Cards/CardsDriver.cpp
+    src/CommandProcessor/Command.cpp
+    src/CommandProcessor/CommandProcessor.cpp
+    src/CommandProcessor/CommandProcessorDriver.cpp
+    src/CommandProcessor/FileLineReader.cpp
+    src/GameEngine/GameEngine.cpp
+    src/GameEngine/GameEngineDriver.cpp
+    src/Map/Map.cpp
+    src/Map/MapDriver.cpp
+    src/Orders/Orders.cpp
+    src/Orders/OrdersDriver.cpp
+    src/Player/Player.cpp
+    src/Player/PlayerDriver.cpp
+    src/LoggingObserver/LoggingObserver.cpp
+    src/LoggingObserver/LoggingObserverDriver.cpp
+    src/driver.cpp
 )
 
 # Add include directories to the root project
 set(INCLUDE_DIRS
-    Cards
-    CommandProcessor
-    GameEngine
-    Map
-    Orders
-    Player
-    LoggingObserver
+    src/Cards
+    src/CommandProcessor
+    src/GameEngine
+    src/Map
+    src/Orders
+    src/Player
+    src/LoggingObserver
 )
 
 # Create an executable from the source files
