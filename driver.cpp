@@ -9,6 +9,11 @@
 #include "Player.h"
 #include "Command.h"
 
+void game()
+{
+    std::cout << "Welcome to Warzone!" << std::endl;
+}
+
 int main(int argc, char const *argv[])
 {
     // Using obs::path, path to the gamelog file.
@@ -27,6 +32,7 @@ int main(int argc, char const *argv[])
     if (testRunIterator == argsVector.end())
     {
         // run actual game
+        game();
 
         return 0;
     }
