@@ -28,13 +28,7 @@ set(SOURCES
 
 # Add include directories to the root project
 set(INCLUDE_DIRS
-    src/Cards
-    src/CommandProcessor
-    src/GameEngine
-    src/Map
-    src/Orders
-    src/Player
-    src/LoggingObserver
+    src/include
 )
 
 # Create an executable from the source files

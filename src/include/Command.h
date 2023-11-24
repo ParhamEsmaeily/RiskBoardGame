@@ -1,24 +1,22 @@
 #pragma once
-#include "../LoggingObserver/LoggingObserver.h"
 
 #include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
 
+#include "LoggingObserver.h"
 
 using std::ostream;
 using std::shared_ptr;
 using std::string;
 using std::vector;
 
-
 class Command;
 class State;
 
-
-
-class Command : private ILoggable, private Subject {
+class Command : private ILoggable, private Subject
+{
 public:
   shared_ptr<string> action;
   shared_ptr<State> nextState;
@@ -36,7 +34,8 @@ public:
   std::string stringToLog() const override;
 };
 
-class State {
+class State
+{
 public:
   shared_ptr<string> phase;
   vector<shared_ptr<Command>> commands;
