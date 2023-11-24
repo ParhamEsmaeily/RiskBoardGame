@@ -23,7 +23,7 @@ set(SOURCES
     src/Player/PlayerDriver.cpp
     src/LoggingObserver/LoggingObserver.cpp
     src/LoggingObserver/LoggingObserverDriver.cpp
-    src/driver.cpp
+    src/MainDriver.cpp
 )
 
 # Add include directories to the root project
