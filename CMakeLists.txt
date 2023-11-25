@@ -5,6 +5,8 @@ project(RiskBoardGame) # Name of your project
 # Set C++ standard (you can change this to any standard you prefer)
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Add source file to the root project
 set(SOURCES
     src/Cards/Cards.cpp
@@ -21,6 +23,7 @@ set(SOURCES
     src/Orders/OrdersDriver.cpp
     src/Player/Player.cpp
     src/Player/PlayerDriver.cpp
+    src/Player/PlayerStrategies.cpp
     src/LoggingObserver/LoggingObserver.cpp
     src/LoggingObserver/LoggingObserverDriver.cpp
     src/MainDriver.cpp
