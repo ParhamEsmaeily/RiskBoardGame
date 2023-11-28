@@ -8,10 +8,12 @@
 #include "Map.h"
 #include "Orders.h"
 #include "Player.h"
+#include "PlayerStrategies.h"
 
 void game() { std::cout << "Welcome to Warzone!" << std::endl; }
 
-int main(int argc, char const *argv[]) {
+int main(int argc, char const *argv[])
+{
   // Using obs::path, path to the gamelog file.
   std::ofstream ofs;
   ofs.open(obs::path); // Clears the gamelog file if text was still inside.
@@ -25,7 +27,8 @@ int main(int argc, char const *argv[]) {
       std::find(argsVector.begin(), argsVector.end(), "-test");
 
   // if the '-test' flag is not provided, run the game
-  if (testRunIterator == argsVector.end()) {
+  if (testRunIterator == argsVector.end())
+  {
     // run actual game
     game();
 
@@ -33,15 +36,18 @@ int main(int argc, char const *argv[]) {
   }
 
   // otherwise, if the '-test' flag is provided, run the tests and exit
-  while (true) {
+  while (true)
+  {
     std::cout << "Choose your poison \n1: Test Maps\n2: Test Players\n3: Test "
                  "Orders\n4: Test Cards\n5: Test Game Engine\n6: Test Command "
                  "Processor\n7: Test Startup Phase\n8: Test Main Game Loop "
-                 "\n9: Test Logging Observer\nElse: exit\n";
+                 "\n9: Test Logging Observer\n10: Test Player Strategies\nElse: exit\n";
     std::cin >> choice;
+    std::cin.ignore(1000, '\n');
     std::cout << std::endl;
 
-    switch (choice) {
+    switch (choice)
+    {
     case 1:
       testLoadMaps();
       break;
@@ -57,12 +63,14 @@ int main(int argc, char const *argv[]) {
     case 5:
       testGameStates();
       break;
-    case 6: {
+    case 6:
+    {
       // if the '-console' flag is provided, run the command processor using the
       // console as source
       const auto consoleFlagIterator =
           std::find(argsVector.begin(), argsVector.end(), "-console");
-      if (consoleFlagIterator != argsVector.end()) {
+      if (consoleFlagIterator != argsVector.end())
+      {
         testCommandProcessor();
         break;
       }
@@ -72,7 +80,8 @@ int main(int argc, char const *argv[]) {
       auto fileFlagIterator =
           std::find(argsVector.begin(), argsVector.end(), "-file");
 
-      if (fileFlagIterator != argsVector.end()) {
+      if (fileFlagIterator != argsVector.end())
+      {
         // advance the iterator by 1 to get the file name
         std::advance(fileFlagIterator, 1);
         testCommandProcessor(*fileFlagIterator);
@@ -93,6 +102,9 @@ int main(int argc, char const *argv[]) {
       break;
     case 9:
       test_LoggingObserver();
+      break;
+    case 10:
+      testPlayerStrategies();
       break;
     default:
       std::cout << "Byyyye ;)" << std::endl;

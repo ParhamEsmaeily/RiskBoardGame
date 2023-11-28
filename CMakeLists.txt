@@ -23,6 +23,7 @@ set(SOURCES
     src/Orders/OrdersDriver.cpp
     src/Player/Player.cpp
     src/Player/PlayerDriver.cpp
+    src/Player/PlayerStrategiesDriver.cpp
     src/Player/PlayerStrategies.cpp
     src/LoggingObserver/LoggingObserver.cpp
     src/LoggingObserver/LoggingObserverDriver.cpp
