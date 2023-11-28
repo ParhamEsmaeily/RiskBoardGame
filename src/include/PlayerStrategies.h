@@ -1,31 +1,51 @@
+#pragma once
+
 #include <iostream>
+#include <memory>
 
-enum class StratType : char { Human, Aggressive, Benevolent, Neutral, Cheater };
+#include "Map.h"
 
+void testPlayerStrategies();
+
+enum class StratType : char
+{
+  Human,
+  Aggressive,
+  Benevolent,
+  Neutral,
+  Cheater
+};
+
+class OrdersList;
+class Player;
 class PlayerStrategy;
 
-namespace ps {
-/*
-    Maps a StratType to a std::string value.
-*/
-const std::string map(const StratType &);
-/*
-    Returns a PlayerStrategy pointer, by polymorphism, w/ only a StratType as
-   argument. Pointer is the responsability of the user.
-*/
-PlayerStrategy *make_player_strat(const StratType &);
+namespace ps
+{
+  /*
+      Maps a StratType to a std::string value.
+  */
+  const std::string map(const StratType &);
+  /*
+      Returns a PlayerStrategy pointer, by polymorphism, w/ only a StratType as
+     argument. Pointer is the responsability of the user.
+  */
+  PlayerStrategy *make_player_strat(const StratType &);
 } // namespace ps
 
 std::ostream &operator<<(std::ostream &os, const StratType &type);
 
+std::ostream &operator<<(std::ostream &os, const PlayerStrategy &strategy);
+
 /*
     Interface.
 */
-class PlayerStrategy {
+class PlayerStrategy
+{
 public:
-  virtual void issue_order() const noexcept = 0;
-  virtual void to_defend() const noexcept = 0;
-  virtual void to_attack() const noexcept = 0;
+  virtual void issue_order(const Map &gameMap, Player *player, std::vector<Player *> players, std::vector<Territory *> territoriesToDefend, std::vector<Territory *> territoriesToAttack) const noexcept = 0;
+  virtual std::vector<Territory *> to_defend(Player *player) const noexcept = 0;
+  virtual std::vector<Territory *> to_attack(const Map &gameMap, Player *player) const noexcept = 0;
   virtual inline const StratType type() const noexcept = 0;
   /*
     Acts as a virtual copy constructors. Uses covariant return types. As such,
@@ -43,14 +63,15 @@ protected:
   PlayerStrategy(const PlayerStrategy &) = default;
 };
 
-class HumanPlayer : public PlayerStrategy {
+class HumanPlayer : public PlayerStrategy
+{
 public:
   HumanPlayer() = default;
   ~HumanPlayer() override = default;
 
-  void issue_order() const noexcept override;
-  void to_defend() const noexcept override;
-  void to_attack() const noexcept override;
+  void issue_order(const Map &gameMap, Player *player, std::vector<Player *> players, std::vector<Territory *> territoriesToDefend, std::vector<Territory *> territoriesToAttack) const noexcept override;
+  std::vector<Territory *> to_defend(Player *player) const noexcept override;
+  std::vector<Territory *> to_attack(const Map &gameMap, Player *player) const noexcept override;
 
   inline const StratType type() const noexcept override;
   // Acts as a virtual copy constructor.
@@ -62,14 +83,15 @@ public:
     strongest country, then always advances to enemy territories until it cannot
    do so anymore; will use any card with an aggressive purpose.
 */
-class AggressivePlayer : public PlayerStrategy {
+class AggressivePlayer : public PlayerStrategy
+{
 public:
   AggressivePlayer() = default;
   ~AggressivePlayer() override = default;
 
-  void issue_order() const noexcept override;
-  void to_defend() const noexcept override;
-  void to_attack() const noexcept override;
+  void issue_order(const Map &gameMap, Player *player, std::vector<Player *> players, std::vector<Territory *> territoriesToDefend, std::vector<Territory *> territoriesToAttack) const noexcept override;
+  std::vector<Territory *> to_defend(Player *player) const noexcept override;
+  std::vector<Territory *> to_attack(const Map &gameMap, Player *player) const noexcept override;
 
   inline const StratType type() const noexcept override;
   // Acts as a virtual copy constructor.
@@ -82,42 +104,45 @@ public:
    territories; may use cards but will never use a card in a way that
    purposefully will harm anyone)
 */
-class BenevolentPlayer : public PlayerStrategy {
+class BenevolentPlayer : public PlayerStrategy
+{
 public:
   BenevolentPlayer() = default;
   ~BenevolentPlayer() override = default;
 
-  void issue_order() const noexcept override;
-  void to_defend() const noexcept override;
-  void to_attack() const noexcept override;
+  void issue_order(const Map &gameMap, Player *player, std::vector<Player *> players, std::vector<Territory *> territoriesToDefend, std::vector<Territory *> territoriesToAttack) const noexcept override;
+  std::vector<Territory *> to_defend(Player *player) const noexcept override;
+  std::vector<Territory *> to_attack(const Map &gameMap, Player *player) const noexcept override;
 
   inline const StratType type() const noexcept override;
   // Acts as a virtual copy constructor.
   BenevolentPlayer *clone() const noexcept override;
 };
 
-class NeutralPlayer : public PlayerStrategy {
+class NeutralPlayer : public PlayerStrategy
+{
 public:
   NeutralPlayer() = default;
   ~NeutralPlayer() override = default;
 
-  void issue_order() const noexcept override;
-  void to_defend() const noexcept override;
-  void to_attack() const noexcept override;
+  void issue_order(const Map &gameMap, Player *player, std::vector<Player *> players, std::vector<Territory *> territoriesToDefend, std::vector<Territory *> territoriesToAttack) const noexcept override;
+  std::vector<Territory *> to_defend(Player *player) const noexcept override;
+  std::vector<Territory *> to_attack(const Map &gameMap, Player *player) const noexcept override;
 
   inline const StratType type() const noexcept override;
   // Acts as a virtual copy constructor.
   NeutralPlayer *clone() const noexcept override;
 };
 
-class CheaterPlayer : public PlayerStrategy {
+class CheaterPlayer : public PlayerStrategy
+{
 public:
   CheaterPlayer() = default;
   ~CheaterPlayer() override = default;
 
-  void issue_order() const noexcept override;
-  void to_defend() const noexcept override;
-  void to_attack() const noexcept override;
+  void issue_order(const Map &gameMap, Player *player, std::vector<Player *> players, std::vector<Territory *> territoriesToDefend, std::vector<Territory *> territoriesToAttack) const noexcept override;
+  std::vector<Territory *> to_defend(Player *player) const noexcept override;
+  std::vector<Territory *> to_attack(const Map &gameMap, Player *player) const noexcept override;
 
   inline const StratType type() const noexcept override;
   // Acts as a virtual copy constructor.
