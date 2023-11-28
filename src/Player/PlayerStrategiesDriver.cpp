@@ -113,6 +113,28 @@ void testPlayerStrategies()
         std::cout << std::endl;
     }
 
+    std::cout << "Changing Player Strategies" << std::endl;
+    std::cout << "--------------------------" << std::endl;
+
+    p1->setStrategy(benevolent);
+    p2->setStrategy(human);
+    p3->setStrategy(aggressive);
+
+    std::cout << "Players:" << std::endl;
+    for (const auto &player : players)
+    {
+        std::cout << *player << std::endl;
+    }
+
+    std::cout << "Testing issue_order():" << std::endl;
+    for (const auto &player : players)
+    {
+        std::cout << *player << std::endl;
+        std::cout << "issue_order():" << std::endl;
+        player->issueOrder(*map, players);
+        std::cout << std::endl;
+    }
+
     std::cout << "Completed Player Strategies Test" << std::endl;
 
     delete p1;
