@@ -28,6 +28,7 @@ set(SOURCES
     src/LoggingObserver/LoggingObserver.cpp
     src/LoggingObserver/LoggingObserverDriver.cpp
     src/MainDriver.cpp
+    src/Tournament/TournamentDriver.cpp
 )
 
 # Add include directories to the root project

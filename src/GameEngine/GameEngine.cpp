@@ -168,6 +168,71 @@ void GameEngine::phase(std::string phase) noexcept
   *currState->phase = std::move(phase);
   Notify(this);
 }
+
+bool validateStringCount(const std::string& input, std::vector<std::string>& result, int minCount, int maxCount) {
+    std::istringstream iss(input);
+    std::string token;
+    if (input.empty()) {
+        std::cerr << "No input provided." << std::endl;
+        return false;
+    }
+    result.clear();
+    while (std::getline(iss, token, ',')) {
+        result.push_back(token);
+    }
+    if (result.size() < minCount || result.size() > maxCount) {
+        std::cerr << "Invalid number of strings separated by commas." << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+bool validateNumber(int& result, int min, int max) {
+    std::cin >> result;
+
+    if (std::cin.fail() || result < min || result > max) {
+        std::cin.clear(); // Clear the fail state
+        std::cin.ignore(1000, '\n');
+        std::cerr << "Invalid input." << std::endl;
+        return false;
+    }
+
+    std::cin.ignore(1000, '\n'); // Clear the input buffer
+    return true;
+}
+
+void GameEngine::initiateTournament(){
+    // Ask the list of maps, list of players, number of games per map, number of turns per game
+    std::string maplist, playerlist;
+    int numgames, numturns;
+    std::vector<std::string> mapListVector;
+    std::vector<std::string> playerListVector;
+
+    do {
+        std::cout << "Enter the list of maps (M, 1-5):" << std::endl;
+        std::cin >> maplist;
+        std::cin.ignore(1000, '\n');
+    } while (!validateStringCount(maplist, mapListVector, 1, 5));
+
+    do {
+        std::cout << "Enter the list of players (P, 2-4):" << std::endl;
+        std::cin >> playerlist;
+        std::cin.ignore(1000, '\n');
+    } while (!validateStringCount(playerlist, playerListVector, 2, 4));
+
+    do {
+        std::cout << "Enter the number of games per map (G, 1-5):" << std::endl;
+    } while (!validateNumber(numgames, 1, 5));
+
+    do {
+        std::cout << "Enter the number of turns per game (D, 10-50):" << std::endl;
+    } while (!validateNumber(numturns, 10, 50));
+
+    // Call the tournament method
+     GameEngine::startTournament(mapListVector, playerListVector, numgames, numturns);
+}
+
 // void GameEngine::startupPhase(CommandProcessor* cmdProcessor)
 void GameEngine::startupPhase()
 {
@@ -183,10 +248,14 @@ void GameEngine::startupPhase()
   {
     std::cout << "\nEnter next command: " << std::endl;
     std::cin >> commandType;
+    std::cin.ignore(1000, '\n');
 
     string commandAction = commandType;
 
-    if (commandAction == "loadmap" && !mapLoaded)
+    if (commandAction == "tournament") {
+      initiateTournament();
+    }
+    else if (commandAction == "loadmap" && !mapLoaded)
     {
       string choice;
       // Logic to load the map
@@ -480,13 +549,14 @@ void GameEngine::executeOrdersPhase(vector<Player *> players)
   cout << "Execute Orders Phase End" << endl;
 }
 
-void GameEngine::mainGameLoop(vector<Player *> players, const Map &gameMap)
+std::string GameEngine::mainGameLoop(vector<Player *> players, const Map &gameMap, int numTurns)
 {
+  int currTurns = 0;
   // Check if gamestart was called
   if (getPhase() != "assign reinforcements")
   {
     cout << "Error: Game start has not been called" << endl;
-    return;
+    return "Wrong State";
   }
 
   while (getPhase() != "end")
@@ -510,7 +580,6 @@ void GameEngine::mainGameLoop(vector<Player *> players, const Map &gameMap)
     executeCommand("endissueorders");
 
     executeOrdersPhase(players);
-
     // check if a player has no territories
     for (auto &&player : players)
     {
@@ -529,12 +598,139 @@ void GameEngine::mainGameLoop(vector<Player *> players, const Map &gameMap)
       cout << players[0]->getName() << " has won the game!" << endl;
       // must be in execute orders state to win
       executeCommand("win");
-      return;
+      return players[0]->getName();
+    }
+    if(numTurns != -1 && currTurns >= numTurns){
+      //cout << "Reached max number of turns" << endl;
+      executeCommand("win");
+      return "Draw";
     }
 
     executeCommand("endexecorders");
-
-    // Stops after 1 loop (to delete)
-    break;
+    currTurns++;
   }
+  return "Draw";
+}
+
+void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<std::string> playerList, int numGames, int numTurns)
+{
+    std::vector<shared_ptr<Map>> mapsInTournament;
+    std::vector<Player *> playersInTournament;
+
+    std::cout << "Starting to validate maps and players.." << std::endl;
+  try {
+    // Check if the maps can be loaded and valid
+    for (auto mapstr : mapList)
+    {
+        // Load the map
+        string map_path = "maps/" + mapstr + ".map";
+        std::cout << "Loading map: " << map_path << std::endl;
+        shared_ptr<Map> loadedMap = MapLoader::loadMap(map_path);
+        Map::validate(loadedMap.get());
+
+        // check validation
+        if (loadedMap->getValidity() == MapValidity::VALID){
+            std::cout << "valid map: " << map_path << std::endl;
+            mapsInTournament.push_back(loadedMap);
+        }
+        else {
+            throw std::invalid_argument("Invalid map: " + mapstr);
+        }
+    }
+
+    std::cout << "Maps loaded and validated" << std::endl;
+    int index = 0;
+    // Validate and turn the players into objects
+    for (auto playerstr : playerList)
+    {
+        // lowercase the string
+        std::transform(playerstr.begin(), playerstr.end(), playerstr.begin(), ::tolower);
+
+        auto * player = new Player(index, playerstr);
+
+        // Assign the player strategy
+        if (playerstr == "aggressive")
+        {
+            //player->setStrategy(new AggressivePlayer());
+        }
+        else if (playerstr == "benevolent")
+        {
+            //player->setStrategy(new BenevolentPlayer());
+        }
+        else if (playerstr == "neutral")
+        {
+            //player->setStrategy(new NeutralPlayer());
+        }
+        else if (playerstr == "cheater")
+        {
+            //player->setStrategy(new CheaterPlayer());
+        }
+        else {
+            throw std::invalid_argument( "Invalid player type: " + playerstr );
+        }
+
+        index++;
+        playersInTournament.push_back(player);
+    }
+    std::cout << "Players loaded and validated" << std::endl;
+  }
+  catch (const std::exception &e) {
+    std::cerr << e.what() << std::endl;
+    exit(0);
+  }
+
+  // Start the tournament
+  for (auto map : mapsInTournament)
+  {
+    this->map = map;
+    for (int i = 0; i < numGames; i++)
+    {
+        executeCommand("loadmap");
+        executeCommand("validate");
+        executeCommand("addplayers");
+
+        // DEBUG: list players
+        /*std::cout << "Players in tournament: " << std::endl;
+        for (auto player : playersInTournament)
+        {
+            std::cout << player->getName() << std::endl;
+        }*/
+
+        executeCommand("assigncountries");
+        // assign countries to players
+        const auto territories = Map::getAllTerritories(*map);
+        auto size = static_cast<double>(territories.size());
+        cout << size << " total territories" << endl;
+        for (int x = 0; x < size; x++)
+        {
+            Territory *territory = &*territories[x];
+            int playerIndex = x % playersInTournament.size();
+            playersInTournament[playerIndex]->addTerritory(territory);
+        }
+
+        // DEBUG: print all players and their territories
+        /*for (int j = 0; j < playersInTournament.size(); j++)
+        {
+            std::cout << "Printing player: " << j + 1 << " territories:\n";
+            for (Territory *t : playersInTournament[j]->getTerritories())
+            {
+                cout << *t << endl;
+            }
+        }*/
+
+        std::cout << "Starting game " << i + 1 << std::endl;
+        // Start the game, returns name of player or draw if no winner
+        std::string result = mainGameLoop(playersInTournament, *map, numTurns);
+        std::cout << "Game " << i + 1 << " has ended. Winner: " << result << std::endl;
+
+        // play again
+        executeCommand("play");
+    }
+
+    // TODO: write txt file with results
+
+
+
+  }
+
 }

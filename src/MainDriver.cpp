@@ -41,7 +41,7 @@ int main(int argc, char const *argv[])
     std::cout << "Choose your poison \n1: Test Maps\n2: Test Players\n3: Test "
                  "Orders\n4: Test Cards\n5: Test Game Engine\n6: Test Command "
                  "Processor\n7: Test Startup Phase\n8: Test Main Game Loop "
-                 "\n9: Test Logging Observer\n10: Test Player Strategies\nElse: exit\n";
+                 "\n9: Test Logging Observer\n10: Test Player Strategies\n11: Test Tournament\nElse: exit\n";
     std::cin >> choice;
     std::cin.ignore(1000, '\n');
     std::cout << std::endl;
@@ -105,6 +105,9 @@ int main(int argc, char const *argv[])
       break;
     case 10:
       testPlayerStrategies();
+      break;
+    case 11:
+      testTournament();
       break;
     default:
       std::cout << "Byyyye ;)" << std::endl;
