@@ -1,6 +1,7 @@
 #include <map>
 
 #include "GameEngine.h"
+#include "PlayerStrategies.h"
 
 using std::make_shared;
 using std::ostream;
@@ -651,19 +652,19 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
         // Assign the player strategy
         if (playerstr == "aggressive")
         {
-            //player->setStrategy(new AggressivePlayer());
+            player->setStrategy(new AggressivePlayer());
         }
         else if (playerstr == "benevolent")
         {
-            //player->setStrategy(new BenevolentPlayer());
+            player->setStrategy(new BenevolentPlayer());
         }
         else if (playerstr == "neutral")
         {
-            //player->setStrategy(new NeutralPlayer());
+            player->setStrategy(new NeutralPlayer());
         }
         else if (playerstr == "cheater")
         {
-            //player->setStrategy(new CheaterPlayer());
+            player->setStrategy(new CheaterPlayer());
         }
         else {
             throw std::invalid_argument( "Invalid player type: " + playerstr );
