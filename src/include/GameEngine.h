@@ -20,6 +20,7 @@ using std::vector;
 void testGameStates();
 void testMainGameLoop();
 void testStartupPhase();
+void testTournament();
 
 // class State; // Forward declaration
 class CommandProcessor;
@@ -32,6 +33,7 @@ class GameEngine : private ILoggable, private Subject
   void reinforcementPhase(vector<Player *> players, const Map &map);
   void issueOrdersPhase(vector<Player *> players, const Map &map);
   void executeOrdersPhase(vector<Player *> players);
+  void startTournament(vector<std::string> mapList, vector<std::string> playerList, int numGames, int numTurns);
 
 public:
   string getCurrCommandsList();
@@ -54,5 +56,6 @@ public:
   GameEngine &operator=(const GameEngine &other);
   friend ostream &operator<<(ostream &os, const GameEngine &gameEngine);
 
-  void mainGameLoop(vector<Player *> players, const Map &map);
+  void initiateTournament();
+  string mainGameLoop(vector<Player *> players, const Map &gameMap, int numTurns = -1);
 };
