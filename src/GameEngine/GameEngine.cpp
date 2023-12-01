@@ -763,10 +763,9 @@ std::string formatForTable(std::string input)
     std::string space = "";
     for (int i = 0; i < spacing; i++)
         space += " ";
-    std::string output = "";
     if (input.length > maxLength)
         return input.substr(0, maxLength) + space;
     for (int j = input.length(); j < maxLength; j++)
-        spacing += " ";
-    return input + spacing;
+        space += " ";
+    return (input + space);
 }
