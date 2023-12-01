@@ -37,8 +37,8 @@ void testPlayerStrategies()
     Player *p3 = new Player(3, "Maxime");
 
     PlayerStrategy *human = new HumanPlayer();
-    PlayerStrategy *aggressive = new HumanPlayer(); // swap with AggressivePlayer() when implemented
-    PlayerStrategy *benevolent = new HumanPlayer(); // swap with BenevolentPlayer() when implemented
+    PlayerStrategy *aggressive = new AggressivePlayer(); // swap with AggressivePlayer() when implemented
+    PlayerStrategy *benevolent = new BenevolentPlayer(); // swap with BenevolentPlayer() when implemented
 
     p1->setStrategy(human);
     p2->setStrategy(aggressive);

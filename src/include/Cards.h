@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <ostream>
 #include <random>
@@ -103,6 +104,8 @@ public:
 class Buffer {
 protected:
   card_vector m_buffer;
+  // Keeps count of number of each card type inside the Buffer.
+  std::map<CardType, int> m_card_count;
 
   /*
     Manages the removal of the card from the m_buffer.
@@ -153,6 +156,8 @@ public:
     Deep copy of the m_buffer is made.
   */
   Buffer &operator=(const Buffer &) noexcept;
+
+  const std::map<CardType, int> &card_count() const noexcept;
 };
 
 /*

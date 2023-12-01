@@ -1,14 +1,14 @@
 #pragma once
+#include <cstdlib>
 #include <iostream>
-#include <vector>
 #include <memory>
 #include <string>
-#include <cstdlib>
+#include <vector>
 
-#include "LoggingObserver.h"
-#include "Player.h"
-#include "Map.h"
 #include "Cards.h"
+#include "LoggingObserver.h"
+#include "Map.h"
+#include "Player.h"
 
 using namespace std;
 
@@ -17,8 +17,7 @@ class Order;
 class Player;
 class OrdersList;
 
-class Order
-{
+class Order {
 public:
   std::string description;
   std::string name;
@@ -28,7 +27,8 @@ public:
   Order() = delete;
   Order(const Order &other);
   Order(std::string name, std::string description);
-  Order(Player *player, const Map *map, std::string name, std::string description);
+  Order(Player *player, const Map *map, std::string name,
+        std::string description);
   ~Order();
 
   friend std::ostream &operator<<(std::ostream &os, const Order &order);
@@ -41,8 +41,7 @@ public:
   virtual void execute();
 };
 
-class OrdersList : protected ILoggable, protected Subject
-{
+class OrdersList : protected ILoggable, protected Subject {
 public:
   vector<std::shared_ptr<Order>> list;
 
@@ -63,8 +62,7 @@ public:
   std::string stringToLog() const override;
 };
 
-class Advance : public Order, private ILoggable, private Subject
-{
+class Advance : public Order, private ILoggable, private Subject {
 public:
   const Territory *source_terr;
   const Territory *dest_terr;
@@ -73,7 +71,8 @@ public:
 
   Advance() = delete;
   Advance(const Advance &other);
-  Advance(Player *player, const Map *map, Player *target_player, const Territory *source, const Territory *dest, int units);
+  Advance(Player *player, const Map *map, Player *target_player,
+          const Territory *source, const Territory *dest, int units);
   ~Advance();
 
   Advance &operator=(const Advance &other);
@@ -88,8 +87,7 @@ public:
   std::string stringToLog() const override;
 };
 
-class Airlift : public Order, private ILoggable, private Subject
-{
+class Airlift : public Order, private ILoggable, private Subject {
 public:
   const Territory *source_terr;
   const Territory *dest_terr;
@@ -98,7 +96,8 @@ public:
 
   Airlift() = delete;
   Airlift(const Airlift &other);
-  Airlift(Player *player, const Map *map, Card *card, const Territory *source, const Territory *dest, int units);
+  Airlift(Player *player, const Map *map, Card *card, const Territory *source,
+          const Territory *dest, int units);
   ~Airlift();
 
   Airlift &operator=(const Airlift &other);
@@ -113,8 +112,7 @@ public:
   std::string stringToLog() const override;
 };
 
-class Bomb : public Order, private ILoggable, private Subject
-{
+class Bomb : public Order, private ILoggable, private Subject {
 public:
   const Territory *dest_terr;
   Card *card;
@@ -122,7 +120,8 @@ public:
 
   Bomb() = delete;
   Bomb(const Bomb &other);
-  Bomb(Player *player, const Map *map, Player *target, Card *card, const Territory *dest);
+  Bomb(Player *player, const Map *map, Player *target, Card *card,
+       const Territory *dest);
   ~Bomb();
 
   Bomb &operator=(const Bomb &other);
@@ -137,8 +136,7 @@ public:
   std::string stringToLog() const override;
 };
 
-class Blockade : public Order, private ILoggable, private Subject
-{
+class Blockade : public Order, private ILoggable, private Subject {
 public:
   const Territory *dest_terr;
   Player *neutral_player;
@@ -146,7 +144,8 @@ public:
 
   Blockade() = delete;
   Blockade(const Blockade &other);
-  Blockade(Player *player, const Map *map, Player *neutral, Card *card, const Territory *dest);
+  Blockade(Player *player, const Map *map, Player *neutral, Card *card,
+           const Territory *dest);
   ~Blockade();
 
   Blockade &operator=(const Blockade &other);
@@ -161,8 +160,7 @@ public:
   std::string stringToLog() const override;
 };
 
-class Deploy : public Order, private ILoggable, private Subject
-{
+class Deploy : public Order, private ILoggable, private Subject {
 public:
   const Territory *dest_terr;
   int units_deployed;
@@ -183,8 +181,7 @@ public:
   std::string stringToLog() const override;
 };
 
-class Negotiate : public Order, private ILoggable, private Subject
-{
+class Negotiate : public Order, private ILoggable, private Subject {
 public:
   Player *target_player;
   Card *card;
