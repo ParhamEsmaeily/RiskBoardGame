@@ -132,13 +132,16 @@ void random_order(const Map &gameMap, Player *player, const bool &make_harm) {
       distribution.
     */
 
+  // Count - 1 for distribution.
+  auto get_count = [&player](CardType type) {
+    return player->card_count(type) - 1;
+  };
+
   if (make_harm) {
     // Getting a random over the number of cards available.
-    std::uniform_int_distribution<> airlift(
-        player->card_count(CardType::airlift));
-    std::uniform_int_distribution<> bomb(player->card_count(CardType::bomb));
-    std::uniform_int_distribution<> blockade(
-        player->card_count(CardType::blockade));
+    std::uniform_int_distribution<> airlift(0, get_count(CardType::airlift));
+    std::uniform_int_distribution<> bomb(0, get_count(CardType::bomb));
+    std::uniform_int_distribution<> blockade(0, get_count(CardType::blockade));
 
     int no_airlift = airlift(rng);
     int no_bomb = bomb(rng);
@@ -157,8 +160,7 @@ void random_order(const Map &gameMap, Player *player, const bool &make_harm) {
     }
   }
 
-  std::uniform_int_distribution<> diplomacy(
-      player->card_count(CardType::diplomacy));
+  std::uniform_int_distribution<> diplomacy(0, get_count(CardType::diplomacy));
   int no_diplomacy = diplomacy(rng);
   for (int i = 0; i < no_diplomacy; i++) {
     player->getPlayerOrderList()->add(
@@ -471,8 +473,7 @@ void CheaterPlayer::issue_order(
     std::vector<Territory *> territoriesToDefend,
     std::vector<Territory *> territoriesToAttack) const noexcept {
 
-  void random_deployment(const Map &gameMap, Player *player,
-                         std::vector<Territory *> t_defend);
+  ps::random_deployment(gameMap, player, territoriesToDefend);
   // ADVANCE IMPLEMENTATION LEFT>
   ps::random_order(gameMap, player, true);
 }
