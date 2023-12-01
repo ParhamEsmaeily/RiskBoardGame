@@ -70,7 +70,6 @@ void strong_deployment(const Map &gameMap, Player *player,
   Territory *strongest_t = nullptr;
   int no_units = 0;
   for (auto *t : t_defend) {
-    no_units = player->getTerritoryUnits(t);
     if (no_units < player->getTerritoryUnits(t)) {
       no_units = player->getTerritoryUnits(t);
       strongest_t = t;
