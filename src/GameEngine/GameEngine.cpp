@@ -45,7 +45,9 @@ void GameEngine::initGame()
   /*
    *  Create 'Startup' section of the game
    */
-
+  //Assume it isn't a tournament, dealt with after if it is and it is validated
+  this->isTournament = false;
+  this->tournament_log = "";
   // States
   shared_ptr<State> start = make_shared<State>("start");
   shared_ptr<State> mapLoaded = make_shared<State>("map loaded");
@@ -160,6 +162,8 @@ string GameEngine::executeCommand(string input)
 
 std::string GameEngine::stringToLog() const
 {
+  if (this->isTournament)
+    return this->tournament_log
   // Returns the current state of the game engine.
   return "GameEngine stringToLog: Phase " + *currState->phase;
 }
@@ -209,6 +213,7 @@ void GameEngine::initiateTournament(){
     int numgames, numturns;
     std::vector<std::string> mapListVector;
     std::vector<std::string> playerListVector;
+    this->initiateTournament = True;
 
     do {
         std::cout << "Enter the list of maps (M, 1-5):" << std::endl;
@@ -679,11 +684,26 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
     std::cerr << e.what() << std::endl;
     exit(0);
   }
-
+  this->isTournament = true;
+  //Build the first part of log string
+  std::string mapsLine = "";
+  for (auto map : mapsInTournament)
+  { 
+      mapsLine += map->getImage() + " by " + map->getAuthor() + " ";
+  }
+  std::string playersLine = "";
+  for (auto player : playersInTournament)
+  {
+      playersLine += "Player" + player->getName() + " ";
+  }
+  std::string log = "Tournament mode:\nM: " + mapsLine + "\nP: " + playersLine + "\nG: " + numGames + "\n D: " + numTurns + "\n\nResults:"+formatForTable("");
+  for (int i = 0; i < numGames; i++)
+      log += formatForTable("Game " + std::to_string(i));
   // Start the tournament
   for (auto map : mapsInTournament)
   {
     this->map = map;
+    log += formatForTable(map->getImage() + " by " + map->getAuthor());
     for (int i = 0; i < numGames; i++)
     {
         executeCommand("loadmap");
@@ -722,16 +742,31 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
         std::cout << "Starting game " << i + 1 << std::endl;
         // Start the game, returns name of player or draw if no winner
         std::string result = mainGameLoop(playersInTournament, *map, numTurns);
-        std::cout << "Game " << i + 1 << " has ended. Winner: " << result << std::endl;
+        log += formatForTable(result);
 
         // play again
         executeCommand("play");
     }
-
+    log += "\n";
     // TODO: write txt file with results
-
-
-
+    //Done by the notify(this) fct
   }
+  this->tournament_log = log;
+}
 
+std::string formatForTable(std::string input)
+{
+    //just so table format can be changed easily
+    int maxLength = 20;
+    int spacing = 5;
+    //this formats all the string going in the tournament table to the same length
+    std::string space = "";
+    for (int i = 0; i < spacing; i++)
+        space += " ";
+    std::string output = "";
+    if (input.length > maxLength)
+        return input.substr(0, maxLength) + space;
+    for (int j = input.length(); j < maxLength; j++)
+        spacing += " ";
+    return input + spacing;
 }
