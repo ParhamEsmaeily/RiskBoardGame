@@ -1,14 +1,14 @@
 #pragma once
+#include <cstdlib>
 #include <iostream>
-#include <vector>
 #include <memory>
 #include <string>
-#include <cstdlib>
+#include <vector>
 
-#include "LoggingObserver.h"
-#include "Player.h"
-#include "Map.h"
 #include "Cards.h"
+#include "LoggingObserver.h"
+#include "Map.h"
+#include "Player.h"
 
 using namespace std;
 
@@ -28,7 +28,8 @@ public:
   Order() = delete;
   Order(const Order &other);
   Order(std::string name, std::string description);
-  Order(Player *player, const Map *map, std::string name, std::string description);
+  Order(Player *player, const Map *map, std::string name,
+        std::string description);
   ~Order();
 
   friend std::ostream &operator<<(std::ostream &os, const Order &order);
@@ -44,19 +45,20 @@ public:
 class OrdersList : protected ILoggable, protected Subject
 {
 public:
-  vector<std::shared_ptr<Order>> list;
+  vector<Order *> list;
 
   OrdersList() = default;
-  OrdersList(vector<shared_ptr<Order>>);
+  OrdersList(vector<Order *>);
   OrdersList(const OrdersList &other);
+  ~OrdersList();
 
-  std::shared_ptr<Order> &operator[](const int i);
+  Order *operator[](const int i);
 
   friend ostream &operator<<(ostream &os, const OrdersList &olist);
 
   bool move(int index, int destination);
   bool remove(int index);
-  void add(const Order &o);
+  void add(Order *o);
   bool isEmpty() const { return (this->list.size() == 0); };
   int size() const { return this->list.size(); };
 
@@ -73,7 +75,8 @@ public:
 
   Advance() = delete;
   Advance(const Advance &other);
-  Advance(Player *player, const Map *map, Player *target_player, const Territory *source, const Territory *dest, int units);
+  Advance(Player *player, const Map *map, Player *target_player,
+          const Territory *source, const Territory *dest, int units);
   ~Advance();
 
   Advance &operator=(const Advance &other);
@@ -82,8 +85,8 @@ public:
 
   friend ostream &operator<<(ostream &os, const Advance &order);
 
-  bool validate();
-  void execute();
+  bool validate() override;
+  void execute() override;
 
   std::string stringToLog() const override;
 };
@@ -98,7 +101,8 @@ public:
 
   Airlift() = delete;
   Airlift(const Airlift &other);
-  Airlift(Player *player, const Map *map, Card *card, const Territory *source, const Territory *dest, int units);
+  Airlift(Player *player, const Map *map, Card *card, const Territory *source,
+          const Territory *dest, int units);
   ~Airlift();
 
   Airlift &operator=(const Airlift &other);
@@ -107,8 +111,8 @@ public:
 
   friend ostream &operator<<(ostream &os, const Airlift &order);
 
-  bool validate();
-  void execute();
+  bool validate() override;
+  void execute() override;
 
   std::string stringToLog() const override;
 };
@@ -122,7 +126,8 @@ public:
 
   Bomb() = delete;
   Bomb(const Bomb &other);
-  Bomb(Player *player, const Map *map, Player *target, Card *card, const Territory *dest);
+  Bomb(Player *player, const Map *map, Player *target, Card *card,
+       const Territory *dest);
   ~Bomb();
 
   Bomb &operator=(const Bomb &other);
@@ -131,8 +136,8 @@ public:
 
   friend ostream &operator<<(ostream &os, const Bomb &order);
 
-  bool validate();
-  void execute();
+  bool validate() override;
+  void execute() override;
 
   std::string stringToLog() const override;
 };
@@ -146,7 +151,8 @@ public:
 
   Blockade() = delete;
   Blockade(const Blockade &other);
-  Blockade(Player *player, const Map *map, Player *neutral, Card *card, const Territory *dest);
+  Blockade(Player *player, const Map *map, Player *neutral, Card *card,
+           const Territory *dest);
   ~Blockade();
 
   Blockade &operator=(const Blockade &other);
@@ -155,8 +161,8 @@ public:
 
   friend ostream &operator<<(ostream &os, const Blockade &order);
 
-  bool validate();
-  void execute();
+  bool validate() override;
+  void execute() override;
 
   std::string stringToLog() const override;
 };
@@ -177,8 +183,8 @@ public:
 
   friend ostream &operator<<(ostream &os, const Deploy &order);
 
-  bool validate();
-  void execute();
+  bool validate() override;
+  void execute() override;
 
   std::string stringToLog() const override;
 };
@@ -199,8 +205,8 @@ public:
   bool operator!=(const Negotiate &other);
   friend ostream &operator<<(ostream &os, const Negotiate &order);
 
-  bool validate();
-  void execute();
+  bool validate() override;
+  void execute() override;
 
   std::string stringToLog() const override;
 };

@@ -117,10 +117,11 @@ void Player::issueOrder(const Map &gameMap, std::vector<Player *> players)
                           this->toAttack(gameMap));
 }
 
-void Player::addTerritory(const Territory *t)
+void Player::addTerritory(Territory *t)
 {
-  territories.push_back(const_cast<Territory *>(t));
+  t->setOwner(this);
   units_map[t->getName()] = 0;
+  territories.push_back(t);
 }
 
 void Player::removeTerritory(const Territory *t)
@@ -130,6 +131,7 @@ void Player::removeTerritory(const Territory *t)
     if (territories[i]->getName() == t->getName())
     {
       territories.erase(territories.begin() + i);
+      territories[i]->setOwner(nullptr);
       break;
     }
   }
@@ -159,12 +161,7 @@ bool Player::isAllied(Player *p)
 
 bool Player::owns(const Territory *t) const
 {
-  for (int i = 0; i < territories.size(); i++)
-  {
-    if (territories[i]->getName() == t->getName())
-      return true;
-  }
-  return false;
+  return t->getOwner() == this;
 }
 
 // getters
@@ -172,9 +169,20 @@ int Player::getPlayerId() { return playerId; }
 
 string Player::getName() { return name; }
 
-StratType Player::getStrategyType() const
+StratType Player::getStrategyType() const { return m_strategy->type(); }
+
+int Player::card_count(const CardType &type) const noexcept
 {
-  return m_strategy->type();
+  size_t count = 0;
+  try
+  {
+    count = hand->card_count().at(type);
+  }
+  catch (const std::exception &)
+  {
+  }
+
+  return count;
 }
 
 Hand *Player::getHand() { return &*hand; }
@@ -198,11 +206,18 @@ void Player::setPlayerOrderList(OrdersList *orders)
   this->order_list = orders;
 }
 
-void Player::setTerritories(vector<Territory *> t) { this->territories = t; }
+void Player::setTerritories(vector<Territory *> newTerritories)
+{
+  for (Territory *t : newTerritories)
+  {
+    addTerritory(t);
+  }
+}
 
 ostream &operator<<(ostream &os, Player &p)
 {
-  return os << "{Name: " << p.getName() << ", ID: " << p.getPlayerId() << ", Strategy: " << p.getStrategyType() << "}";
+  return os << "{Name: " << p.getName() << ", ID: " << p.getPlayerId()
+            << ", Strategy: " << p.getStrategyType() << "}";
 }
 
 void Player::setTerritoryUnits(const Territory *t, int units)

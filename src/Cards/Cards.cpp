@@ -101,16 +101,22 @@ card_ptr Buffer::remove(const int index) {
   m_buffer[index] = std::move(m_buffer[end_index]);
   m_buffer.pop_back(); // Reduce size.
 
+  // Decrease counter.
+  m_card_count[card->m_type]--;
+
   return card;
 }
 
 void Buffer::insert(const Card card) noexcept {
   // Copy constructor of card.
   m_buffer.push_back(std::make_unique<Card>(card));
+  // Increase counter.
+  m_card_count[card.m_type]++;
 }
 
 void Buffer::insert(const CardType type) noexcept {
   m_buffer.push_back(std::make_unique<Card>(type));
+  m_card_count[type]++;
 }
 
 void Buffer::random_insert(const int &number) noexcept {
@@ -148,6 +154,10 @@ Buffer &Buffer::operator=(const Buffer &buf) noexcept {
     m_buffer.push_back(std::make_unique<Card>(*p));
   }
   return *this;
+}
+
+const std::map<CardType, int> &Buffer::card_count() const noexcept {
+  return m_card_count;
 }
 
 // --Deck.

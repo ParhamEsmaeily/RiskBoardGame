@@ -18,7 +18,7 @@ void test_LoggingObserver()
   // 1- Generic Order and OrderList created.
   Order o("name", "desc");
   OrdersList list;
-  list.add(o);
+  list.add(&o);
   std::cout << "Order added to the Order list." << std::endl;
 
   // 2-
