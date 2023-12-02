@@ -4,177 +4,250 @@
 #include "Player.h"
 #include <algorithm>
 
-namespace ps {
-const std::string map(const StratType &type) {
-  switch (type) {
-  case StratType::Human:
-    return "Human";
-  case StratType::Aggressive:
-    return "Aggressive";
-  case StratType::Benevolent:
-    return "Benevolent";
-  case StratType::Neutral:
-    return "Neutral";
-  case StratType::Cheater:
-    return "Cheater";
-  default:
-    return "Unknown";
-  }
-}
-
-PlayerStrategy *make_player_strat(const StratType &type) {
-  switch (type) {
-  case StratType::Human:
-    return new HumanPlayer();
-  case StratType::Aggressive:
-    return new AggressivePlayer();
-  case StratType::Benevolent:
-    return new BenevolentPlayer();
-  case StratType::Neutral:
-    return new NeutralPlayer();
-  case StratType::Cheater:
-    return new CheaterPlayer();
-  }
-}
-
-void random_deployment(const Map &gameMap, Player *player,
-                       std::vector<Territory *> t_defend) {
-
-  // Simple function to get the number of reinforcement cards left.
-  auto get_no_reinf = [&player]() {
-    return player->getHand()->card_count().at(CardType::reinforcement);
-  };
-
-  int no_reinforcements = get_no_reinf();
-
-  std::random_device rd;  // Generates a seed.
-  std::mt19937 rng(rd()); // Random seed
-  std::uniform_int_distribution<> random_idx(0, t_defend.size() - 1);
-  // Repeatedly randomly add soldiers to territories.
-  while (no_reinforcements > 0) {
-    std::uniform_int_distribution<> random_no_soldiers(1, no_reinforcements);
-
-    const int idx = random_idx(rng);
-    const int no_soldiers = random_no_soldiers(rng);
-
-    player->getPlayerOrderList()->add(
-        Deploy(player, &gameMap, t_defend[idx], no_soldiers));
-
-    no_reinforcements = get_no_reinf();
-  }
-}
-
-void strong_deployment(const Map &gameMap, Player *player,
-                       std::vector<Territory *> t_defend) {
-  // Find strongest country.
-  Territory *strongest_t = nullptr;
-  int no_units = 0;
-  for (auto *t : t_defend) {
-    if (no_units < player->getTerritoryUnits(t)) {
-      no_units = player->getTerritoryUnits(t);
-      strongest_t = t;
+namespace ps
+{
+  const std::string map(const StratType &type)
+  {
+    switch (type)
+    {
+    case StratType::Human:
+      return "Human";
+    case StratType::Aggressive:
+      return "Aggressive";
+    case StratType::Benevolent:
+      return "Benevolent";
+    case StratType::Neutral:
+      return "Neutral";
+    case StratType::Cheater:
+      return "Cheater";
+    default:
+      return "Unknown";
     }
   }
 
-  // No of reinforcement cards.
-  auto card_count = player->getHand()->card_count();
-  int no_reinforcements = card_count[CardType::reinforcement];
-
-  player->getPlayerOrderList()->add(
-      Deploy(player, &gameMap, strongest_t, no_reinforcements));
-}
-
-void weak_deployment(const Map &gameMap, Player *player,
-                     std::vector<Territory *> t_defend) {
-  int no_reinforcement_cards =
-      player->getHand()->card_count().at(CardType::reinforcement);
-
-  // Very slow O(n^2). Optimization necessary.
-  // Increment add to the weakest countries.
-  while (no_reinforcement_cards > 0) {
-    Territory *territory = *std::min_element(
-        t_defend.begin(), t_defend.end(),
-        [&player](Territory *t1, Territory *t2) {
-          return player->getTerritoryUnits(t1) < player->getTerritoryUnits(t2);
-        });
-    player->getPlayerOrderList()->add(Deploy(player, &gameMap, territory, 1));
-    no_reinforcement_cards--;
+  PlayerStrategy *make_player_strat(const StratType &type)
+  {
+    switch (type)
+    {
+    case StratType::Human:
+      return new HumanPlayer();
+    case StratType::Aggressive:
+      return new AggressivePlayer();
+    case StratType::Benevolent:
+      return new BenevolentPlayer();
+    case StratType::Neutral:
+      return new NeutralPlayer();
+    case StratType::Cheater:
+      return new CheaterPlayer();
+    }
   }
-}
 
-const std::vector<Territory *> adjacent_territories(const Map &gameMap,
-                                                    Player *player) {
-  std::vector<Territory *> territories_to_attack;
+  void random_deployment(const Map &gameMap, Player *player,
+                         std::vector<Territory *> t_defend)
+  {
 
-  // For each adjacent and not owned by the player.
-  for (Territory *t : player->getTerritories()) {
+    // Simple function to get the number of reinforcement cards left.
+    auto get_no_reinf = [&player]()
+    {
+      return player->getHand()->card_count().at(CardType::reinforcement);
+    };
+
+    int no_reinforcements = get_no_reinf();
+
+    std::random_device rd;  // Generates a seed.
+    std::mt19937 rng(rd()); // Random seed
+    std::uniform_int_distribution<> random_idx(0, t_defend.size() - 1);
+    // Repeatedly randomly add soldiers to territories.
+    while (no_reinforcements > 0)
+    {
+      std::uniform_int_distribution<> random_no_soldiers(1, no_reinforcements);
+
+      const int idx = random_idx(rng);
+      const int no_soldiers = random_no_soldiers(rng);
+
+      player->getPlayerOrderList()->add(
+          Deploy(player, &gameMap, t_defend[idx], no_soldiers));
+
+      no_reinforcements = get_no_reinf();
+    }
+  }
+
+  Territory *find_strongest_territory(const Map &map, Player *player)
+  {
+    Territory *strongest_t = nullptr;
+    int no_units = -1;
+    for (auto *t : player->getTerritories())
+    {
+      if (no_units < player->getTerritoryUnits(t))
+      {
+        no_units = player->getTerritoryUnits(t);
+        strongest_t = t;
+      }
+    }
+
+    return strongest_t;
+  }
+
+  Territory *find_strongest_territory_from_territories(const Map &map, Player *player, std::vector<Territory *> territories)
+  {
+    Territory *strongest_t = nullptr;
+    int no_units = -1;
+    for (auto *t : territories)
+    {
+      if (no_units < player->getTerritoryUnits(t))
+      {
+        no_units = player->getTerritoryUnits(t);
+        strongest_t = t;
+      }
+    }
+
+    return strongest_t;
+  }
+
+  Territory *strong_deployment(const Map &gameMap, Player *player,
+                               std::vector<Territory *> t_defend)
+  {
+    Territory *strongest_t = find_strongest_territory_from_territories(gameMap, player, t_defend);
+
+    // No of reinforcement cards.
+    auto card_count = player->getHand()->card_count();
+    int no_reinforcements = card_count[CardType::reinforcement];
+
+    player->getPlayerOrderList()->add(
+        Deploy(player, &gameMap, strongest_t, no_reinforcements));
+
+    return strongest_t;
+  }
+
+  void weak_deployment(const Map &gameMap, Player *player,
+                       std::vector<Territory *> t_defend)
+  {
+    int no_reinforcement_cards =
+        player->getHand()->card_count().at(CardType::reinforcement);
+
+    // Very slow O(n^2). Optimization necessary.
+    // Increment add to the weakest countries.
+    while (no_reinforcement_cards > 0)
+    {
+      Territory *territory = *std::min_element(
+          t_defend.begin(), t_defend.end(),
+          [&player](Territory *t1, Territory *t2)
+          {
+            return player->getTerritoryUnits(t1) < player->getTerritoryUnits(t2);
+          });
+      player->getPlayerOrderList()->add(Deploy(player, &gameMap, territory, 1));
+      no_reinforcement_cards--;
+    }
+  }
+
+  const std::vector<Territory *> enemy_adjacent_territories(const Map &gameMap,
+                                                            Player *player)
+  {
+    std::vector<Territory *> territories_to_attack;
+
+    // For each adjacent and not owned by the player.
+    for (Territory *t : player->getTerritories())
+    {
+      for (std::shared_ptr<Territory> n :
+           Map::getAdjacentTerritories(gameMap, t->getName()))
+      {
+        if (!player->owns(n.get()) &&
+            territories_to_attack.end() ==
+                std::find(territories_to_attack.begin(),
+                          territories_to_attack.end(), n.get()))
+        {
+          territories_to_attack.push_back(n.get());
+          break;
+        }
+      }
+    }
+
+    return territories_to_attack;
+  }
+
+  const std::vector<Territory *> enemy_adjacent_territories_from_territory(const Map &gameMap,
+                                                                           Player *player, Territory *t)
+  {
+    std::vector<Territory *> territories_to_attack;
+
+    // For each adjacent and not owned by the player.
     for (std::shared_ptr<Territory> n :
-         Map::getAdjacentTerritories(gameMap, t->getName())) {
+         Map::getAdjacentTerritories(gameMap, t->getName()))
+    {
       if (!player->owns(n.get()) &&
           territories_to_attack.end() ==
               std::find(territories_to_attack.begin(),
-                        territories_to_attack.end(), n.get())) {
+                        territories_to_attack.end(), n.get()))
+      {
         territories_to_attack.push_back(n.get());
         break;
       }
     }
+
+    return territories_to_attack;
   }
 
-  return territories_to_attack;
-}
+  void random_order(const Map &gameMap, Player *player, const bool &make_harm)
+  {
+    std::random_device rd;  // Generates a seed.
+    std::mt19937 rng(rd()); // Random seed
 
-void random_order(const Map &gameMap, Player *player, const bool &make_harm) {
-  std::random_device rd;  // Generates a seed.
-  std::mt19937 rng(rd()); // Random seed
+    /*
+        Calls each order depending on the value sampled from the uniform
+        distribution.
+      */
 
-  /*
-      Calls each order depending on the value sampled from the uniform
-      distribution.
-    */
+    // Count - 1 for distribution.
+    auto get_count = [&player](CardType type)
+    {
+      return player->card_count(type);
+    };
 
-  // Count - 1 for distribution.
-  auto get_count = [&player](CardType type) {
-    return player->card_count(type) - 1;
-  };
+    if (make_harm)
+    {
+      // Getting a random over the number of cards available.
+      std::uniform_int_distribution<int> airlift(0, get_count(CardType::airlift));
+      std::uniform_int_distribution<int> bomb(0, get_count(CardType::bomb));
+      std::uniform_int_distribution<int> blockade(0, get_count(CardType::blockade));
 
-  if (make_harm) {
-    // Getting a random over the number of cards available.
-    std::uniform_int_distribution<> airlift(0, get_count(CardType::airlift));
-    std::uniform_int_distribution<> bomb(0, get_count(CardType::bomb));
-    std::uniform_int_distribution<> blockade(0, get_count(CardType::blockade));
-
-    int no_airlift = airlift(rng);
-    int no_bomb = bomb(rng);
-    int no_blockade = blockade(rng);
-    for (int i = 0; i < no_airlift; i++) {
-      player->getPlayerOrderList()->add(
-          Airlift(player, &gameMap, nullptr, nullptr, nullptr, 0));
+      int no_airlift = airlift(rng);
+      int no_bomb = bomb(rng);
+      int no_blockade = blockade(rng);
+      for (int i = 0; i < no_airlift; i++)
+      {
+        player->getPlayerOrderList()->add(
+            Airlift(player, &gameMap, nullptr, nullptr, nullptr, 0));
+      }
+      for (int i = 0; i < no_bomb; i++)
+      {
+        player->getPlayerOrderList()->add(
+            Bomb(player, &gameMap, nullptr, nullptr, nullptr));
+      }
+      for (int i = 0; i < no_blockade; i++)
+      {
+        player->getPlayerOrderList()->add(
+            Blockade(player, &gameMap, nullptr, nullptr, nullptr));
+      }
     }
-    for (int i = 0; i < no_bomb; i++) {
+
+    std::uniform_int_distribution<> diplomacy(0, get_count(CardType::diplomacy));
+    int no_diplomacy = diplomacy(rng);
+    for (int i = 0; i < no_diplomacy; i++)
+    {
       player->getPlayerOrderList()->add(
-          Bomb(player, &gameMap, nullptr, nullptr, nullptr));
-    }
-    for (int i = 0; i < no_blockade; i++) {
-      player->getPlayerOrderList()->add(
-          Blockade(player, &gameMap, nullptr, nullptr, nullptr));
+          Negotiate(player, &gameMap, nullptr, nullptr));
     }
   }
-
-  std::uniform_int_distribution<> diplomacy(0, get_count(CardType::diplomacy));
-  int no_diplomacy = diplomacy(rng);
-  for (int i = 0; i < no_diplomacy; i++) {
-    player->getPlayerOrderList()->add(
-        Negotiate(player, &gameMap, nullptr, nullptr));
-  }
-}
 } // namespace ps
 
-std::ostream &operator<<(std::ostream &os, const StratType &strat) {
+std::ostream &operator<<(std::ostream &os, const StratType &strat)
+{
   os << ps::map(strat);
   return os;
 }
 
-std::ostream &operator<<(std::ostream &os, const PlayerStrategy &strategy) {
+std::ostream &operator<<(std::ostream &os, const PlayerStrategy &strategy)
+{
   os << "{Type: " << strategy.type() << "}";
   return os;
 }
@@ -184,10 +257,12 @@ const StratType HumanPlayer::type() const noexcept { return StratType::Human; }
 void HumanPlayer::issue_order(
     const Map &gameMap, Player *player, std::vector<Player *> players,
     std::vector<Territory *> territoriesToDefend,
-    std::vector<Territory *> territoriesToAttack) const noexcept {
+    std::vector<Territory *> territoriesToAttack) const noexcept
+{
   // print all territories to defend
   cout << player->getName() << "'s territories to defend:" << endl;
-  for (Territory *t : territoriesToDefend) {
+  for (Territory *t : territoriesToDefend)
+  {
     cout << *t << endl;
   }
 
@@ -196,21 +271,27 @@ void HumanPlayer::issue_order(
   // Create a map of card types and their count of the player's hand
   map<CardType, int> cards_count;
   int nb_reinforcement_cards = 0;
-  for (CardType card : player->getHand()->show_cards()) {
-    if (card != CardType::reinforcement) {
+  for (CardType card : player->getHand()->show_cards())
+  {
+    if (card != CardType::reinforcement)
+    {
       cards_count[card]++;
-    } else {
+    }
+    else
+    {
       nb_reinforcement_cards++;
     }
   }
 
   // while the user doesn't type 'end turn', keep asking for orders
   string input;
-  while (input != "end turn") {
+  while (input != "end turn")
+  {
     /*
     / Issue Deploy() orders until the player has no more reinforcement cards
     */
-    while (nb_reinforcement_cards > 0) {
+    while (nb_reinforcement_cards > 0)
+    {
       string terr_name;
       string str_reinforcements;
       bool orderAdded = false;
@@ -227,15 +308,18 @@ void HumanPlayer::issue_order(
 
       // if num_reinforcements is not a number, ask again
       if (!std::all_of(str_reinforcements.begin(), str_reinforcements.end(),
-                       ::isdigit)) {
+                       ::isdigit))
+      {
         cout << "Invalid number of reinforcements." << endl;
         continue;
       }
 
       // add to orders list the order to deploy the number of reinforcements to
       // the territory
-      for (Territory *t : territoriesToDefend) {
-        if (t->getName() == terr_name) {
+      for (Territory *t : territoriesToDefend)
+      {
+        if (t->getName() == terr_name)
+        {
           // TODO: add the deploy order to the order list
           player->getPlayerOrderList()->add(Deploy(player, &gameMap, t, 1));
           orderAdded = true;
@@ -245,9 +329,12 @@ void HumanPlayer::issue_order(
 
       int num_reinforcements = std::stoi(str_reinforcements);
       if (orderAdded && num_reinforcements <= nb_reinforcement_cards &&
-          num_reinforcements > 0) {
+          num_reinforcements > 0)
+      {
         nb_reinforcement_cards -= num_reinforcements;
-      } else {
+      }
+      else
+      {
         cout << "Invalid order." << endl;
       }
     }
@@ -255,12 +342,14 @@ void HumanPlayer::issue_order(
     /*
     / Other orders
     */
-    while (true) {
+    while (true)
+    {
 
       // print all cards in hand
       cout << player->getName() << "'s cards in hand:" << endl;
       cout << "advance: infinite" << endl;
-      for (auto const &[card, count] : cards_count) {
+      for (auto const &[card, count] : cards_count)
+      {
         cout << cd::map(card) << ": " << count << " available" << endl;
       }
 
@@ -269,12 +358,16 @@ void HumanPlayer::issue_order(
       getline(cin, input);
 
       // create an order based on the input
-      if (input == "end turn") {
+      if (input == "end turn")
+      {
         break;
-      } else if (input == "advance") {
+      }
+      else if (input == "advance")
+      {
         // print all territories to attack (for visibility)
         cout << player->getName() << "'s territories to attack:" << endl;
-        for (Territory *t : territoriesToAttack) {
+        for (Territory *t : territoriesToAttack)
+        {
           cout << *t << endl;
         }
 
@@ -296,7 +389,8 @@ void HumanPlayer::issue_order(
 
         // if num_armies is not a number, ask again
         if (!std::all_of(str_num_armies.begin(), str_num_armies.end(),
-                         ::isdigit)) {
+                         ::isdigit))
+        {
           cout << "Invalid number of armies." << endl;
           continue;
         }
@@ -305,10 +399,14 @@ void HumanPlayer::issue_order(
         Territory *source = nullptr;
         Territory *dest = nullptr;
 
-        for (Territory *t : territoriesToAttack) {
-          if (t->getName() == terr_1) {
+        for (Territory *t : territoriesToAttack)
+        {
+          if (t->getName() == terr_1)
+          {
             source = t;
-          } else if (t->getName() == terr_2) {
+          }
+          else if (t->getName() == terr_2)
+          {
             dest = t;
           }
         }
@@ -316,8 +414,10 @@ void HumanPlayer::issue_order(
         // find the target player
         Player *target_player = nullptr;
 
-        for (size_t i = 0; i < players.size(); i++) {
-          if (players[i]->owns(dest)) {
+        for (size_t i = 0; i < players.size(); i++)
+        {
+          if (players[i]->owns(dest))
+          {
             target_player = players[i];
             break;
           }
@@ -326,23 +426,33 @@ void HumanPlayer::issue_order(
         player->getPlayerOrderList()->add(Advance(player, &gameMap,
                                                   target_player, source, dest,
                                                   std::stoi(str_num_armies)));
-      } else if (input == "bomb" && cards_count[CardType::bomb] > 0) {
+      }
+      else if (input == "bomb" && cards_count[CardType::bomb] > 0)
+      {
         player->getPlayerOrderList()->add(
             Bomb(player, &gameMap, nullptr, nullptr, nullptr));
         cards_count[CardType::bomb]--;
-      } else if (input == "blockade" && cards_count[CardType::blockade] > 0) {
+      }
+      else if (input == "blockade" && cards_count[CardType::blockade] > 0)
+      {
         player->getPlayerOrderList()->add(
             Blockade(player, &gameMap, nullptr, nullptr, nullptr));
         cards_count[CardType::blockade]--;
-      } else if (input == "airlift" && cards_count[CardType::airlift] > 0) {
+      }
+      else if (input == "airlift" && cards_count[CardType::airlift] > 0)
+      {
         player->getPlayerOrderList()->add(
             Airlift(player, &gameMap, nullptr, nullptr, nullptr, 0));
         cards_count[CardType::airlift]--;
-      } else if (input == "negotiate" && cards_count[CardType::diplomacy] > 0) {
+      }
+      else if (input == "negotiate" && cards_count[CardType::diplomacy] > 0)
+      {
         player->getPlayerOrderList()->add(
             Negotiate(player, &gameMap, nullptr, nullptr));
         cards_count[CardType::diplomacy]--;
-      } else {
+      }
+      else
+      {
         cout << "Invalid order." << endl;
       }
     }
@@ -350,18 +460,22 @@ void HumanPlayer::issue_order(
 }
 
 std::vector<Territory *> HumanPlayer::to_attack(const Map &gameMap,
-                                                Player *player) const noexcept {
+                                                Player *player) const noexcept
+{
   // Could use adjacent territories instead.
 
   std::vector<Territory *> territoriesToAttack;
 
-  for (Territory *t : player->getTerritories()) {
+  for (Territory *t : player->getTerritories())
+  {
     for (std::shared_ptr<Territory> n :
-         Map::getAdjacentTerritories(gameMap, t->getName())) {
+         Map::getAdjacentTerritories(gameMap, t->getName()))
+    {
       if (!player->owns(n.get()) &&
           territoriesToAttack.end() == std::find(territoriesToAttack.begin(),
                                                  territoriesToAttack.end(),
-                                                 n.get())) {
+                                                 n.get()))
+      {
         territoriesToAttack.push_back(n.get());
         break;
       }
@@ -370,53 +484,70 @@ std::vector<Territory *> HumanPlayer::to_attack(const Map &gameMap,
   return territoriesToAttack;
 }
 
-std::vector<Territory *> HumanPlayer::to_defend(Player *player) const noexcept {
+std::vector<Territory *> HumanPlayer::to_defend(Player *player) const noexcept
+{
   return player->getTerritories();
 }
 
-HumanPlayer *HumanPlayer::clone() const noexcept {
+HumanPlayer *HumanPlayer::clone() const noexcept
+{
   return new HumanPlayer(*this);
 }
 
-const StratType AggressivePlayer::type() const noexcept {
+const StratType AggressivePlayer::type() const noexcept
+{
   return StratType::Aggressive;
 }
 
 void AggressivePlayer::issue_order(
     const Map &gameMap, Player *player, std::vector<Player *> players,
     std::vector<Territory *> territoriesToDefend,
-    std::vector<Territory *> territoriesToAttack) const noexcept {
+    std::vector<Territory *> territoriesToAttack) const noexcept
+{
 
-  // All troops deployed on the strongest country.
-  ps::strong_deployment(gameMap, player, territoriesToDefend);
+  // All troops deployed on the strongest friendly territory.
+  Territory *strongestTerritory = ps::strong_deployment(gameMap, player, territoriesToDefend);
 
-  // ATTACK IMPLEMENTATION LEFT.
-  for (auto *t : to_attack(gameMap, player)) {
+  // attacks all adjacent territories of the strongest territory.
+  for (auto *t : ps::enemy_adjacent_territories_from_territory(gameMap, player, strongestTerritory))
+  {
+    player->getPlayerOrderList()->add(
+        Advance(player, &gameMap, t->getOwner(), strongestTerritory, t, player->getTerritoryUnits(strongestTerritory) / territoriesToAttack.size()));
   }
+
+  // Randomly calls aggressive orders such as Airlift, Blockade, Bomb.
+  ps::random_order(gameMap, player, true);
 }
 
 std::vector<Territory *>
-AggressivePlayer::to_attack(const Map &gameMap, Player *player) const noexcept {
-  return ps::adjacent_territories(gameMap, player);
+AggressivePlayer::to_attack(const Map &gameMap, Player *player) const noexcept
+{
+  Territory *strongestTerritory = ps::find_strongest_territory(gameMap, player);
+
+  return ps::enemy_adjacent_territories_from_territory(gameMap, player, strongestTerritory);
 }
 
 std::vector<Territory *>
-AggressivePlayer::to_defend(Player *player) const noexcept {
+AggressivePlayer::to_defend(Player *player) const noexcept
+{
   return player->getTerritories();
 }
 
-AggressivePlayer *AggressivePlayer::clone() const noexcept {
+AggressivePlayer *AggressivePlayer::clone() const noexcept
+{
   return new AggressivePlayer(*this);
 }
 
-const StratType BenevolentPlayer::type() const noexcept {
+const StratType BenevolentPlayer::type() const noexcept
+{
   return StratType::Benevolent;
 }
 
 void BenevolentPlayer::issue_order(
     const Map &gameMap, Player *player, std::vector<Player *> players,
     std::vector<Territory *> territoriesToDefend,
-    std::vector<Territory *> territoriesToAttack) const noexcept {
+    std::vector<Territory *> territoriesToAttack) const noexcept
+{
 
   ps::weak_deployment(gameMap, player, territoriesToDefend);
   ps::random_order(gameMap, player, false);
@@ -424,54 +555,64 @@ void BenevolentPlayer::issue_order(
 }
 
 std::vector<Territory *>
-BenevolentPlayer::to_attack(const Map &gameMap, Player *player) const noexcept {
+BenevolentPlayer::to_attack(const Map &gameMap, Player *player) const noexcept
+{
   // No territories to attack.
   return std::vector<Territory *>(0);
 }
 
 std::vector<Territory *>
-BenevolentPlayer::to_defend(Player *player) const noexcept {
+BenevolentPlayer::to_defend(Player *player) const noexcept
+{
   return player->getTerritories();
 }
 
-BenevolentPlayer *BenevolentPlayer::clone() const noexcept {
+BenevolentPlayer *BenevolentPlayer::clone() const noexcept
+{
   return new BenevolentPlayer(*this);
 }
 
-const StratType NeutralPlayer::type() const noexcept {
+const StratType NeutralPlayer::type() const noexcept
+{
   return StratType::Neutral;
 }
 
 void NeutralPlayer::issue_order(
     const Map &gameMap, Player *player, std::vector<Player *> players,
     std::vector<Territory *> territoriesToDefend,
-    std::vector<Territory *> territoriesToAttack) const noexcept {
+    std::vector<Territory *> territoriesToAttack) const noexcept
+{
   // If attacked, becomes an Aggressive Player.
 }
 
 std::vector<Territory *>
-NeutralPlayer::to_attack(const Map &gameMap, Player *player) const noexcept {
+NeutralPlayer::to_attack(const Map &gameMap, Player *player) const noexcept
+{
   // No territory to attack.
   return std::vector<Territory *>(0);
 }
 
 std::vector<Territory *>
-NeutralPlayer::to_defend(Player *player) const noexcept {
+NeutralPlayer::to_defend(Player *player) const noexcept
+{
   return player->getTerritories();
 }
 
-NeutralPlayer *NeutralPlayer::clone() const noexcept {
+NeutralPlayer *NeutralPlayer::clone() const noexcept
+{
   return new NeutralPlayer(*this);
 }
 
-const StratType CheaterPlayer::type() const noexcept {
+const StratType CheaterPlayer::type() const noexcept
+{
   return StratType::Cheater;
 }
 
 void CheaterPlayer::issue_order(
     const Map &gameMap, Player *player, std::vector<Player *> players,
     std::vector<Territory *> territoriesToDefend,
-    std::vector<Territory *> territoriesToAttack) const noexcept {
+    std::vector<Territory *> territoriesToAttack) const noexcept
+{
 
   ps::random_deployment(gameMap, player, territoriesToDefend);
   // ADVANCE IMPLEMENTATION LEFT>
@@ -479,15 +620,18 @@ void CheaterPlayer::issue_order(
 }
 
 std::vector<Territory *>
-CheaterPlayer::to_attack(const Map &gameMap, Player *player) const noexcept {
-  return ps::adjacent_territories(gameMap, player);
+CheaterPlayer::to_attack(const Map &gameMap, Player *player) const noexcept
+{
+  return ps::enemy_adjacent_territories(gameMap, player);
 }
 
 std::vector<Territory *>
-CheaterPlayer::to_defend(Player *player) const noexcept {
+CheaterPlayer::to_defend(Player *player) const noexcept
+{
   return player->getTerritories();
 }
 
-CheaterPlayer *CheaterPlayer::clone() const noexcept {
+CheaterPlayer *CheaterPlayer::clone() const noexcept
+{
   return new CheaterPlayer(*this);
 }

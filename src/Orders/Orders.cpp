@@ -231,7 +231,7 @@ void Advance::execute()
     {
         if (this->issuer->owns(this->dest_terr))
         {
-            this->issuer->addTerritory(this->dest_terr);
+            this->issuer->addTerritory(const_cast<Territory *>(this->dest_terr));
             this->issuer->setTerritoryUnits(this->dest_terr, this->units_deployed);
         }
         else
@@ -250,7 +250,7 @@ void Advance::execute()
             if (attackers > 0)
             {
                 this->target_player->removeTerritory(this->dest_terr);
-                this->issuer->addTerritory(this->dest_terr);
+                this->issuer->addTerritory(const_cast<Territory *>(this->dest_terr));
                 this->issuer->setTerritoryUnits(this->source_terr, source_units);
                 this->issuer->setTerritoryUnits(this->dest_terr, attackers);
             }
@@ -485,7 +485,7 @@ void Blockade::execute()
     {
         int units = this->issuer->getTerritoryUnits(this->dest_terr) * 2;
         this->issuer->removeTerritory(this->dest_terr);
-        this->neutral_player->addTerritory(this->dest_terr);
+        this->neutral_player->addTerritory(const_cast<Territory *>(this->dest_terr));
         this->neutral_player->setTerritoryUnits(this->dest_terr, units);
         Notify(this);
     }

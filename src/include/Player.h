@@ -21,7 +21,8 @@ class Hand;
 class OrdersList;
 class Order;
 
-class Player {
+class Player
+{
 
 private:
   string name;
@@ -97,9 +98,9 @@ public:
   issueOrder(const Map &gameMap,
              std::vector<Player *> players); // uses the console to add orders
                                              // to the player's list of orders
-  void addTerritory(const Territory *territory); // add territories to player
-  void removeTerritory(const Territory *t);      // removes territory and
-                                            // corresponding units from player
+  void addTerritory(Territory *territory);   // add territories to player
+  void removeTerritory(const Territory *t);  // removes territory and
+                                             // corresponding units from player
   bool owns(const Territory *t) const;
   void addAlly(const Player *p);
   bool isAllied(Player *p);

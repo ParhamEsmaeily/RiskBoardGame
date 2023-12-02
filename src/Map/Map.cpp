@@ -537,3 +537,9 @@ std::string Territory::getName() const { return *name; }
 uint16_t Territory::getX() const { return *x; }
 uint16_t Territory::getY() const { return *y; }
 const std::shared_ptr<Continent> &Territory::getContinent() const { return continent; }
+Player *Territory::getOwner() const { return owner; }
+
+void Territory::setOwner(Player *owner)
+{
+    this->owner = owner;
+}

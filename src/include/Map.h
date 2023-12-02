@@ -16,6 +16,8 @@
 void testLoadMaps();
 
 // forward declarations
+class Player;
+
 class Map;
 class Continent;
 class Territory;
@@ -88,6 +90,7 @@ private:
 
     uint16_t *x, *y;
     std::string *name;
+    Player *owner;
 
 public:
     Territory();
@@ -101,6 +104,9 @@ public:
     uint16_t getX() const;
     uint16_t getY() const;
     const std::shared_ptr<Continent> &getContinent() const;
+
+    Player *getOwner() const;
+    void setOwner(Player *owner);
 };
 
 class Map
