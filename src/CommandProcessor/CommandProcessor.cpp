@@ -69,7 +69,6 @@ bool CommandProcessor::readCommand(Command *_newCommand) {
   if (commandString.rfind("loadmap", 0) != std::string::npos) {
     // if the command requires an argument, reads the argument from the console
     std::cin >> commandArgString;
-
     commandString += " " + commandArgString;
     nextStateString = "maploaded";
     validStatesString = {"start", "maploaded"};
@@ -91,7 +90,12 @@ bool CommandProcessor::readCommand(Command *_newCommand) {
   } else if (commandString.rfind("quit", 0) != std::string::npos) {
     nextStateString = "exit";
     validStatesString = {"win"};
-  } else {
+  }
+  else if(commandString.rfind("tournament", 0) != std::string::npos){
+      //Reading the arguments is implemented in the initiateTournament() method in GameEngine
+      nextStateString = "exit";
+      validStatesString = {"start"}
+  }else {
     // if the command is unknown, sets the next state to unknown and the valid
     // states to an empty vector (for later validation)
     nextStateString = "unknown";

@@ -36,6 +36,8 @@ class GameEngine : private ILoggable, private Subject
   void startTournament(vector<std::string> mapList, vector<std::string> playerList, int numGames, int numTurns);
 
 public:
+  bool isTournament;
+  std::string tournament_log;
   string getCurrCommandsList();
   string executeCommand(string input);
   string getPhase();
@@ -59,3 +61,4 @@ public:
   void initiateTournament();
   string mainGameLoop(vector<Player *> players, const Map &gameMap, int numTurns = -1);
 };
+std::string formatForTable(std::string input);
