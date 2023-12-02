@@ -45,7 +45,7 @@ void GameEngine::initGame()
   /*
    *  Create 'Startup' section of the game
    */
-  //Assume it isn't a tournament, dealt with after if it is and it is validated
+  // Assume it isn't a tournament, dealt with after if it is and it is validated
   this->isTournament = false;
   this->tournament_log = "";
   // States
@@ -163,7 +163,8 @@ string GameEngine::executeCommand(string input)
 std::string GameEngine::stringToLog() const
 {
   if (this->isTournament)
-    return this->tournament_log
+    return this->tournament_log;
+
   // Returns the current state of the game engine.
   return "GameEngine stringToLog: Phase " + *currState->phase;
 }
@@ -174,69 +175,80 @@ void GameEngine::phase(std::string phase) noexcept
   Notify(this);
 }
 
-bool validateStringCount(const std::string& input, std::vector<std::string>& result, int minCount, int maxCount) {
-    std::istringstream iss(input);
-    std::string token;
-    if (input.empty()) {
-        std::cerr << "No input provided." << std::endl;
-        return false;
-    }
-    result.clear();
-    while (std::getline(iss, token, ',')) {
-        result.push_back(token);
-    }
-    if (result.size() < minCount || result.size() > maxCount) {
-        std::cerr << "Invalid number of strings separated by commas." << std::endl;
-        return false;
-    }
+bool validateStringCount(const std::string &input, std::vector<std::string> &result, int minCount, int maxCount)
+{
+  std::istringstream iss(input);
+  std::string token;
+  if (input.empty())
+  {
+    std::cerr << "No input provided." << std::endl;
+    return false;
+  }
+  result.clear();
+  while (std::getline(iss, token, ','))
+  {
+    result.push_back(token);
+  }
+  if (result.size() < minCount || result.size() > maxCount)
+  {
+    std::cerr << "Invalid number of strings separated by commas." << std::endl;
+    return false;
+  }
 
-    return true;
+  return true;
 }
 
-bool validateNumber(int& result, int min, int max) {
-    std::cin >> result;
+bool validateNumber(int &result, int min, int max)
+{
+  std::cin >> result;
 
-    if (std::cin.fail() || result < min || result > max) {
-        std::cin.clear(); // Clear the fail state
-        std::cin.ignore(1000, '\n');
-        std::cerr << "Invalid input." << std::endl;
-        return false;
-    }
+  if (std::cin.fail() || result < min || result > max)
+  {
+    std::cin.clear(); // Clear the fail state
+    std::cin.ignore(1000, '\n');
+    std::cerr << "Invalid input." << std::endl;
+    return false;
+  }
 
-    std::cin.ignore(1000, '\n'); // Clear the input buffer
-    return true;
+  std::cin.ignore(1000, '\n'); // Clear the input buffer
+  return true;
 }
 
-void GameEngine::initiateTournament(){
-    // Ask the list of maps, list of players, number of games per map, number of turns per game
-    std::string maplist, playerlist;
-    int numgames, numturns;
-    std::vector<std::string> mapListVector;
-    std::vector<std::string> playerListVector;
-    this->initiateTournament = True;
+void GameEngine::initiateTournament()
+{
+  // Ask the list of maps, list of players, number of games per map, number of turns per game
+  std::string maplist, playerlist;
+  int numgames, numturns;
+  std::vector<std::string> mapListVector;
+  std::vector<std::string> playerListVector;
+  this->isTournament = true;
 
-    do {
-        std::cout << "Enter the list of maps (M, 1-5):" << std::endl;
-        std::cin >> maplist;
-        std::cin.ignore(1000, '\n');
-    } while (!validateStringCount(maplist, mapListVector, 1, 5));
+  do
+  {
+    std::cout << "Enter the list of maps (M, 1-5):" << std::endl;
+    std::cin >> maplist;
+    std::cin.ignore(1000, '\n');
+  } while (!validateStringCount(maplist, mapListVector, 1, 5));
 
-    do {
-        std::cout << "Enter the list of players (P, 2-4):" << std::endl;
-        std::cin >> playerlist;
-        std::cin.ignore(1000, '\n');
-    } while (!validateStringCount(playerlist, playerListVector, 2, 4));
+  do
+  {
+    std::cout << "Enter the list of players (P, 2-4):" << std::endl;
+    std::cin >> playerlist;
+    std::cin.ignore(1000, '\n');
+  } while (!validateStringCount(playerlist, playerListVector, 2, 4));
 
-    do {
-        std::cout << "Enter the number of games per map (G, 1-5):" << std::endl;
-    } while (!validateNumber(numgames, 1, 5));
+  do
+  {
+    std::cout << "Enter the number of games per map (G, 1-5):" << std::endl;
+  } while (!validateNumber(numgames, 1, 5));
 
-    do {
-        std::cout << "Enter the number of turns per game (D, 10-50):" << std::endl;
-    } while (!validateNumber(numturns, 10, 50));
+  do
+  {
+    std::cout << "Enter the number of turns per game (D, 10-50):" << std::endl;
+  } while (!validateNumber(numturns, 10, 50));
 
-    // Call the tournament method
-     GameEngine::startTournament(mapListVector, playerListVector, numgames, numturns);
+  // Call the tournament method
+  GameEngine::startTournament(mapListVector, playerListVector, numgames, numturns);
 }
 
 // void GameEngine::startupPhase(CommandProcessor* cmdProcessor)
@@ -258,7 +270,8 @@ void GameEngine::startupPhase()
 
     string commandAction = commandType;
 
-    if (commandAction == "tournament") {
+    if (commandAction == "tournament")
+    {
       initiateTournament();
     }
     else if (commandAction == "loadmap" && !mapLoaded)
@@ -536,18 +549,32 @@ void GameEngine::executeOrdersPhase(vector<Player *> players)
     // for each player, execute orders
     for (auto &&player : players)
     {
+      // executes all the deploy orders first
+      for (size_t i = 0; i < player->getPlayerOrderList()->list.size(); i++)
+      {
+        auto order = player->getPlayerOrderList()->list[i];
+
+        if (order->name == "Deploy")
+        {
+          cout << "Player " << player->getName() << " executing deploy orders" << endl;
+
+          order->execute();
+
+          player->getPlayerOrderList()->remove(i);
+        }
+      }
+
+      // decrement number of players with deploy orders left
+      if (players_with_deploys_left > 0)
+        players_with_deploys_left--;
+
       // execute deploy orders first, then when all players have no deploy orders left, execute the rest
-      if (!player->getPlayerOrderList()->list.empty() &&
-          (player->getPlayerOrderList()->list[0]->name == "Deploy" || players_with_deploys_left <= 0))
+      if (!player->getPlayerOrderList()->list.empty() && players_with_deploys_left <= 0)
       {
         cout << "Player " << player->getName() << " executing orders" << endl;
 
         player->getPlayerOrderList()->list[0]->execute();
         player->getPlayerOrderList()->remove(0);
-      }
-      else if (players_with_deploys_left > 0)
-      {
-        players_with_deploys_left--;
       }
     }
   }
@@ -606,8 +633,9 @@ std::string GameEngine::mainGameLoop(vector<Player *> players, const Map &gameMa
       executeCommand("win");
       return players[0]->getName();
     }
-    if(numTurns != -1 && currTurns >= numTurns){
-      //cout << "Reached max number of turns" << endl;
+    if (numTurns != -1 && currTurns >= numTurns)
+    {
+      // cout << "Reached max number of turns" << endl;
       executeCommand("win");
       return "Draw";
     }
@@ -620,85 +648,89 @@ std::string GameEngine::mainGameLoop(vector<Player *> players, const Map &gameMa
 
 void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<std::string> playerList, int numGames, int numTurns)
 {
-    std::vector<shared_ptr<Map>> mapsInTournament;
-    std::vector<Player *> playersInTournament;
+  std::vector<shared_ptr<Map>> mapsInTournament;
+  std::vector<Player *> playersInTournament;
 
-    std::cout << "Starting to validate maps and players.." << std::endl;
-  try {
-    // Check if the maps can be loaded and valid
-    for (auto mapstr : mapList)
+  std::cout << "Starting to validate maps and players.." << std::endl;
+
+  // Check if the maps can be loaded and valid
+  for (auto mapstr : mapList)
+  {
+    // Load the map
+    string map_path = "maps/" + mapstr + ".map";
+    std::cout << "Loading map: " << map_path << std::endl;
+    shared_ptr<Map> loadedMap = MapLoader::loadMap(map_path);
+    Map::validate(loadedMap.get());
+
+    // check validation
+    if (loadedMap->getValidity() == MapValidity::VALID)
     {
-        // Load the map
-        string map_path = "maps/" + mapstr + ".map";
-        std::cout << "Loading map: " << map_path << std::endl;
-        shared_ptr<Map> loadedMap = MapLoader::loadMap(map_path);
-        Map::validate(loadedMap.get());
+      std::cout << "valid map: " << map_path << std::endl;
+      mapsInTournament.push_back(loadedMap);
+    }
+    else
+    {
+      std::cout << "invalid map: " << map_path << std::endl;
+      return;
+    }
+  }
 
-        // check validation
-        if (loadedMap->getValidity() == MapValidity::VALID){
-            std::cout << "valid map: " << map_path << std::endl;
-            mapsInTournament.push_back(loadedMap);
-        }
-        else {
-            throw std::invalid_argument("Invalid map: " + mapstr);
-        }
+  std::cout << "Maps loaded and validated" << std::endl;
+  int index = 0;
+  // Validate and turn the players into objects
+  for (auto playerstr : playerList)
+  {
+    // lowercase the string
+    std::transform(playerstr.begin(), playerstr.end(), playerstr.begin(), ::tolower);
+
+    auto *player = new Player(index, playerstr);
+
+    // Assign the player strategy
+    if (playerstr == "aggressive")
+    {
+      player->setStrategy(new AggressivePlayer());
+    }
+    else if (playerstr == "benevolent")
+    {
+      player->setStrategy(new BenevolentPlayer());
+    }
+    else if (playerstr == "neutral")
+    {
+      player->setStrategy(new NeutralPlayer());
+    }
+    else if (playerstr == "cheater")
+    {
+      player->setStrategy(new CheaterPlayer());
+    }
+    else
+    {
+      throw std::invalid_argument("Invalid player type: " + playerstr);
     }
 
-    std::cout << "Maps loaded and validated" << std::endl;
-    int index = 0;
-    // Validate and turn the players into objects
-    for (auto playerstr : playerList)
-    {
-        // lowercase the string
-        std::transform(playerstr.begin(), playerstr.end(), playerstr.begin(), ::tolower);
-
-        auto * player = new Player(index, playerstr);
-
-        // Assign the player strategy
-        if (playerstr == "aggressive")
-        {
-            player->setStrategy(new AggressivePlayer());
-        }
-        else if (playerstr == "benevolent")
-        {
-            player->setStrategy(new BenevolentPlayer());
-        }
-        else if (playerstr == "neutral")
-        {
-            player->setStrategy(new NeutralPlayer());
-        }
-        else if (playerstr == "cheater")
-        {
-            player->setStrategy(new CheaterPlayer());
-        }
-        else {
-            throw std::invalid_argument( "Invalid player type: " + playerstr );
-        }
-
-        index++;
-        playersInTournament.push_back(player);
-    }
-    std::cout << "Players loaded and validated" << std::endl;
+    index++;
+    playersInTournament.push_back(player);
   }
-  catch (const std::exception &e) {
-    std::cerr << e.what() << std::endl;
-    exit(0);
-  }
+  std::cout << "Players loaded and validated" << std::endl;
+
   this->isTournament = true;
-  //Build the first part of log string
+
+  // Build the first part of log string
   std::string mapsLine = "";
   for (auto map : mapsInTournament)
-  { 
-      mapsLine += map->getImage() + " by " + map->getAuthor() + " ";
+  {
+    mapsLine += map->getImage() + " by " + map->getAuthor() + " ";
   }
+
   std::string playersLine = "";
   for (auto player : playersInTournament)
   {
-      playersLine += "Player" + player->getName() + " ";
+    playersLine += "Player" + player->getName() + " ";
   }
-  std::string log = "Tournament mode:\nM: " + mapsLine + "\nP: " + playersLine + "\nG: " + numGames + "\n D: " + numTurns + "\n\nResults:"+formatForTable("");
+
+  std::string log = "Tournament mode:\nM: " + mapsLine + "\nP: " + playersLine + "\nG: " + std::to_string(numGames) + "\n D: " + std::to_string(numTurns) + "\n\nResults:" + formatForTable("");
   for (int i = 0; i < numGames; i++)
-      log += formatForTable("Game " + std::to_string(i));
+    log += formatForTable("Game " + std::to_string(i));
+
   // Start the tournament
   for (auto map : mapsInTournament)
   {
@@ -706,66 +738,66 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
     log += formatForTable(map->getImage() + " by " + map->getAuthor());
     for (int i = 0; i < numGames; i++)
     {
-        executeCommand("loadmap");
-        executeCommand("validate");
-        executeCommand("addplayers");
+      executeCommand("loadmap");
+      executeCommand("validate");
+      executeCommand("addplayers");
 
-        // DEBUG: list players
-        /*std::cout << "Players in tournament: " << std::endl;
-        for (auto player : playersInTournament)
-        {
-            std::cout << player->getName() << std::endl;
-        }*/
+      // DEBUG: list players
+      /*std::cout << "Players in tournament: " << std::endl;
+      for (auto player : playersInTournament)
+      {
+          std::cout << player->getName() << std::endl;
+      }*/
 
-        executeCommand("assigncountries");
-        // assign countries to players
-        const auto territories = Map::getAllTerritories(*map);
-        auto size = static_cast<double>(territories.size());
-        cout << size << " total territories" << endl;
-        for (int x = 0; x < size; x++)
-        {
-            Territory *territory = &*territories[x];
-            int playerIndex = x % playersInTournament.size();
-            playersInTournament[playerIndex]->addTerritory(territory);
-        }
+      executeCommand("assigncountries");
+      // assign countries to players
+      const auto territories = Map::getAllTerritories(*map);
+      auto size = static_cast<double>(territories.size());
+      cout << size << " total territories" << endl;
+      for (int x = 0; x < size; x++)
+      {
+        Territory *territory = &*territories[x];
+        int playerIndex = x % playersInTournament.size();
+        playersInTournament[playerIndex]->addTerritory(territory);
+      }
 
-        // DEBUG: print all players and their territories
-        /*for (int j = 0; j < playersInTournament.size(); j++)
-        {
-            std::cout << "Printing player: " << j + 1 << " territories:\n";
-            for (Territory *t : playersInTournament[j]->getTerritories())
-            {
-                cout << *t << endl;
-            }
-        }*/
+      // DEBUG: print all players and their territories
+      /*for (int j = 0; j < playersInTournament.size(); j++)
+      {
+          std::cout << "Printing player: " << j + 1 << " territories:\n";
+          for (Territory *t : playersInTournament[j]->getTerritories())
+          {
+              cout << *t << endl;
+          }
+      }*/
 
-        std::cout << "Starting game " << i + 1 << std::endl;
-        // Start the game, returns name of player or draw if no winner
-        std::string result = mainGameLoop(playersInTournament, *map, numTurns);
-        log += formatForTable(result);
+      std::cout << "Starting game " << i + 1 << std::endl;
+      // Start the game, returns name of player or draw if no winner
+      std::string result = mainGameLoop(playersInTournament, *map, numTurns);
+      log += formatForTable(result);
 
-        // play again
-        executeCommand("play");
+      // play again
+      executeCommand("play");
     }
     log += "\n";
     // TODO: write txt file with results
-    //Done by the notify(this) fct
+    // Done by the notify(this) fct
   }
   this->tournament_log = log;
 }
 
 std::string formatForTable(std::string input)
 {
-    //just so table format can be changed easily
-    int maxLength = 20;
-    int spacing = 5;
-    //this formats all the string going in the tournament table to the same length
-    std::string space = "";
-    for (int i = 0; i < spacing; i++)
-        space += " ";
-    if (input.length > maxLength)
-        return input.substr(0, maxLength) + space;
-    for (int j = input.length(); j < maxLength; j++)
-        space += " ";
-    return (input + space);
+  // just so table format can be changed easily
+  int maxLength = 20;
+  int spacing = 5;
+  // this formats all the string going in the tournament table to the same length
+  std::string space = "";
+  for (int i = 0; i < spacing; i++)
+    space += " ";
+  if (input.length() > maxLength)
+    return input.substr(0, maxLength) + space;
+  for (int j = input.length(); j < maxLength; j++)
+    space += " ";
+  return (input + space);
 }

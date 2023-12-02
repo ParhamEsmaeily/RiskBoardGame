@@ -86,6 +86,7 @@ std::shared_ptr<Map> MapLoader::loadMap(const std::string &path)
     if (!mapFile.is_open())
     {
         std::cout << "Could not open file: " << path << std::endl;
+        *(map->validity) = MapValidity::NOTFOUND;
         return map;
     }
 
@@ -401,6 +402,9 @@ void Map::countTraversedTerritoriesInContinent(const Map &map, const std::string
 void Map::validate(Map *map)
 {
     std::unordered_set<std::string> visitedTerritories;
+
+    if (*(map->validity) == MapValidity::NOTFOUND)
+        return;
 
     *(map->validity) = MapValidity::UNKNOWN;
 

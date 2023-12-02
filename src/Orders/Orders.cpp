@@ -12,13 +12,27 @@
 using namespace std;
 
 /**Prameterized constructor*/
-OrdersList::OrdersList(vector<shared_ptr<Order>> list) { this->list = list; }
+OrdersList::OrdersList(vector<Order *> list)
+{
+    for (Order *o : list)
+    {
+        this->list.push_back(o);
+    }
+}
 
 /**Copy constructor*/
 OrdersList::OrdersList(const OrdersList &other) { this->list = other.list; }
 
+OrdersList::~OrdersList()
+{
+    for (Order *o : this->list)
+    {
+        delete o;
+    }
+}
+
 /**[] operator override*/
-std::shared_ptr<Order> &OrdersList::operator[](const int i)
+Order *OrdersList::operator[](const int i)
 {
     if (i >= this->size() || i < 0)
     {
@@ -56,7 +70,7 @@ bool OrdersList::move(int index, int destination)
                   << ")." << endl;
         return false;
     }
-    shared_ptr<Order> temp = this->list.at(index);
+    Order *temp = this->list.at(index);
     this->list.erase(this->list.begin() + index);
     this->list.insert(this->list.begin() + destination, temp);
     return true;
@@ -78,9 +92,10 @@ bool OrdersList::remove(int index)
  * shared_ptr, since I'm not changing the actual pointer, but it seems like I
  * cannot. Is this because vector::push_back() is not a const function?
  */
-void OrdersList::add(const Order &o)
+
+void OrdersList::add(Order *o)
 {
-    this->list.push_back(std::make_shared<Order>(o));
+    this->list.push_back(o);
     // Calls in the log file that the order has been added to the list.
     Notify(this);
 }
@@ -237,7 +252,7 @@ void Advance::execute()
         else
         {
             int attackers = this->units_deployed;
-            int defenders = this->target_player->getTerritoryUnits(this->source_terr);
+            int defenders = this->target_player->getTerritoryUnits(this->dest_terr);
             while (attackers > 0 && defenders > 0)
             {
                 int seed = rand() % 10;
@@ -496,7 +511,7 @@ std::string Blockade::stringToLog() const
     return "Blockade stringToLog: Order Executing:";
 }
 
-Deploy::Deploy(Player *player, const Map *map, const Territory *dest, int units) : Order(issuer, map, "Deploy", "A deploy order tells a certain number of army units taken from the reinforcement pool to deploy to a target territory owned by the player issuing this order.")
+Deploy::Deploy(Player *player, const Map *map, const Territory *dest, int units) : Order(player, map, "Deploy", "A deploy order tells a certain number of army units taken from the reinforcement pool to deploy to a target territory owned by the player issuing this order.")
 {
     this->dest_terr = dest;
     this->units_deployed = units;

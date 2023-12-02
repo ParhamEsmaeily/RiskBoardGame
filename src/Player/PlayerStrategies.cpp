@@ -65,8 +65,8 @@ namespace ps
       const int idx = random_idx(rng);
       const int no_soldiers = random_no_soldiers(rng);
 
-      player->getPlayerOrderList()->add(
-          Deploy(player, &gameMap, t_defend[idx], no_soldiers));
+      Deploy *order = new Deploy(player, &gameMap, t_defend[idx], no_soldiers);
+      player->getPlayerOrderList()->add(order);
 
       no_reinforcements = get_no_reinf();
     }
@@ -113,8 +113,8 @@ namespace ps
     auto card_count = player->getHand()->card_count();
     int no_reinforcements = card_count[CardType::reinforcement];
 
-    player->getPlayerOrderList()->add(
-        Deploy(player, &gameMap, strongest_t, no_reinforcements));
+    Deploy *order = new Deploy(player, &gameMap, strongest_t, no_reinforcements);
+    player->getPlayerOrderList()->add(order);
 
     return strongest_t;
   }
@@ -135,7 +135,8 @@ namespace ps
           {
             return player->getTerritoryUnits(t1) < player->getTerritoryUnits(t2);
           });
-      player->getPlayerOrderList()->add(Deploy(player, &gameMap, territory, 1));
+      Deploy *order = new Deploy(player, &gameMap, territory, 1);
+      player->getPlayerOrderList()->add(order);
       no_reinforcement_cards--;
     }
   }
@@ -215,18 +216,18 @@ namespace ps
       int no_blockade = blockade(rng);
       for (int i = 0; i < no_airlift; i++)
       {
-        player->getPlayerOrderList()->add(
-            Airlift(player, &gameMap, nullptr, nullptr, nullptr, 0));
+        Airlift *airlift = new Airlift(player, &gameMap, nullptr, nullptr, nullptr, 0);
+        player->getPlayerOrderList()->add(airlift);
       }
       for (int i = 0; i < no_bomb; i++)
       {
-        player->getPlayerOrderList()->add(
-            Bomb(player, &gameMap, nullptr, nullptr, nullptr));
+        Bomb *bomb = new Bomb(player, &gameMap, nullptr, nullptr, nullptr);
+        player->getPlayerOrderList()->add(bomb);
       }
       for (int i = 0; i < no_blockade; i++)
       {
-        player->getPlayerOrderList()->add(
-            Blockade(player, &gameMap, nullptr, nullptr, nullptr));
+        Blockade *blockade = new Blockade(player, &gameMap, nullptr, nullptr, nullptr);
+        player->getPlayerOrderList()->add(blockade);
       }
     }
 
@@ -234,8 +235,8 @@ namespace ps
     int no_diplomacy = diplomacy(rng);
     for (int i = 0; i < no_diplomacy; i++)
     {
-      player->getPlayerOrderList()->add(
-          Negotiate(player, &gameMap, nullptr, nullptr));
+      Negotiate *negotiate = new Negotiate(player, &gameMap, nullptr, nullptr);
+      player->getPlayerOrderList()->add(negotiate);
     }
   }
 } // namespace ps
@@ -320,8 +321,8 @@ void HumanPlayer::issue_order(
       {
         if (t->getName() == terr_name)
         {
-          // TODO: add the deploy order to the order list
-          player->getPlayerOrderList()->add(Deploy(player, &gameMap, t, 1));
+          Deploy *order = new Deploy(player, &gameMap, t, std::stoi(str_reinforcements));
+          player->getPlayerOrderList()->add(order);
           orderAdded = true;
           break;
         }
@@ -423,32 +424,31 @@ void HumanPlayer::issue_order(
           }
         }
 
-        player->getPlayerOrderList()->add(Advance(player, &gameMap,
-                                                  target_player, source, dest,
-                                                  std::stoi(str_num_armies)));
+        Advance *order = new Advance(player, &gameMap, target_player, source, dest, std::stoi(str_num_armies));
+        player->getPlayerOrderList()->add(order);
       }
       else if (input == "bomb" && cards_count[CardType::bomb] > 0)
       {
-        player->getPlayerOrderList()->add(
-            Bomb(player, &gameMap, nullptr, nullptr, nullptr));
+        Bomb *order = new Bomb(player, &gameMap, nullptr, nullptr, nullptr);
+        player->getPlayerOrderList()->add(order);
         cards_count[CardType::bomb]--;
       }
       else if (input == "blockade" && cards_count[CardType::blockade] > 0)
       {
-        player->getPlayerOrderList()->add(
-            Blockade(player, &gameMap, nullptr, nullptr, nullptr));
+        Blockade *order = new Blockade(player, &gameMap, nullptr, nullptr, nullptr);
+        player->getPlayerOrderList()->add(order);
         cards_count[CardType::blockade]--;
       }
       else if (input == "airlift" && cards_count[CardType::airlift] > 0)
       {
-        player->getPlayerOrderList()->add(
-            Airlift(player, &gameMap, nullptr, nullptr, nullptr, 0));
+        Airlift *order = new Airlift(player, &gameMap, nullptr, nullptr, nullptr, 0);
+        player->getPlayerOrderList()->add(order);
         cards_count[CardType::airlift]--;
       }
       else if (input == "negotiate" && cards_count[CardType::diplomacy] > 0)
       {
-        player->getPlayerOrderList()->add(
-            Negotiate(player, &gameMap, nullptr, nullptr));
+        Negotiate *order = new Negotiate(player, &gameMap, nullptr, nullptr);
+        player->getPlayerOrderList()->add(order);
         cards_count[CardType::diplomacy]--;
       }
       else
@@ -511,8 +511,8 @@ void AggressivePlayer::issue_order(
   // attacks all adjacent territories of the strongest territory.
   for (auto *t : ps::enemy_adjacent_territories_from_territory(gameMap, player, strongestTerritory))
   {
-    player->getPlayerOrderList()->add(
-        Advance(player, &gameMap, t->getOwner(), strongestTerritory, t, player->getTerritoryUnits(strongestTerritory) / territoriesToAttack.size()));
+    Advance *order = new Advance(player, &gameMap, t->getOwner(), strongestTerritory, t, player->getTerritoryUnits(strongestTerritory) / territoriesToAttack.size());
+    player->getPlayerOrderList()->add(order);
   }
 
   // Randomly calls aggressive orders such as Airlift, Blockade, Bomb.

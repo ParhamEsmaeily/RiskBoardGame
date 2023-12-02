@@ -17,7 +17,8 @@ class Order;
 class Player;
 class OrdersList;
 
-class Order {
+class Order
+{
 public:
   std::string description;
   std::string name;
@@ -41,28 +42,31 @@ public:
   virtual void execute();
 };
 
-class OrdersList : protected ILoggable, protected Subject {
+class OrdersList : protected ILoggable, protected Subject
+{
 public:
-  vector<std::shared_ptr<Order>> list;
+  vector<Order *> list;
 
   OrdersList() = default;
-  OrdersList(vector<shared_ptr<Order>>);
+  OrdersList(vector<Order *>);
   OrdersList(const OrdersList &other);
+  ~OrdersList();
 
-  std::shared_ptr<Order> &operator[](const int i);
+  Order *operator[](const int i);
 
   friend ostream &operator<<(ostream &os, const OrdersList &olist);
 
   bool move(int index, int destination);
   bool remove(int index);
-  void add(const Order &o);
+  void add(Order *o);
   bool isEmpty() const { return (this->list.size() == 0); };
   int size() const { return this->list.size(); };
 
   std::string stringToLog() const override;
 };
 
-class Advance : public Order, private ILoggable, private Subject {
+class Advance : public Order, private ILoggable, private Subject
+{
 public:
   const Territory *source_terr;
   const Territory *dest_terr;
@@ -81,13 +85,14 @@ public:
 
   friend ostream &operator<<(ostream &os, const Advance &order);
 
-  bool validate();
-  void execute();
+  bool validate() override;
+  void execute() override;
 
   std::string stringToLog() const override;
 };
 
-class Airlift : public Order, private ILoggable, private Subject {
+class Airlift : public Order, private ILoggable, private Subject
+{
 public:
   const Territory *source_terr;
   const Territory *dest_terr;
@@ -106,13 +111,14 @@ public:
 
   friend ostream &operator<<(ostream &os, const Airlift &order);
 
-  bool validate();
-  void execute();
+  bool validate() override;
+  void execute() override;
 
   std::string stringToLog() const override;
 };
 
-class Bomb : public Order, private ILoggable, private Subject {
+class Bomb : public Order, private ILoggable, private Subject
+{
 public:
   const Territory *dest_terr;
   Card *card;
@@ -130,13 +136,14 @@ public:
 
   friend ostream &operator<<(ostream &os, const Bomb &order);
 
-  bool validate();
-  void execute();
+  bool validate() override;
+  void execute() override;
 
   std::string stringToLog() const override;
 };
 
-class Blockade : public Order, private ILoggable, private Subject {
+class Blockade : public Order, private ILoggable, private Subject
+{
 public:
   const Territory *dest_terr;
   Player *neutral_player;
@@ -154,13 +161,14 @@ public:
 
   friend ostream &operator<<(ostream &os, const Blockade &order);
 
-  bool validate();
-  void execute();
+  bool validate() override;
+  void execute() override;
 
   std::string stringToLog() const override;
 };
 
-class Deploy : public Order, private ILoggable, private Subject {
+class Deploy : public Order, private ILoggable, private Subject
+{
 public:
   const Territory *dest_terr;
   int units_deployed;
@@ -175,13 +183,14 @@ public:
 
   friend ostream &operator<<(ostream &os, const Deploy &order);
 
-  bool validate();
-  void execute();
+  bool validate() override;
+  void execute() override;
 
   std::string stringToLog() const override;
 };
 
-class Negotiate : public Order, private ILoggable, private Subject {
+class Negotiate : public Order, private ILoggable, private Subject
+{
 public:
   Player *target_player;
   Card *card;
@@ -196,8 +205,8 @@ public:
   bool operator!=(const Negotiate &other);
   friend ostream &operator<<(ostream &os, const Negotiate &order);
 
-  bool validate();
-  void execute();
+  bool validate() override;
+  void execute() override;
 
   std::string stringToLog() const override;
 };

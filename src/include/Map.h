@@ -38,7 +38,8 @@ enum class MapValidity
 {
     UNKNOWN,
     INVALID,
-    VALID
+    VALID,
+    NOTFOUND
 };
 
 std::ostream &operator<<(std::ostream &os, const MapValidity &validity);
