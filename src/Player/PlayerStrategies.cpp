@@ -39,6 +39,8 @@ namespace ps
       return new NeutralPlayer();
     case StratType::Cheater:
       return new CheaterPlayer();
+    default:
+        return nullptr;
     }
   }
 
