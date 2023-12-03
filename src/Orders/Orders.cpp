@@ -484,7 +484,7 @@ Blockade &Blockade::operator=(const Blockade &other)
 
 bool Blockade::validate()
 {
-    if (this->neutral_player->isNeutral() && this->issuer->card_count(CardType::blockade) && this->issuer->owns(this->dest_terr))
+    if (this->neutral_player->isNeutral() && this->issuer->card_count(CardType::blockade) > 0 && this->issuer->owns(this->dest_terr))
         return true;
     cout << this->name << " order invalid.";
     return false;
