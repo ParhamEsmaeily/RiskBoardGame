@@ -639,7 +639,26 @@ std::string GameEngine::mainGameLoop(vector<Player *> players, const Map &gameMa
     {
       // cout << "Reached max number of turns" << endl;
       executeCommand("win");
-      return "Draw (no turns left)";
+      std::string biggestPlayerNameLeft;
+      int biggestPlayerTerritoriesLeft = -1;
+
+      for (Player *p : players)
+      {
+        const int territoriesLeft = p->getTerritories().size();
+
+        if (territoriesLeft > biggestPlayerTerritoriesLeft)
+        {
+          biggestPlayerTerritoriesLeft = territoriesLeft;
+          biggestPlayerNameLeft = p->getName();
+        }
+      }
+
+      if (biggestPlayerTerritoriesLeft > 0)
+      {
+        return "Draw (" + biggestPlayerNameLeft + ")";
+      }
+
+      return "Draw (no turns)";
     }
 
     executeCommand("endexecorders");
@@ -814,8 +833,8 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
 std::string formatForTable(std::string input)
 {
   // just so table format can be changed easily
-  int maxLength = 16;
-  int spacing = 4;
+  int maxLength = 24;
+  int spacing = 2;
   // this formats all the string going in the tournament table to the same length
   std::string space;
   for (int i = 0; i < spacing; i++)
