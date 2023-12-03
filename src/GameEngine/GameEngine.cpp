@@ -805,11 +805,9 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
     }
     log += "\n";
     std::cout << log << std::endl;
-    // TODO: write txt file with results
-    // Done by the notify(this) fct
-//    Notify(this);
   }
   this->tournament_log = log;
+  Notify(this);
 }
 
 std::string formatForTable(std::string input)
