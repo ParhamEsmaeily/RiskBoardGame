@@ -130,9 +130,8 @@ void Player::removeTerritory(const Territory *t)
   {
     if (territories[i]->getName() == t->getName())
     {
-      territories.erase(territories.begin() + i);
-      territories[i]->setOwner(nullptr);
-      break;
+        territories.erase(territories.begin() + i);
+        break;
     }
   }
   units_map.erase(t->getName());
@@ -231,4 +230,15 @@ void Player::setStrategy(const PlayerStrategy *strat)
 {
   // Proper deep copy is made this way.
   m_strategy = strat->clone();
+}
+void Player::resetNewGame() {
+  while (!this->order_list->isEmpty()) {
+    this->order_list->remove(0);
+  }
+    this->hand->clear();
+    this->units_map.clear();
+    this->territories.clear();
+    this->allies.clear();
+    this->conquered_this_turn = false;
+    this->resetTurnValues();
 }

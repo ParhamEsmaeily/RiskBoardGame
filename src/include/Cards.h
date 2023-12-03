@@ -174,6 +174,7 @@ public:
     Returns false if the card is not in the player's hand.
   */
   bool play(const CardType, Deck &);
+  bool play(CardType);
 
   /*
     Deep copy of the Hand is made.

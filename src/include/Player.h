@@ -111,6 +111,7 @@ public:
   void setTerritoryUnits(const Territory *t, int units);
   void setConqueredThisTurn(bool b);
   void resetTurnValues();
+  void resetNewGame();
 };
 
 /**

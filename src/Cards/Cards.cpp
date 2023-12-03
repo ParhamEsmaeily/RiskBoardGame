@@ -217,4 +217,19 @@ Hand &Hand::operator=(const Hand &h) noexcept {
   }
   return *this;
 }
+
+// Same as above but without the deck.
+bool Hand::play(CardType type) {
+  // Searching through the whole hand to search for a card of the proper
+  for (int i = 0; i < m_buffer.size(); i++) {
+    if (m_buffer[i]->m_type == type) {
+      // Removes card and returns it.
+      auto ptr = this->remove(i);
+      return true;
+    }
+  }
+
+  // If card has not been found.
+  return false;
+}
 // Very similar to Buffer's.
