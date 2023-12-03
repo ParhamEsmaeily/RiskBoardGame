@@ -8,6 +8,7 @@
 #include "Cards.h"
 
 #include "Orders.h"
+#include "PlayerStrategies.h"
 
 using namespace std;
 
@@ -234,7 +235,7 @@ Advance &Advance::operator=(const Advance &other)
 bool Advance::validate()
 {
     if (this->issuer->owns(this->source_terr) &&
-        this->issuer->getTerritoryUnits(this->source_terr) >= this->units_deployed &&
+        (this->issuer->getTerritoryUnits(this->source_terr) >= this->units_deployed || this->issuer->getStrategyType() == StratType::Cheater) &&
         this->target_player->owns(this->dest_terr) &&
         Map::areAdjacent(*map, *source_terr, *dest_terr))
         return true;
@@ -265,7 +266,7 @@ void Advance::execute()
                     attackers--;
             }
             int source_units = this->issuer->getTerritoryUnits(this->source_terr) - this->units_deployed;
-            if (attackers > 0)
+            if (attackers > 0 || this->issuer->getStrategyType() == StratType::Cheater)
             {
                 this->target_player->removeTerritory(this->dest_terr);
                 this->issuer->addTerritory(const_cast<Territory *>(this->dest_terr));
