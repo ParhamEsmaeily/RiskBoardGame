@@ -694,7 +694,7 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
     // lowercase the string
     std::transform(playerstr.begin(), playerstr.end(), playerstr.begin(), ::tolower);
 
-    auto *player = new Player(index, playerstr);
+    auto *player = new Player(index, playerstr + std::to_string(index+1));
 
     // Assign the player strategy
     if (playerstr == "aggressive")
@@ -732,7 +732,7 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
 
   // Game log
   std::string log = "Tournament mode:\nM: " + mapsLine + "\nP: " + playersLine + "\nG: " +
-                    std::to_string(numGames) + "\nD: " + std::to_string(numTurns) + "\n\nResults:" + formatForTable("");
+                    std::to_string(numGames) + "\nD: " + std::to_string(numTurns) + "\n\n" + formatForTable("Results:");
   for (int i = 1; i <= numGames; i++) {
     log += formatForTable("Game " + std::to_string(i));
   }
@@ -813,7 +813,7 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
 std::string formatForTable(std::string input)
 {
   // just so table format can be changed easily
-  int maxLength = 10;
+  int maxLength = 12;
   int spacing = 5;
   // this formats all the string going in the tournament table to the same length
   std::string space;

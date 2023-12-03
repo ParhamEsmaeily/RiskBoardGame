@@ -131,6 +131,9 @@ void Player::removeTerritory(const Territory *t)
     if (territories[i]->getName() == t->getName())
     {
         territories.erase(territories.begin() + i);
+        if(this->getStrategyType() == StratType::Neutral) {
+            this->setStrategy(ps::make_player_strat(StratType::Aggressive));
+        }
         break;
     }
   }
