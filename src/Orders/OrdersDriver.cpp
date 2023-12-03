@@ -13,7 +13,7 @@ using namespace std;
 void testOrdersList()
 {
      // Test: load map
-     const shared_ptr<Map> gameMap = MapLoader::loadMap("../maps/world.map");
+     const shared_ptr<Map> gameMap = MapLoader::loadMap("maps/world.map");
      SharedTerritoriesVector territories = Map::getAllTerritories(*gameMap);
 
      // create two normal players and one neutral player with a set of territories and cards already
@@ -73,13 +73,15 @@ void testOrdersList()
 
      // Show negotiate prevents attacks between players
      Card *negocard = new Card(CardType::diplomacy);
-     Negotiate *nego = new Negotiate(p1, gameMap.get(), p2, negocard);
+     p1->getHand()->insert(*negocard);
+     Negotiate *nego = new Negotiate(p1, gameMap.get(), p2);
      Advance *advance5 = new Advance(p1, gameMap.get(), p2, &*territories[1], &*territories[4], 1);
      cout << "p1 just negotiated with p2. check if they can now attack them: " << advance5->validate() << endl;
 
      // Show that blockade transfers to neutral player
      Card *blocard = new Card(CardType::blockade);
-     Blockade *blockade = new Blockade(p1, gameMap.get(), neutral, blocard, &*territories[1]);
+     p1->getHand()->insert(*blocard);
+     Blockade *blockade = new Blockade(p1, gameMap.get(), neutral, &*territories[1]);
      cout << "Blockade from p1 on territory 1 should give the territory to the neutral player. Check: " << neutral->owns(&*territories[1]);
 
      // deletes
