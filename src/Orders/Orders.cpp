@@ -353,6 +353,7 @@ void Airlift::execute()
         this->issuer->setTerritoryUnits(this->source_terr, source_remainder);
         int dest_sum = this->issuer->getTerritoryUnits(this->dest_terr) + this->units_deployed;
         this->issuer->setTerritoryUnits(this->dest_terr, dest_sum);
+        this->issuer->getHand()->play(CardType::airlift);
         Notify(this);
     }
 }
@@ -426,6 +427,7 @@ void Bomb::execute()
     if (validate())
     {
         this->target_player->setTerritoryUnits(this->dest_terr, this->target_player->getTerritoryUnits(this->dest_terr) / 2);
+        this->issuer->getHand()->play(CardType::bomb);
         Notify(this);
     }
 }
@@ -502,6 +504,7 @@ void Blockade::execute()
         this->issuer->removeTerritory(this->dest_terr);
         this->neutral_player->addTerritory(const_cast<Territory *>(this->dest_terr));
         this->neutral_player->setTerritoryUnits(this->dest_terr, units);
+        this->issuer->getHand()->play(CardType::blockade);
         Notify(this);
     }
 }
@@ -574,6 +577,9 @@ void Deploy::execute()
     if (this->validate())
     {
         this->issuer->setTerritoryUnits(this->dest_terr, this->units_deployed);
+        for(int i = 0; i < this->units_deployed; i++) {
+            this->issuer->getHand()->play(CardType::reinforcement);
+        }
         Notify(this);
     }
 }
@@ -644,6 +650,7 @@ void Negotiate::execute()
     {
         this->issuer->addAlly(this->target_player);
         this->target_player->addAlly(this->issuer);
+        this->issuer->getHand()->play(CardType::diplomacy);
         Notify(this);
     }
 }

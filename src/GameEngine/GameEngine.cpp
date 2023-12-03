@@ -503,6 +503,7 @@ void GameEngine::reinforcementPhase(vector<Player *> players, const Map &gameMap
     {
       player->getHand()->insert(Card(CardType::reinforcement));
     }
+    player->getHand()->random_insert(1); // give a random card
   }
   cout << "Reinforcement Phase End" << endl;
 }
@@ -514,8 +515,8 @@ void GameEngine::issueOrdersPhase(vector<Player *> players, const Map &gameMap)
   // for each player, issue orders
   for (auto &&player : players)
   {
-    cout << "Player " << player->getName() << " issuing orders" << endl;
     player->issueOrder(gameMap, players);
+    cout << "Player " << player->getName() << " has issued " << player->getPlayerOrderList()->list.size() << " orders" << endl;
   }
 
   cout << "Issue Orders Phase End" << endl;
@@ -613,6 +614,7 @@ std::string GameEngine::mainGameLoop(vector<Player *> players, const Map &gameMa
     executeCommand("endissueorders");
 
     executeOrdersPhase(players);
+
     // check if a player has no territories
     for (auto &&player : players)
     {
@@ -650,6 +652,8 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
 {
   std::vector<shared_ptr<Map>> mapsInTournament;
   std::vector<Player *> playersInTournament;
+  std::string mapsLine = "";
+  std::string playersLine = "";
 
   std::cout << "Starting to validate maps and players.." << std::endl;
 
@@ -672,6 +676,13 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
     {
       std::cout << "invalid map: " << map_path << std::endl;
       return;
+    }
+
+    // Game log
+    mapsLine += loadedMap->getImage();
+    if (mapstr != mapList.back())
+    {
+      mapsLine += ", ";
     }
   }
 
@@ -707,35 +718,30 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
       throw std::invalid_argument("Invalid player type: " + playerstr);
     }
 
-    index++;
     playersInTournament.push_back(player);
+    index++;
+
+    // Game log
+    playersLine += player->getName();
+    if(index < playerList.size()) {
+      playersLine += ", ";
+    }
   }
   std::cout << "Players loaded and validated" << std::endl;
-
   this->isTournament = true;
 
-  // Build the first part of log string
-  std::string mapsLine = "";
-  for (auto map : mapsInTournament)
-  {
-    mapsLine += map->getImage() + " by " + map->getAuthor() + " ";
-  }
-
-  std::string playersLine = "";
-  for (auto player : playersInTournament)
-  {
-    playersLine += "Player" + player->getName() + " ";
-  }
-
-  std::string log = "Tournament mode:\nM: " + mapsLine + "\nP: " + playersLine + "\nG: " + std::to_string(numGames) + "\n D: " + std::to_string(numTurns) + "\n\nResults:" + formatForTable("");
-  for (int i = 0; i < numGames; i++)
+  // Game log
+  std::string log = "Tournament mode:\nM: " + mapsLine + "\nP: " + playersLine + "\nG: " +
+                    std::to_string(numGames) + "\nD: " + std::to_string(numTurns) + "\n\nResults:" + formatForTable("");
+  for (int i = 1; i <= numGames; i++) {
     log += formatForTable("Game " + std::to_string(i));
+  }
 
   // Start the tournament
   for (auto map : mapsInTournament)
   {
     this->map = map;
-    log += formatForTable(map->getImage() + " by " + map->getAuthor());
+    log += "\n" + formatForTable(map->getImage());
     for (int i = 0; i < numGames; i++)
     {
       executeCommand("loadmap");
@@ -771,6 +777,19 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
           }
       }*/
 
+      // DEBUG: print all players and territory count
+//        for (auto player : playersInTournament)
+//        {
+//            std::cout << "Player: " << player->getName() << " has " << player->getTerritories().size() << " territories" << std::endl;
+//        }
+
+      // DEBUG: print all territories and their owner
+//        for (const auto& t : territories)
+//        {
+//            std::cout << "Territory: " << t->getName() << " owned by: " << t->getOwner()->getName() << std::endl;
+//        }
+
+
       std::cout << "Starting game " << i + 1 << std::endl;
       // Start the game, returns name of player or draw if no winner
       std::string result = mainGameLoop(playersInTournament, *map, numTurns);
@@ -778,10 +797,17 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
 
       // play again
       executeCommand("play");
+
+      for (auto player : playersInTournament)
+      {
+            player->resetNewGame();
+      }
     }
     log += "\n";
+    std::cout << log << std::endl;
     // TODO: write txt file with results
     // Done by the notify(this) fct
+//    Notify(this);
   }
   this->tournament_log = log;
 }
@@ -789,10 +815,10 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
 std::string formatForTable(std::string input)
 {
   // just so table format can be changed easily
-  int maxLength = 20;
+  int maxLength = 10;
   int spacing = 5;
   // this formats all the string going in the tournament table to the same length
-  std::string space = "";
+  std::string space;
   for (int i = 0; i < spacing; i++)
     space += " ";
   if (input.length() > maxLength)

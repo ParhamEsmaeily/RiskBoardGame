@@ -94,7 +94,19 @@ namespace ps
     int no_units = -1;
     for (auto *t : territories)
     {
-      if (no_units < player->getTerritoryUnits(t))
+      // count if any enemy adjacent territories.
+        bool has_enemy_adjacent = false;
+        for (const std::shared_ptr<Territory>& n :
+             Map::getAdjacentTerritories(map, t->getName()))
+        {
+          if (!player->owns(n.get()))
+          {
+            has_enemy_adjacent = true;
+            break;
+          }
+        }
+
+      if (no_units < player->getTerritoryUnits(t) && has_enemy_adjacent)
       {
         no_units = player->getTerritoryUnits(t);
         strongest_t = t;
@@ -522,7 +534,7 @@ void AggressivePlayer::issue_order(
 std::vector<Territory *>
 AggressivePlayer::to_attack(const Map &gameMap, Player *player) const noexcept
 {
-  Territory *strongestTerritory = ps::find_strongest_territory(gameMap, player);
+  auto *strongestTerritory = ps::find_strongest_territory_from_territories(gameMap, player, player->getTerritories());
 
   return ps::enemy_adjacent_territories_from_territory(gameMap, player, strongestTerritory);
 }
