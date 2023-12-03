@@ -32,6 +32,8 @@ namespace ps
   */
   PlayerStrategy *make_player_strat(const StratType &);
 
+  /* Parses the territory name to the object within the passed vector. */
+  Territory *parse_territory_name(std::vector<Territory *> territories, std::string terr_name);
   /* Randomly deploys soldiers to territories.*/
   void random_deployment(const Map &, Player *, std::vector<Territory *>);
   /* Returns the strongest territory of a certain player. If all are equal, returns the first territory. */

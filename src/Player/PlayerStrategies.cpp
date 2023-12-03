@@ -42,6 +42,20 @@ namespace ps
     }
   }
 
+  Territory *parse_territory_name(std::vector<Territory *> territories, std::string terr_name)
+  {
+    // Parse strings to territory objects
+    for (Territory *t : territories)
+    {
+      if (t->getName() == terr_name)
+      {
+        return t;
+      }
+    }
+
+    return nullptr;
+  }
+
   void random_deployment(const Map &gameMap, Player *player,
                          std::vector<Territory *> t_defend)
   {
@@ -272,9 +286,21 @@ void HumanPlayer::issue_order(
     std::vector<Territory *> territoriesToDefend,
     std::vector<Territory *> territoriesToAttack) const noexcept
 {
-  // print all territories to defend
+  // print all necessary info
+  cout << "Current active players:" << endl;
+  for (Player *p : players)
+  {
+    cout << *p << endl;
+  }
+
   cout << player->getName() << "'s territories to defend:" << endl;
   for (Territory *t : territoriesToDefend)
+  {
+    cout << *t << endl;
+  }
+
+  cout << player->getName() << "'s territories to attack:" << endl;
+  for (Territory *t : territoriesToAttack)
   {
     cout << *t << endl;
   }
@@ -377,13 +403,6 @@ void HumanPlayer::issue_order(
       }
       else if (input == "advance")
       {
-        // print all territories to attack (for visibility)
-        cout << player->getName() << "'s territories to attack:" << endl;
-        for (Territory *t : territoriesToAttack)
-        {
-          cout << *t << endl;
-        }
-
         string terr_1;
         string terr_2;
         string str_num_armies;
@@ -409,20 +428,8 @@ void HumanPlayer::issue_order(
         }
 
         // Parse strings to territory objects
-        Territory *source = nullptr;
-        Territory *dest = nullptr;
-
-        for (Territory *t : territoriesToAttack)
-        {
-          if (t->getName() == terr_1)
-          {
-            source = t;
-          }
-          else if (t->getName() == terr_2)
-          {
-            dest = t;
-          }
-        }
+        Territory *source = ps::parse_territory_name(territoriesToDefend, terr_1);
+        Territory *dest = ps::parse_territory_name(territoriesToAttack, terr_2);
 
         // find the target player
         Player *target_player = nullptr;
@@ -441,25 +448,98 @@ void HumanPlayer::issue_order(
       }
       else if (input == "bomb" && cards_count[CardType::bomb] > 0)
       {
-        Bomb *order = new Bomb(player, &gameMap, nullptr, nullptr);
+        string terr_to_bomb;
+
+        cout << "Choose a territory to bomb: ";
+        getline(cin, terr_to_bomb);
+        cout << endl;
+
+        Territory *target = ps::parse_territory_name(territoriesToAttack, terr_to_bomb);
+        if (target == nullptr)
+        {
+          cout << "Invalid target territory." << endl;
+          continue;
+        }
+
+        Bomb *order = new Bomb(player, &gameMap, target->getOwner(), target);
         player->getPlayerOrderList()->add(order);
         cards_count[CardType::bomb]--;
       }
       else if (input == "blockade" && cards_count[CardType::blockade] > 0)
       {
-        Blockade *order = new Blockade(player, &gameMap, nullptr, nullptr);
+        string terr_to_blockade;
+
+        cout << "Choose a territory to blockade: ";
+        getline(cin, terr_to_blockade);
+        cout << endl;
+
+        Territory *target = ps::parse_territory_name(territoriesToAttack, terr_to_blockade);
+        if (target == nullptr)
+        {
+          cout << "Invalid target territory." << endl;
+          continue;
+        }
+
+        Blockade *order = new Blockade(player, &gameMap, nullptr, target);
         player->getPlayerOrderList()->add(order);
         cards_count[CardType::blockade]--;
       }
       else if (input == "airlift" && cards_count[CardType::airlift] > 0)
       {
-        Airlift *order = new Airlift(player, &gameMap, nullptr, nullptr, 0);
+        string terr_to_airlift_from;
+        string terr_to_drop_airlift;
+
+        cout << "Choose a territory to airlift from: ";
+        getline(cin, terr_to_airlift_from);
+        cout << endl;
+
+        cout << "Choose a territory to drop airlift: ";
+        getline(cin, terr_to_drop_airlift);
+        cout << endl;
+
+        Territory *source = ps::parse_territory_name(territoriesToDefend, terr_to_airlift_from);
+        if (source == nullptr)
+        {
+          cout << "Invalid source territory." << endl;
+          continue;
+        }
+
+        Territory *target = ps::parse_territory_name(territoriesToAttack, terr_to_drop_airlift);
+        if (target == nullptr)
+        {
+          cout << "Invalid target territory." << endl;
+          continue;
+        }
+
+        Airlift *order = new Airlift(player, &gameMap, source, target, 0);
         player->getPlayerOrderList()->add(order);
         cards_count[CardType::airlift]--;
       }
       else if (input == "negotiate" && cards_count[CardType::diplomacy] > 0)
       {
-        Negotiate *order = new Negotiate(player, &gameMap, nullptr);
+        string player_to_negotiate_with;
+        Player *target_player = nullptr;
+
+        cout << "Choose a player to negotiate with: ";
+        getline(cin, player_to_negotiate_with);
+        cout << endl;
+
+        for (Player *p : players)
+        {
+          if (p->getName() == player_to_negotiate_with)
+          {
+            target_player = p;
+            break;
+          }
+        }
+
+        if (target_player == nullptr)
+        {
+          cout << "Invalid player." << endl;
+          continue;
+        }
+
+        Negotiate *order = new Negotiate(player, &gameMap, target_player);
         player->getPlayerOrderList()->add(order);
         cards_count[CardType::diplomacy]--;
       }
