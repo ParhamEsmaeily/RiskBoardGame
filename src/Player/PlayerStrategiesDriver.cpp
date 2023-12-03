@@ -8,7 +8,7 @@ void testPlayerStrategies()
     const auto map = MapLoader::loadMap("maps/world.map");
 
     const auto continents = Map::getAllContinents(*map);
-    std::vector<Territory *> territoriesInFirstContinent, territoriesInSecondContinent, territoriesInThirdContinent;
+    std::vector<Territory *> territoriesInFirstContinent, territoriesInSecondContinent, territoriesInThirdContinent, territoriesInFourthContinent;
 
     // assigns territories to players (3 players, 3 continents)
     if (continents.size() >= 3)
@@ -30,23 +30,34 @@ void testPlayerStrategies()
         {
             territoriesInThirdContinent.push_back(territory.get());
         }
+
+        tempTerritories = Map::getAllTerritoriesInContinent(*map, *continents[3]);
+        for (const auto &territory : tempTerritories)
+        {
+            territoriesInFourthContinent.push_back(territory.get());
+        }
     }
 
     Player *p1 = new Player(1, "Parham");
     Player *p2 = new Player(2, "Augusto");
     Player *p3 = new Player(3, "Maxime");
+    Player *p4 = new Player(4, "Nikola");
 
     PlayerStrategy *human = new HumanPlayer();
-    PlayerStrategy *aggressive = new AggressivePlayer(); // swap with AggressivePlayer() when implemented
-    PlayerStrategy *benevolent = new BenevolentPlayer(); // swap with BenevolentPlayer() when implemented
+    PlayerStrategy *aggressive = new AggressivePlayer();
+    PlayerStrategy *benevolent = new BenevolentPlayer();
+    PlayerStrategy *neutral = new NeutralPlayer();
+    PlayerStrategy *cheater = new CheaterPlayer();
 
     p1->setStrategy(human);
     p2->setStrategy(aggressive);
     p3->setStrategy(benevolent);
+    p4->setStrategy(neutral);
 
     p1->setTerritories(territoriesInFirstContinent);
     p2->setTerritories(territoriesInSecondContinent);
     p3->setTerritories(territoriesInThirdContinent);
+    p4->setTerritories(territoriesInFourthContinent);
 
     // initial setup
 
@@ -62,7 +73,11 @@ void testPlayerStrategies()
     p3->getHand()->insert(Card(CardType::reinforcement));
     p3->getHand()->random_insert(3);
 
-    const auto players = std::vector<Player *>{p1, p2, p3};
+    p4->getHand()->insert(Card(CardType::reinforcement));
+    p4->getHand()->insert(Card(CardType::reinforcement));
+    p4->getHand()->random_insert(3);
+
+    const auto players = std::vector<Player *>{p1, p2, p3, p4};
     const auto strategies = std::vector<PlayerStrategy *>{human, aggressive, benevolent};
 
     std::cout << "Testing Player Strategies" << std::endl;
@@ -119,6 +134,7 @@ void testPlayerStrategies()
     p1->setStrategy(benevolent);
     p2->setStrategy(human);
     p3->setStrategy(aggressive);
+    p4->setStrategy(cheater);
 
     std::cout << "Players:" << std::endl;
     for (const auto &player : players)
@@ -140,7 +156,10 @@ void testPlayerStrategies()
     delete p1;
     delete p2;
     delete p3;
+    delete p4;
     delete human;
     delete aggressive;
     delete benevolent;
+    delete neutral;
+    delete cheater;
 }

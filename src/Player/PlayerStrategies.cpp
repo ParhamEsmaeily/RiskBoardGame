@@ -95,16 +95,16 @@ namespace ps
     for (auto *t : territories)
     {
       // count if any enemy adjacent territories.
-        bool has_enemy_adjacent = false;
-        for (const std::shared_ptr<Territory>& n :
-             Map::getAdjacentTerritories(map, t->getName()))
+      bool has_enemy_adjacent = false;
+      for (const std::shared_ptr<Territory> &n :
+           Map::getAdjacentTerritories(map, t->getName()))
+      {
+        if (!player->owns(n.get()))
         {
-          if (!player->owns(n.get()))
-          {
-            has_enemy_adjacent = true;
-            break;
-          }
+          has_enemy_adjacent = true;
+          break;
         }
+      }
 
       if (no_units < player->getTerritoryUnits(t) && has_enemy_adjacent)
       {
@@ -228,17 +228,17 @@ namespace ps
       int no_blockade = blockade(rng);
       for (int i = 0; i < no_airlift; i++)
       {
-        Airlift *airlift = new Airlift(player, &gameMap, nullptr, nullptr, nullptr, 0);
+        Airlift *airlift = new Airlift(player, &gameMap, nullptr, nullptr, 0);
         player->getPlayerOrderList()->add(airlift);
       }
       for (int i = 0; i < no_bomb; i++)
       {
-        Bomb *bomb = new Bomb(player, &gameMap, nullptr, nullptr, nullptr);
+        Bomb *bomb = new Bomb(player, &gameMap, nullptr, nullptr);
         player->getPlayerOrderList()->add(bomb);
       }
       for (int i = 0; i < no_blockade; i++)
       {
-        Blockade *blockade = new Blockade(player, &gameMap, nullptr, nullptr, nullptr);
+        Blockade *blockade = new Blockade(player, &gameMap, nullptr, nullptr);
         player->getPlayerOrderList()->add(blockade);
       }
     }
@@ -247,7 +247,7 @@ namespace ps
     int no_diplomacy = diplomacy(rng);
     for (int i = 0; i < no_diplomacy; i++)
     {
-      Negotiate *negotiate = new Negotiate(player, &gameMap, nullptr, nullptr);
+      Negotiate *negotiate = new Negotiate(player, &gameMap, nullptr);
       player->getPlayerOrderList()->add(negotiate);
     }
   }
@@ -441,25 +441,25 @@ void HumanPlayer::issue_order(
       }
       else if (input == "bomb" && cards_count[CardType::bomb] > 0)
       {
-        Bomb *order = new Bomb(player, &gameMap, nullptr, nullptr, nullptr);
+        Bomb *order = new Bomb(player, &gameMap, nullptr, nullptr);
         player->getPlayerOrderList()->add(order);
         cards_count[CardType::bomb]--;
       }
       else if (input == "blockade" && cards_count[CardType::blockade] > 0)
       {
-        Blockade *order = new Blockade(player, &gameMap, nullptr, nullptr, nullptr);
+        Blockade *order = new Blockade(player, &gameMap, nullptr, nullptr);
         player->getPlayerOrderList()->add(order);
         cards_count[CardType::blockade]--;
       }
       else if (input == "airlift" && cards_count[CardType::airlift] > 0)
       {
-        Airlift *order = new Airlift(player, &gameMap, nullptr, nullptr, nullptr, 0);
+        Airlift *order = new Airlift(player, &gameMap, nullptr, nullptr, 0);
         player->getPlayerOrderList()->add(order);
         cards_count[CardType::airlift]--;
       }
       else if (input == "negotiate" && cards_count[CardType::diplomacy] > 0)
       {
-        Negotiate *order = new Negotiate(player, &gameMap, nullptr, nullptr);
+        Negotiate *order = new Negotiate(player, &gameMap, nullptr);
         player->getPlayerOrderList()->add(order);
         cards_count[CardType::diplomacy]--;
       }

@@ -96,13 +96,11 @@ class Airlift : public Order, private ILoggable, private Subject
 public:
   const Territory *source_terr;
   const Territory *dest_terr;
-  Card *card;
   int units_deployed;
 
   Airlift() = delete;
   Airlift(const Airlift &other);
-  Airlift(Player *player, const Map *map, Card *card, const Territory *source,
-          const Territory *dest, int units);
+  Airlift(Player *player, const Map *map, const Territory *source, const Territory *dest, int units);
   ~Airlift();
 
   Airlift &operator=(const Airlift &other);
@@ -121,13 +119,11 @@ class Bomb : public Order, private ILoggable, private Subject
 {
 public:
   const Territory *dest_terr;
-  Card *card;
   Player *target_player;
 
   Bomb() = delete;
   Bomb(const Bomb &other);
-  Bomb(Player *player, const Map *map, Player *target, Card *card,
-       const Territory *dest);
+  Bomb(Player *player, const Map *map, Player *target, const Territory *dest);
   ~Bomb();
 
   Bomb &operator=(const Bomb &other);
@@ -147,12 +143,10 @@ class Blockade : public Order, private ILoggable, private Subject
 public:
   const Territory *dest_terr;
   Player *neutral_player;
-  Card *card;
 
   Blockade() = delete;
   Blockade(const Blockade &other);
-  Blockade(Player *player, const Map *map, Player *neutral, Card *card,
-           const Territory *dest);
+  Blockade(Player *player, const Map *map, Player *neutral, const Territory *dest);
   ~Blockade();
 
   Blockade &operator=(const Blockade &other);
@@ -193,11 +187,10 @@ class Negotiate : public Order, private ILoggable, private Subject
 {
 public:
   Player *target_player;
-  Card *card;
 
   Negotiate() = delete;
   Negotiate(const Negotiate &other);
-  Negotiate(Player *issuer, const Map *map, Player *target, Card *card);
+  Negotiate(Player *issuer, const Map *map, Player *target);
   ~Negotiate();
 
   Negotiate &operator=(const Negotiate &other);
