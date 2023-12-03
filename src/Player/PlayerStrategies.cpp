@@ -511,7 +511,7 @@ void HumanPlayer::issue_order(
           continue;
         }
 
-        Airlift *order = new Airlift(player, &gameMap, source, target, 0);
+        Airlift *order = new Airlift(player, &gameMap, source, target, player->getTerritoryUnits(source));
         player->getPlayerOrderList()->add(order);
         cards_count[CardType::airlift]--;
       }
