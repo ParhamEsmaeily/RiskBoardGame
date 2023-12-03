@@ -233,7 +233,11 @@ Advance &Advance::operator=(const Advance &other)
 
 bool Advance::validate()
 {
-    if (this->issuer->owns(this->source_terr) && this->issuer->getTerritoryUnits(this->source_terr) >= this->units_deployed && Map::areAdjacent(*map, *source_terr, *dest_terr)) //&& check adjacency
+    if (this->issuer->owns(this->source_terr) &&
+        this->issuer->getTerritoryUnits(this->source_terr) >= this->units_deployed &&
+        this->target_player->owns(this->dest_terr) &&
+        Map::areAdjacent(*map, *source_terr, *dest_terr)
+    )
         return true;
 
     cout << this->name << " order invalid.";
