@@ -639,7 +639,7 @@ std::string GameEngine::mainGameLoop(vector<Player *> players, const Map &gameMa
     {
       // cout << "Reached max number of turns" << endl;
       executeCommand("win");
-      return "Draw";
+      return "Draw (no turns left)";
     }
 
     executeCommand("endexecorders");
@@ -694,7 +694,7 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
     // lowercase the string
     std::transform(playerstr.begin(), playerstr.end(), playerstr.begin(), ::tolower);
 
-    auto *player = new Player(index, playerstr + std::to_string(index+1));
+    auto *player = new Player(index, playerstr + std::to_string(index + 1));
 
     // Assign the player strategy
     if (playerstr == "aggressive")
@@ -723,7 +723,8 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
 
     // Game log
     playersLine += player->getName();
-    if(index < playerList.size()) {
+    if (index < playerList.size())
+    {
       playersLine += ", ";
     }
   }
@@ -733,7 +734,8 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
   // Game log
   std::string log = "Tournament mode:\nM: " + mapsLine + "\nP: " + playersLine + "\nG: " +
                     std::to_string(numGames) + "\nD: " + std::to_string(numTurns) + "\n\n" + formatForTable("Results:");
-  for (int i = 1; i <= numGames; i++) {
+  for (int i = 1; i <= numGames; i++)
+  {
     log += formatForTable("Game " + std::to_string(i));
   }
 
@@ -778,17 +780,16 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
       }*/
 
       // DEBUG: print all players and territory count
-//        for (auto player : playersInTournament)
-//        {
-//            std::cout << "Player: " << player->getName() << " has " << player->getTerritories().size() << " territories" << std::endl;
-//        }
+      //        for (auto player : playersInTournament)
+      //        {
+      //            std::cout << "Player: " << player->getName() << " has " << player->getTerritories().size() << " territories" << std::endl;
+      //        }
 
       // DEBUG: print all territories and their owner
-//        for (const auto& t : territories)
-//        {
-//            std::cout << "Territory: " << t->getName() << " owned by: " << t->getOwner()->getName() << std::endl;
-//        }
-
+      //        for (const auto& t : territories)
+      //        {
+      //            std::cout << "Territory: " << t->getName() << " owned by: " << t->getOwner()->getName() << std::endl;
+      //        }
 
       std::cout << "Starting game " << i + 1 << std::endl;
       // Start the game, returns name of player or draw if no winner
@@ -800,7 +801,7 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
 
       for (auto player : playersInTournament)
       {
-            player->resetNewGame();
+        player->resetNewGame();
       }
     }
     log += "\n";
@@ -813,8 +814,8 @@ void GameEngine::startTournament(std::vector<std::string> mapList, std::vector<s
 std::string formatForTable(std::string input)
 {
   // just so table format can be changed easily
-  int maxLength = 12;
-  int spacing = 5;
+  int maxLength = 16;
+  int spacing = 4;
   // this formats all the string going in the tournament table to the same length
   std::string space;
   for (int i = 0; i < spacing; i++)
