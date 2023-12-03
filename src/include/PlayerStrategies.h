@@ -32,6 +32,8 @@ namespace ps
   */
   PlayerStrategy *make_player_strat(const StratType &);
 
+  /* Parses the territory name to the object within the passed vector. */
+  Territory *parse_territory_name(std::vector<Territory *> territories, std::string terr_name);
   /* Randomly deploys soldiers to territories.*/
   void random_deployment(const Map &, Player *, std::vector<Territory *>);
   /* Returns the strongest territory of a certain player. If all are equal, returns the first territory. */
@@ -44,7 +46,7 @@ namespace ps
   void weak_deployment(const Map &, Player *, std::vector<Territory *>);
   /* Randomly calls order other than Deploy and Advance. As such, only calls
   Airlift, Blockade, Diplomacy, Bomb.*/
-  void random_order(const Map &, Player *, const bool &make_harm);
+  void random_order(const Map &gameMap, Player *player, std::vector<Player *> players, std::vector<Territory *> toAttack, std::vector<Territory *> toDefend, const bool &make_harm);
   /* Returns all adjacent and non-owned territories. */
   const std::vector<Territory *> enemy_adjacent_territories(const Map &, Player *);
   /* Returns all adjacent and non-owned territories from a territory. */

@@ -1,0 +1,27 @@
+[Map]
+author=Augusto
+image=small.bmp
+wrap=no
+scroll=horizontal
+warn=yes
+
+[Continents]
+North America=5
+
+[Territories]
+Alaska,70,126,North America,Northwest Territory,Alberta
+Northwest Territory,148,127,North America,Alaska,Alberta,Ontario,Greenland
+Alberta,147,163,North America,Alaska,Northwest Territory,Ontario,Western United States
+Greenland,324,76,North America,Northwest Territory,Ontario,Quebec
+Ontario,199,167,North America,Northwest Territory,Alberta,Greenland,Quebec,Western United States,Eastern United States
+Quebec,253,166,North America,Greenland,Ontario,Eastern United States
+Western United States,159,204,North America,Alberta,Ontario,Eastern United States,Central America
+Eastern United States,219,216,North America,Ontario,Quebec,Western United States,Central America
+Central America,183,262,North America,Western United States,Eastern United States
+
+
+
+
+
+
+

@@ -236,8 +236,7 @@ bool Advance::validate()
     if (this->issuer->owns(this->source_terr) &&
         this->issuer->getTerritoryUnits(this->source_terr) >= this->units_deployed &&
         this->target_player->owns(this->dest_terr) &&
-        Map::areAdjacent(*map, *source_terr, *dest_terr)
-    )
+        Map::areAdjacent(*map, *source_terr, *dest_terr))
         return true;
 
     cout << this->name << " order invalid.";
@@ -285,9 +284,8 @@ void Advance::execute()
 
 std::string Advance::stringToLog() const { return name; }
 
-Airlift::Airlift(Player *player, const Map *map, Card *card, const Territory *source, const Territory *dest, int units) : Order(player, map, "Airlift", "An airlift order tells a certain number of army units taken from a source territory to be moved to a target territory, the source and the target territory being owned by the player issuing the order.The airlift order can only be created by playing the airlift card.")
+Airlift::Airlift(Player *player, const Map *map, const Territory *source, const Territory *dest, int units) : Order(player, map, "Airlift", "An airlift order tells a certain number of army units taken from a source territory to be moved to a target territory, the source and the target territory being owned by the player issuing the order.The airlift order can only be created by playing the airlift card.")
 {
-    this->card = card;
     this->source_terr = source;
     this->dest_terr = dest;
     this->units_deployed = units;
@@ -297,7 +295,6 @@ Airlift::Airlift(const Airlift &other) : Order(other)
 {
     this->source_terr = other.source_terr;
     this->dest_terr = other.dest_terr;
-    this->card = other.card;
     this->units_deployed = other.units_deployed;
 }
 
@@ -318,7 +315,7 @@ bool Airlift::operator==(const Airlift &other)
 {
     Airlift base = *this;
     Airlift baseo = other;
-    if (base == baseo && this->source_terr == other.source_terr && this->dest_terr == other.dest_terr && this->units_deployed == other.units_deployed && this->card == other.card)
+    if (base == baseo && this->source_terr == other.source_terr && this->dest_terr == other.dest_terr && this->units_deployed == other.units_deployed)
         return true;
     return false;
 }
@@ -336,14 +333,13 @@ Airlift &Airlift::operator=(const Airlift &other)
         this->source_terr = other.source_terr;
         this->dest_terr = other.dest_terr;
         this->units_deployed = other.units_deployed;
-        this->card = other.card;
     }
     return *this;
 }
 
 bool Airlift::validate()
 {
-    if (this->issuer->owns(this->source_terr) && this->issuer->owns(this->source_terr) && this->units_deployed <= this->issuer->getTerritoryUnits(this->source_terr) && this->card->type() == "airlift")
+    if (this->issuer->owns(this->source_terr) && this->issuer->owns(this->source_terr) && this->units_deployed <= this->issuer->getTerritoryUnits(this->source_terr) && this->issuer->card_count(CardType::airlift) > 0)
         return true;
     cout << this->name << " order invalid.";
     return false;
@@ -367,9 +363,8 @@ std::string Airlift::stringToLog() const
     return "Airlift stringToLog: Airlift Executing:";
 }
 
-Bomb::Bomb(Player *player, const Map *map, Player *target, Card *card, const Territory *dest) : Order(player, map, "Bomb", "A bomb order targets a territory owned by another player than the one issuing the order. Its result is to remove half of the army units from this territory.The bomb order can only be created by playing the bomb card.")
+Bomb::Bomb(Player *player, const Map *map, Player *target, const Territory *dest) : Order(player, map, "Bomb", "A bomb order targets a territory owned by another player than the one issuing the order. Its result is to remove half of the army units from this territory.The bomb order can only be created by playing the bomb card.")
 {
-    this->card = card;
     this->dest_terr = dest;
     this->target_player = target;
 }
@@ -377,13 +372,12 @@ Bomb::Bomb(Player *player, const Map *map, Player *target, Card *card, const Ter
 Bomb::Bomb(const Bomb &other) : Order(other)
 {
     this->dest_terr = other.dest_terr;
-    this->card = other.card;
     this->target_player = other.target_player;
 }
 
 Bomb::~Bomb()
 {
-    delete this->card;
+    // redundant destructor, all pointers are non-owned
 }
 
 ostream &operator<<(ostream &os, Bomb &order)
@@ -398,7 +392,7 @@ bool Bomb::operator==(const Bomb &other)
 {
     Bomb base = *this;
     Bomb baseo = other;
-    if (base == baseo && this->dest_terr == other.dest_terr && this->card == other.card && this->target_player == other.target_player)
+    if (base == baseo && this->dest_terr == other.dest_terr && this->target_player == other.target_player)
         return true;
     return false;
 }
@@ -414,13 +408,12 @@ Bomb &Bomb::operator=(const Bomb &other)
     {
         Order::operator=(other);
         this->dest_terr = other.dest_terr;
-        this->card = other.card;
     }
     return *this;
 }
 bool Bomb::validate()
 {
-    if (this->target_player->owns(this->dest_terr) && this->card->type() == "bomb" && !this->issuer->isAllied(this->target_player))
+    if (this->target_player->owns(this->dest_terr) && this->issuer->card_count(CardType::bomb) > 0 && !this->issuer->isAllied(this->target_player))
         return true;
     cout << this->name << " order invalid.";
     return false;
@@ -441,22 +434,20 @@ std::string Bomb::stringToLog() const
     return "Bomb stringToLog: Bomb Executing:";
 }
 
-Blockade::Blockade(Player *player, const Map *map, Player *neutral, Card *card, const Territory *dest) : Order(player, map, "Blockade", "A blockade order targets a territory that belongs to the player issuing the order. Its effect is to double the number of army units on the territory and to transfer the ownership of the territory to the Neutral player. The blockade order can only be created by playing the blockade card")
+Blockade::Blockade(Player *player, const Map *map, Player *neutral, const Territory *dest) : Order(player, map, "Blockade", "A blockade order targets a territory that belongs to the player issuing the order. Its effect is to double the number of army units on the territory and to transfer the ownership of the territory to the Neutral player. The blockade order can only be created by playing the blockade card")
 {
     this->neutral_player = neutral;
-    this->card = card;
     this->dest_terr = dest;
 }
 
 Blockade::Blockade(const Blockade &other) : Order(other)
 {
-    this->card = other.card;
     this->dest_terr = other.dest_terr;
 }
 
 Blockade::~Blockade()
 {
-    delete this->card;
+    // redundant destructor, all pointers are non-owned
 }
 
 ostream &operator<<(ostream &os, Blockade &order)
@@ -471,7 +462,7 @@ bool Blockade::operator==(const Blockade &other)
 {
     Blockade base = *this;
     Blockade baseo = other;
-    if (base == baseo && this->dest_terr == other.dest_terr && this->card == other.card)
+    if (base == baseo && this->dest_terr == other.dest_terr)
         return true;
     return false;
 }
@@ -487,14 +478,13 @@ Blockade &Blockade::operator=(const Blockade &other)
     {
         Order::operator=(other);
         this->dest_terr = other.dest_terr;
-        this->card = other.card;
     }
     return *this;
 }
 
 bool Blockade::validate()
 {
-    if (this->neutral_player->isNeutral() && this->card->type() == "blockade" && this->issuer->owns(this->dest_terr))
+    if (this->neutral_player->isNeutral() && this->issuer->card_count(CardType::blockade) > 0 && this->issuer->owns(this->dest_terr))
         return true;
     cout << this->name << " order invalid.";
     return false;
@@ -581,7 +571,8 @@ void Deploy::execute()
     if (this->validate())
     {
         this->issuer->setTerritoryUnits(this->dest_terr, this->units_deployed);
-        for(int i = 0; i < this->units_deployed; i++) {
+        for (int i = 0; i < this->units_deployed; i++)
+        {
             this->issuer->getHand()->play(CardType::reinforcement);
         }
         Notify(this);
@@ -590,21 +581,19 @@ void Deploy::execute()
 
 std::string Deploy::stringToLog() const { return name; }
 
-Negotiate::Negotiate(Player *player, const Map *map, Player *target, Card *card) : Order(player, map, "Negotiate", "A negotiate order targets an enemy player. It results in the target player and the player issuing the order to not be able to successfully attack each others territories for the remainder of the turn.The negotiate order can only be created by playing the diplomacy card.")
+Negotiate::Negotiate(Player *player, const Map *map, Player *target) : Order(player, map, "Negotiate", "A negotiate order targets an enemy player. It results in the target player and the player issuing the order to not be able to successfully attack each others territories for the remainder of the turn.The negotiate order can only be created by playing the diplomacy card.")
 {
     this->target_player = target;
-    this->card = card;
 }
 
 Negotiate::Negotiate(const Negotiate &other) : Order(other)
 {
     this->target_player = other.target_player;
-    this->card = other.card;
 }
 
 Negotiate::~Negotiate()
 {
-    delete this->card;
+    // redundant destructor, all pointers are non-owned
 }
 
 ostream &operator<<(ostream &os, Negotiate &order)
@@ -619,7 +608,7 @@ bool Negotiate::operator==(const Negotiate &other)
 {
     Negotiate base = *this;
     Negotiate baseo = other;
-    if (base == baseo && this->target_player == other.target_player && this->card == other.card)
+    if (base == baseo && this->target_player == other.target_player)
         return true;
     return false;
 }
@@ -634,7 +623,6 @@ Negotiate &Negotiate::operator=(const Negotiate &other)
     if (*this != other)
     {
         Order::operator=(other);
-        this->card = other.card;
         this->target_player = other.target_player;
     }
     return *this;
@@ -642,7 +630,7 @@ Negotiate &Negotiate::operator=(const Negotiate &other)
 
 bool Negotiate::validate()
 {
-    if (this->card->type() == "negotiate")
+    if (this->issuer->card_count(CardType::diplomacy) > 0)
         return true;
     cout << this->name << " order invalid.";
     return false;
