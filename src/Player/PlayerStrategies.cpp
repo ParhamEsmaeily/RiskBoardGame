@@ -214,7 +214,7 @@ namespace ps
     return territories_to_attack;
   }
 
-  void random_order(const Map &gameMap, Player *player, const bool &make_harm)
+  void random_order(const Map &gameMap, Player *player, std::vector<Player *> players, std::vector<Territory *> toAttack, std::vector<Territory *> toDefend, const bool &make_harm)
   {
     std::random_device rd;  // Generates a seed.
     std::mt19937 rng(rd()); // Random seed
@@ -242,17 +242,38 @@ namespace ps
       int no_blockade = blockade(rng);
       for (int i = 0; i < no_airlift; i++)
       {
-        Airlift *airlift = new Airlift(player, &gameMap, nullptr, nullptr, 0);
+        if (toAttack.size() == 0)
+          break;
+
+        std::uniform_int_distribution<int> random_idx(0, toDefend.size() - 1);
+        std::uniform_int_distribution<int> random_no_soldiers(1, player->getTerritoryUnits(toDefend[random_idx(rng)]));
+
+        const int idx = random_idx(rng);
+        const int no_soldiers = random_no_soldiers(rng);
+
+        const std::vector<Territory *> attackable_territories = enemy_adjacent_territories_from_territory(gameMap, player, toDefend[idx]);
+
+        Airlift *airlift = new Airlift(player, &gameMap, toDefend[idx], attackable_territories[0], no_soldiers);
         player->getPlayerOrderList()->add(airlift);
       }
       for (int i = 0; i < no_bomb; i++)
       {
-        Bomb *bomb = new Bomb(player, &gameMap, nullptr, nullptr);
+        if (toAttack.size() == 0)
+          break;
+
+        std::uniform_int_distribution<int> random_idx(0, toAttack.size() - 1);
+
+        Bomb *bomb = new Bomb(player, &gameMap, toAttack[random_idx(rng)]->getOwner(), toAttack[random_idx(rng)]);
         player->getPlayerOrderList()->add(bomb);
       }
       for (int i = 0; i < no_blockade; i++)
       {
-        Blockade *blockade = new Blockade(player, &gameMap, nullptr, nullptr);
+        if (toAttack.size() == 0)
+          break;
+
+        std::uniform_int_distribution<int> random_idx(0, toAttack.size() - 1);
+
+        Blockade *blockade = new Blockade(player, &gameMap, nullptr, toAttack[random_idx(rng)]);
         player->getPlayerOrderList()->add(blockade);
       }
     }
@@ -261,7 +282,21 @@ namespace ps
     int no_diplomacy = diplomacy(rng);
     for (int i = 0; i < no_diplomacy; i++)
     {
-      Negotiate *negotiate = new Negotiate(player, &gameMap, nullptr);
+      if (players.size() == 0)
+        break;
+
+      Player *nego_player = nullptr;
+
+      for (Player *p : players)
+      {
+        if (p != player)
+        {
+          nego_player = p;
+          break;
+        }
+      }
+
+      Negotiate *negotiate = new Negotiate(player, &gameMap, nego_player);
       player->getPlayerOrderList()->add(negotiate);
     }
   }
@@ -608,7 +643,7 @@ void AggressivePlayer::issue_order(
   }
 
   // Randomly calls aggressive orders such as Airlift, Blockade, Bomb.
-  ps::random_order(gameMap, player, true);
+  ps::random_order(gameMap, player, players, territoriesToAttack, territoriesToDefend, true);
 }
 
 std::vector<Territory *>
@@ -641,9 +676,9 @@ void BenevolentPlayer::issue_order(
     std::vector<Territory *> territoriesToAttack) const noexcept
 {
 
-  ps::weak_deployment(gameMap, player, territoriesToDefend);
-  ps::random_order(gameMap, player, false);
   // Does not attack.
+  ps::weak_deployment(gameMap, player, territoriesToDefend);
+  ps::random_order(gameMap, player, players, territoriesToAttack, territoriesToDefend, false);
 }
 
 std::vector<Territory *>
@@ -708,7 +743,7 @@ void CheaterPlayer::issue_order(
 
   ps::random_deployment(gameMap, player, territoriesToDefend);
   // ADVANCE IMPLEMENTATION LEFT>
-  ps::random_order(gameMap, player, true);
+  ps::random_order(gameMap, player, players, territoriesToAttack, territoriesToDefend, true);
 }
 
 std::vector<Territory *>

@@ -46,7 +46,7 @@ namespace ps
   void weak_deployment(const Map &, Player *, std::vector<Territory *>);
   /* Randomly calls order other than Deploy and Advance. As such, only calls
   Airlift, Blockade, Diplomacy, Bomb.*/
-  void random_order(const Map &, Player *, const bool &make_harm);
+  void random_order(const Map &gameMap, Player *player, std::vector<Player *> players, std::vector<Territory *> toAttack, std::vector<Territory *> toDefend, const bool &make_harm);
   /* Returns all adjacent and non-owned territories. */
   const std::vector<Territory *> enemy_adjacent_territories(const Map &, Player *);
   /* Returns all adjacent and non-owned territories from a territory. */
