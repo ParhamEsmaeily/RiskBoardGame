@@ -39,6 +39,8 @@ namespace ps
       return new NeutralPlayer();
     case StratType::Cheater:
       return new CheaterPlayer();
+    default:
+        return nullptr;
     }
   }
 
@@ -741,9 +743,25 @@ void CheaterPlayer::issue_order(
     std::vector<Territory *> territoriesToAttack) const noexcept
 {
 
-  ps::random_deployment(gameMap, player, territoriesToDefend);
-  // ADVANCE IMPLEMENTATION LEFT>
-  ps::random_order(gameMap, player, players, territoriesToAttack, territoriesToDefend, true);
+//  ps::random_deployment(gameMap, player, territoriesToDefend);
+
+  for (auto *t : territoriesToAttack){
+    // get any owned adjacent territory and set it as source territory
+    Territory* source = nullptr;
+    for (std::shared_ptr<Territory> n : Map::getAdjacentTerritories(gameMap, t->getName()))
+    {
+      if (player->owns(n.get()))
+      {
+        source = n.get();
+        break;
+      }
+    }
+
+    Advance *order = new Advance(player, &gameMap, t->getOwner(), source, t, 99);
+    player->getPlayerOrderList()->add(order);
+  }
+
+//  ps::random_order(gameMap, player, true);
 }
 
 std::vector<Territory *>

@@ -503,6 +503,7 @@ Territory::Territory()
     name = new std::string("");
     x = new uint16_t(0);
     y = new uint16_t(0);
+    owner = nullptr;
 
     continent = std::make_shared<Continent>();
 }
@@ -512,6 +513,7 @@ Territory::Territory(const Territory &territory) : continent(territory.continent
     name = territory.name;
     x = territory.x;
     y = territory.y;
+    owner = nullptr;
 }
 
 Territory::~Territory()
