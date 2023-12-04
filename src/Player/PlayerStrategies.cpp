@@ -40,7 +40,7 @@ namespace ps
     case StratType::Cheater:
       return new CheaterPlayer();
     default:
-        return nullptr;
+      return nullptr;
     }
   }
 
@@ -132,23 +132,21 @@ namespace ps
     return strongest_t;
   }
 
-  Territory *strong_deployment(const Map &gameMap, Player *player,
-                               std::vector<Territory *> t_defend)
+  Territory *strong_deployment(const Map &gameMap, Player *player, std::vector<Territory *> t_defend, int *deployed)
   {
     Territory *strongest_t = find_strongest_territory_from_territories(gameMap, player, t_defend);
 
     // No of reinforcement cards.
     auto card_count = player->getHand()->card_count();
-    int no_reinforcements = card_count[CardType::reinforcement];
+    *(deployed) = card_count[CardType::reinforcement];
 
-    Deploy *order = new Deploy(player, &gameMap, strongest_t, no_reinforcements);
+    Deploy *order = new Deploy(player, &gameMap, strongest_t, *deployed);
     player->getPlayerOrderList()->add(order);
 
     return strongest_t;
   }
 
-  void weak_deployment(const Map &gameMap, Player *player,
-                       std::vector<Territory *> t_defend)
+  void weak_deployment(const Map &gameMap, Player *player, std::vector<Territory *> t_defend)
   {
     int no_reinforcement_cards =
         player->getHand()->card_count().at(CardType::reinforcement);
@@ -244,16 +242,24 @@ namespace ps
       int no_blockade = blockade(rng);
       for (int i = 0; i < no_airlift; i++)
       {
-        if (toAttack.size() == 0)
+        if (toDefend.size() == 0)
           break;
 
         std::uniform_int_distribution<int> random_idx(0, toDefend.size() - 1);
-        std::uniform_int_distribution<int> random_no_soldiers(1, player->getTerritoryUnits(toDefend[random_idx(rng)]));
+        const int max_no_soldiers = player->getTerritoryUnits(toDefend[random_idx(rng)]);
+
+        if (max_no_soldiers == 0)
+          continue;
+
+        std::uniform_int_distribution<int> random_no_soldiers(1, max_no_soldiers);
 
         const int idx = random_idx(rng);
         const int no_soldiers = random_no_soldiers(rng);
 
         const std::vector<Territory *> attackable_territories = enemy_adjacent_territories_from_territory(gameMap, player, toDefend[idx]);
+
+        if (attackable_territories.size() == 0)
+          continue;
 
         Airlift *airlift = new Airlift(player, &gameMap, toDefend[idx], attackable_territories[0], no_soldiers);
         player->getPlayerOrderList()->add(airlift);
@@ -383,8 +389,7 @@ void HumanPlayer::issue_order(
       cout << endl;
 
       // if num_reinforcements is not a number, ask again
-      if (!std::all_of(str_reinforcements.begin(), str_reinforcements.end(),
-                       ::isdigit))
+      if (!std::all_of(str_reinforcements.begin(), str_reinforcements.end(), ::isdigit))
       {
         cout << "Invalid number of reinforcements." << endl;
         continue;
@@ -404,8 +409,7 @@ void HumanPlayer::issue_order(
       }
 
       int num_reinforcements = std::stoi(str_reinforcements);
-      if (orderAdded && num_reinforcements <= nb_reinforcement_cards &&
-          num_reinforcements > 0)
+      if (orderAdded && num_reinforcements <= nb_reinforcement_cards && num_reinforcements > 0)
       {
         nb_reinforcement_cards -= num_reinforcements;
       }
@@ -465,8 +469,12 @@ void HumanPlayer::issue_order(
         }
 
         // Parse strings to territory objects
+        std::vector<Territory *> allPossibleAdvanceTerritories;
+        allPossibleAdvanceTerritories.insert(allPossibleAdvanceTerritories.end(), territoriesToDefend.begin(), territoriesToDefend.end());
+        allPossibleAdvanceTerritories.insert(allPossibleAdvanceTerritories.end(), territoriesToAttack.begin(), territoriesToAttack.end());
+
         Territory *source = ps::parse_territory_name(territoriesToDefend, terr_1);
-        Territory *dest = ps::parse_territory_name(territoriesToAttack, terr_2);
+        Territory *dest = ps::parse_territory_name(allPossibleAdvanceTerritories, terr_2);
 
         // find the target player
         Player *target_player = nullptr;
@@ -480,7 +488,7 @@ void HumanPlayer::issue_order(
           }
         }
 
-        Advance *order = new Advance(player, &gameMap, target_player, source, dest, std::stoi(str_num_armies));
+        Advance *order = new Advance(player, &gameMap, source, dest, std::stoi(str_num_armies));
         player->getPlayerOrderList()->add(order);
       }
       else if (input == "bomb" && cards_count[CardType::bomb] > 0)
@@ -634,13 +642,16 @@ void AggressivePlayer::issue_order(
     std::vector<Territory *> territoriesToAttack) const noexcept
 {
 
+  int deployed = 0;
+
   // All troops deployed on the strongest friendly territory.
-  Territory *strongestTerritory = ps::strong_deployment(gameMap, player, territoriesToDefend);
+  Territory *strongestTerritory = ps::strong_deployment(gameMap, player, territoriesToDefend, &deployed);
 
   // attacks all adjacent territories of the strongest territory.
-  for (auto *t : ps::enemy_adjacent_territories_from_territory(gameMap, player, strongestTerritory))
+  std::vector<Territory *> territoriesToAttackFromStrongest = ps::enemy_adjacent_territories_from_territory(gameMap, player, strongestTerritory);
+  for (auto *t : territoriesToAttackFromStrongest)
   {
-    Advance *order = new Advance(player, &gameMap, t->getOwner(), strongestTerritory, t, player->getTerritoryUnits(strongestTerritory) / territoriesToAttack.size());
+    Advance *order = new Advance(player, &gameMap, strongestTerritory, t, (player->getTerritoryUnits(strongestTerritory) + deployed) / territoriesToAttackFromStrongest.size());
     player->getPlayerOrderList()->add(order);
   }
 
@@ -743,11 +754,12 @@ void CheaterPlayer::issue_order(
     std::vector<Territory *> territoriesToAttack) const noexcept
 {
 
-//  ps::random_deployment(gameMap, player, territoriesToDefend);
+  //  ps::random_deployment(gameMap, player, territoriesToDefend);
 
-  for (auto *t : territoriesToAttack){
+  for (auto *t : territoriesToAttack)
+  {
     // get any owned adjacent territory and set it as source territory
-    Territory* source = nullptr;
+    Territory *source = nullptr;
     for (std::shared_ptr<Territory> n : Map::getAdjacentTerritories(gameMap, t->getName()))
     {
       if (player->owns(n.get()))
@@ -757,11 +769,11 @@ void CheaterPlayer::issue_order(
       }
     }
 
-    Advance *order = new Advance(player, &gameMap, t->getOwner(), source, t, 99);
+    Advance *order = new Advance(player, &gameMap, source, t, 99);
     player->getPlayerOrderList()->add(order);
   }
 
-//  ps::random_order(gameMap, player, true);
+  //  ps::random_order(gameMap, player, true);
 }
 
 std::vector<Territory *>

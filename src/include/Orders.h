@@ -70,12 +70,11 @@ class Advance : public Order, private ILoggable, private Subject
 public:
   const Territory *source_terr;
   const Territory *dest_terr;
-  Player *target_player;
   int units_deployed;
 
   Advance() = delete;
   Advance(const Advance &other);
-  Advance(Player *player, const Map *map, Player *target_player,
+  Advance(Player *player, const Map *map,
           const Territory *source, const Territory *dest, int units);
   ~Advance();
 

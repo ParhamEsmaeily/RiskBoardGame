@@ -5,6 +5,7 @@
 
 void testPlayerStrategies()
 {
+    GameEngine *engine = new GameEngine();
     const auto map = MapLoader::loadMap("maps/world.map");
 
     const auto continents = Map::getAllContinents(*map);
@@ -50,14 +51,34 @@ void testPlayerStrategies()
     PlayerStrategy *cheater = new CheaterPlayer();
 
     p1->setStrategy(human);
-    p2->setStrategy(aggressive);
+    p2->setStrategy(neutral);
     p3->setStrategy(benevolent);
-    p4->setStrategy(neutral);
+    p4->setStrategy(aggressive);
 
     p1->setTerritories(territoriesInFirstContinent);
     p2->setTerritories(territoriesInSecondContinent);
     p3->setTerritories(territoriesInThirdContinent);
     p4->setTerritories(territoriesInFourthContinent);
+
+    for (Territory *t : territoriesInFirstContinent)
+    {
+        p1->setTerritoryUnits(t, 2);
+    }
+
+    for (Territory *t : territoriesInSecondContinent)
+    {
+        p2->setTerritoryUnits(t, 2);
+    }
+
+    for (Territory *t : territoriesInThirdContinent)
+    {
+        p3->setTerritoryUnits(t, 2);
+    }
+
+    for (Territory *t : territoriesInFourthContinent)
+    {
+        p4->setTerritoryUnits(t, 2);
+    }
 
     // initial setup
 
@@ -78,81 +99,40 @@ void testPlayerStrategies()
     p4->getHand()->random_insert(3);
 
     const auto players = std::vector<Player *>{p1, p2, p3, p4};
-    const auto strategies = std::vector<PlayerStrategy *>{human, aggressive, benevolent};
+    const auto strategies = std::vector<PlayerStrategy *>{human, aggressive, benevolent, neutral, cheater};
 
     std::cout << "Testing Player Strategies" << std::endl;
     std::cout << "-------------------------" << std::endl;
 
-    std::cout << "Strategies:" << std::endl;
-    for (const auto &strategy : strategies)
-    {
-        std::cout << *strategy << std::endl;
-    }
+    engine->executeCommand("loadmap");
+    engine->executeCommand("validate");
+    engine->executeCommand("addplayers");
+    engine->executeCommand("assigncountries");
 
-    std::cout << "Players:" << std::endl;
-    for (const auto &player : players)
-    {
-        std::cout << *player << std::endl;
-    }
+    engine->mainGameLoop(players, *map, 2);
 
-    std::cout << "Testing to_defend():" << std::endl;
-    for (const auto &player : players)
-    {
-        std::cout << *player << std::endl;
-        std::cout << "to_defend():" << std::endl;
-        for (const auto &territory : player->toDefend())
-        {
-            std::cout << *territory << std::endl;
-        }
-        std::cout << std::endl;
-    }
-
-    std::cout << "Testing to_attack():" << std::endl;
-    for (const auto &player : players)
-    {
-        std::cout << *player << std::endl;
-        std::cout << "to_attack():" << std::endl;
-        for (const auto &territory : player->toAttack(*map))
-        {
-            std::cout << *territory << std::endl;
-        }
-        std::cout << std::endl;
-    }
-
-    std::cout << "Testing issue_order():" << std::endl;
-    for (const auto &player : players)
-    {
-        std::cout << *player << std::endl;
-        std::cout << "issue_order():" << std::endl;
-        player->issueOrder(*map, players);
-        std::cout << std::endl;
-    }
+    delete engine;
 
     std::cout << "Changing Player Strategies" << std::endl;
     std::cout << "--------------------------" << std::endl;
 
     p1->setStrategy(benevolent);
-    p2->setStrategy(human);
-    p3->setStrategy(aggressive);
+    p2->setStrategy(aggressive);
+    p3->setStrategy(neutral);
     p4->setStrategy(cheater);
 
-    std::cout << "Players:" << std::endl;
-    for (const auto &player : players)
-    {
-        std::cout << *player << std::endl;
-    }
+    engine = new GameEngine();
 
-    std::cout << "Testing issue_order():" << std::endl;
-    for (const auto &player : players)
-    {
-        std::cout << *player << std::endl;
-        std::cout << "issue_order():" << std::endl;
-        player->issueOrder(*map, players);
-        std::cout << std::endl;
-    }
+    engine->executeCommand("loadmap");
+    engine->executeCommand("validate");
+    engine->executeCommand("addplayers");
+    engine->executeCommand("assigncountries");
+
+    engine->mainGameLoop(players, *map, 2);
 
     std::cout << "Completed Player Strategies Test" << std::endl;
 
+    delete engine;
     delete p1;
     delete p2;
     delete p3;
