@@ -41,7 +41,7 @@ namespace ps
   /* Returns the strongest territory from a vector of territories. If all are equal, returns the first territory. */
   Territory *find_strongest_territory_from_territories(const Map &, Player *, std::vector<Territory *>);
   /* Deploys all troops on the strongest territory. Returns strongest territory. */
-  Territory *strong_deployment(const Map &, Player *, std::vector<Territory *>);
+  Territory *strong_deployment(const Map &, Player *, std::vector<Territory *>, int *);
   /* Deploys troops to the weakest territories. */
   void weak_deployment(const Map &, Player *, std::vector<Territory *>);
   /* Randomly calls order other than Deploy and Advance. As such, only calls

@@ -557,8 +557,6 @@ void GameEngine::executeOrdersPhase(vector<Player *> players)
 
         if (order->name == "Deploy")
         {
-          cout << "Player " << player->getName() << " executing deploy orders" << endl;
-
           order->execute();
 
           player->getPlayerOrderList()->remove(i);
@@ -572,8 +570,6 @@ void GameEngine::executeOrdersPhase(vector<Player *> players)
       // execute deploy orders first, then when all players have no deploy orders left, execute the rest
       if (!player->getPlayerOrderList()->list.empty() && players_with_deploys_left <= 0)
       {
-        cout << "Player " << player->getName() << " executing orders" << endl;
-
         player->getPlayerOrderList()->list[0]->execute();
         player->getPlayerOrderList()->remove(0);
       }
@@ -635,6 +631,7 @@ std::string GameEngine::mainGameLoop(vector<Player *> players, const Map &gameMa
       executeCommand("win");
       return players[0]->getName();
     }
+
     if (numTurns != -1 && currTurns >= numTurns)
     {
       // cout << "Reached max number of turns" << endl;

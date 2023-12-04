@@ -179,9 +179,8 @@ bool Order::operator!=(const Order &other)
     return !(*this == other);
 }
 
-Advance::Advance(Player *player, const Map *map, Player *target, const Territory *source, const Territory *dest, int units) : Order(player, map, "Advance", "An advance order tells a certain number of army units to move from a source territory to a target adjacent territory.")
+Advance::Advance(Player *player, const Map *map, const Territory *source, const Territory *dest, int units) : Order(player, map, "Advance", "An advance order tells a certain number of army units to move from a source territory to a target adjacent territory.")
 {
-    this->target_player = target;
     this->source_terr = source;
     this->dest_terr = dest;
     this->units_deployed = units;
@@ -189,7 +188,6 @@ Advance::Advance(Player *player, const Map *map, Player *target, const Territory
 
 Advance::Advance(const Advance &other) : Order(other)
 {
-    this->target_player = other.target_player;
     this->source_terr = other.source_terr;
     this->dest_terr = other.dest_terr;
     this->units_deployed = other.units_deployed;
@@ -236,11 +234,10 @@ bool Advance::validate()
 {
     if (this->issuer->owns(this->source_terr) &&
         (this->issuer->getTerritoryUnits(this->source_terr) >= this->units_deployed || this->issuer->getStrategyType() == StratType::Cheater) &&
-        this->target_player->owns(this->dest_terr) &&
         Map::areAdjacent(*map, *source_terr, *dest_terr))
         return true;
 
-    cout << this->name << " order invalid.";
+    cout << this->name << " order invalid." << std::endl;
     return false;
 }
 
@@ -252,11 +249,16 @@ void Advance::execute()
         {
             this->issuer->addTerritory(const_cast<Territory *>(this->dest_terr));
             this->issuer->setTerritoryUnits(this->dest_terr, this->units_deployed);
+
+            std::cout << "Player " << this->issuer->getName() << " has moved " << std::to_string(this->units_deployed) << " units to " << this->dest_terr->getName() << "!" << std::endl;
         }
         else
         {
             int attackers = this->units_deployed;
-            int defenders = this->target_player->getTerritoryUnits(this->dest_terr);
+            int defenders = this->dest_terr->getOwner() == nullptr ? 2 : this->dest_terr->getOwner()->getTerritoryUnits(this->dest_terr);
+            int original_defenders = defenders;
+            bool attacker_won = false;
+
             while (attackers > 0 && defenders > 0)
             {
                 int seed = rand() % 10;
@@ -268,16 +270,22 @@ void Advance::execute()
             int source_units = this->issuer->getTerritoryUnits(this->source_terr) - this->units_deployed;
             if (attackers > 0 || this->issuer->getStrategyType() == StratType::Cheater)
             {
-                this->target_player->removeTerritory(this->dest_terr);
+                attacker_won = true;
+                if (this->dest_terr->getOwner() != nullptr)
+                    this->dest_terr->getOwner()->removeTerritory(this->dest_terr);
                 this->issuer->addTerritory(const_cast<Territory *>(this->dest_terr));
                 this->issuer->setTerritoryUnits(this->source_terr, source_units);
                 this->issuer->setTerritoryUnits(this->dest_terr, attackers);
             }
             else
             {
+                attacker_won = false;
                 this->issuer->setTerritoryUnits(this->source_terr, source_units);
-                this->target_player->setTerritoryUnits(this->dest_terr, defenders);
+                if (this->dest_terr->getOwner() != nullptr)
+                    this->dest_terr->getOwner()->setTerritoryUnits(this->dest_terr, defenders < 0 ? 0 : defenders);
             }
+
+            std::cout << "Player " << this->issuer->getName() << " has " << (attacker_won ? "conquered " : "tried to attack ") << this->dest_terr->getName() << " (from " << this->source_terr->getName() << ") with " << this->units_deployed << " (" << attackers << " remaining) units, against " << original_defenders << " (" << defenders << " remaining) units!" << std::endl;
         }
     }
     Notify(this);
@@ -340,7 +348,7 @@ Airlift &Airlift::operator=(const Airlift &other)
 
 bool Airlift::validate()
 {
-    if (this->issuer->owns(this->source_terr) && this->issuer->owns(this->source_terr) && this->units_deployed <= this->issuer->getTerritoryUnits(this->source_terr) && this->issuer->card_count(CardType::airlift) > 0)
+    if (this->issuer->owns(this->source_terr) && this->issuer->owns(this->source_terr) && this->issuer->owns(this->dest_terr) && this->units_deployed <= this->issuer->getTerritoryUnits(this->source_terr) && this->issuer->card_count(CardType::airlift) > 0)
         return true;
     cout << this->name << " order invalid.";
     return false;
@@ -416,7 +424,8 @@ bool Bomb::validate()
 {
     if (this->target_player->owns(this->dest_terr) && this->issuer->card_count(CardType::bomb) > 0 && !this->issuer->isAllied(this->target_player))
         return true;
-    cout << this->name << " order invalid.";
+
+    cout << this->name << " order invalid." << std::endl;
     return false;
 }
 
@@ -426,6 +435,8 @@ void Bomb::execute()
     {
         this->target_player->setTerritoryUnits(this->dest_terr, this->target_player->getTerritoryUnits(this->dest_terr) / 2);
         this->issuer->getHand()->play(CardType::bomb);
+
+        std::cout << "Player " << this->issuer->getName() << " has bombed " << this->dest_terr->getName() << " (" << this->target_player->getTerritoryUnits(this->dest_terr) << " units remaining)!" << std::endl;
         Notify(this);
     }
 }
@@ -485,6 +496,9 @@ Blockade &Blockade::operator=(const Blockade &other)
 
 bool Blockade::validate()
 {
+    if (this->neutral_player == nullptr)
+        return false;
+
     if (this->neutral_player->isNeutral() && this->issuer->card_count(CardType::blockade) > 0 && this->issuer->owns(this->dest_terr))
         return true;
     cout << this->name << " order invalid.";
@@ -571,11 +585,14 @@ void Deploy::execute()
 {
     if (this->validate())
     {
-        this->issuer->setTerritoryUnits(this->dest_terr, this->units_deployed);
+        this->issuer->setTerritoryUnits(this->dest_terr, this->issuer->getTerritoryUnits(this->dest_terr) + this->units_deployed);
         for (int i = 0; i < this->units_deployed; i++)
         {
             this->issuer->getHand()->play(CardType::reinforcement);
         }
+
+        std::cout << "Player " << this->issuer->getName() << " has deployed " << this->units_deployed << " additional units to " << this->dest_terr->getName() << " (" << this->issuer->getTerritoryUnits(this->dest_terr) << " total units)!" << std::endl;
+
         Notify(this);
     }
 }

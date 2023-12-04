@@ -41,11 +41,11 @@ void testOrdersList()
           << deploy->validate() << endl;
 
      // Advance
-     Advance *advance = new Advance(p1, gameMap.get(), p2, &*territories[0], &*territories[1], 6);
+     Advance *advance = new Advance(p1, gameMap.get(), &*territories[0], &*territories[1], 6);
      cout << "validation of:\n"
           << advance << "\n"
           << advance->validate() << endl;
-     Advance *advance2 = new Advance(p1, gameMap.get(), p2, &*territories[0], &*territories[7], 6);
+     Advance *advance2 = new Advance(p1, gameMap.get(), &*territories[0], &*territories[7], 6);
      cout << "validation of:\n"
           << advance << "\n"
           << advance->validate() << endl;
@@ -54,7 +54,7 @@ void testOrdersList()
      p2->setTerritoryUnits(&*territories[1], 20);
      p1->setTerritoryUnits(&*territories[0], 10);
 
-     Advance *advance3 = new Advance(p1, gameMap.get(), p2, &*territories[0], &*territories[1], 6);
+     Advance *advance3 = new Advance(p1, gameMap.get(), &*territories[0], &*territories[1], 6);
      cout << advance3;
      advance3->execute();
      cout << "p1(attacker) lost the battle. p2 has " << p2->getTerritoryUnits(&*territories[1]) << " units left from an initial 20." << endl;
@@ -63,7 +63,7 @@ void testOrdersList()
      p2->setTerritoryUnits(&*territories[1], 3);
      p1->setTerritoryUnits(&*territories[0], 50);
 
-     Advance *advance4 = new Advance(p1, gameMap.get(), p2, &*territories[0], &*territories[1], 20);
+     Advance *advance4 = new Advance(p1, gameMap.get(), &*territories[0], &*territories[1], 20);
      cout << advance;
      advance4->execute();
      cout << "p1(attacker) won the battle. check if p1 now owns territories[1]: " << p1->owns(&*territories[1]) << endl;
@@ -75,7 +75,7 @@ void testOrdersList()
      Card *negocard = new Card(CardType::diplomacy);
      p1->getHand()->insert(*negocard);
      Negotiate *nego = new Negotiate(p1, gameMap.get(), p2);
-     Advance *advance5 = new Advance(p1, gameMap.get(), p2, &*territories[1], &*territories[4], 1);
+     Advance *advance5 = new Advance(p1, gameMap.get(), &*territories[1], &*territories[4], 1);
      cout << "p1 just negotiated with p2. check if they can now attack them: " << advance5->validate() << endl;
 
      // Show that blockade transfers to neutral player

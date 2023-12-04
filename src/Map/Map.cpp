@@ -1,6 +1,7 @@
 #include <fstream>
 
 #include "Map.h"
+#include "Player.h"
 
 std::ostream &operator<<(std::ostream &os, const MapValidity &validity)
 {
@@ -534,7 +535,13 @@ Territory &Territory::operator=(const Territory &territory)
 // Territory object stream insertion operator
 std::ostream &operator<<(std::ostream &os, const Territory &territory)
 {
-    os << "Territory: { Name: " << *territory.name << ", X: " << *territory.x << ", Y: " << *territory.y << ", Continent: " << territory.continent->getName() << " }";
+    int unitQty = 2;
+    if (territory.getOwner() != nullptr)
+    {
+        unitQty = territory.getOwner()->getTerritoryUnits(&territory);
+    }
+
+    os << "Territory: { Name: " << *territory.name << ", X: " << *territory.x << ", Y: " << *territory.y << ", Continent: " << territory.continent->getName() << ", Owner: " << (territory.owner != nullptr ? territory.owner->getName() : "none") << ", Units: " << unitQty << " }";
 
     return os;
 }
